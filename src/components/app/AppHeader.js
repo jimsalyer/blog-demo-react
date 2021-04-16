@@ -25,8 +25,8 @@ export default function AppHeader() {
       <Navbar.Toggle aria-controls="navbarContent" />
       <Navbar.Collapse id="navbarContent">
         <Nav className="mr-auto">
-          <Nav.Link as={NavLink} exact to="/" data-testid="homeLink">
-            Home
+          <Nav.Link as={NavLink} exact to="/" data-testid="postsLink">
+            Posts
           </Nav.Link>
         </Nav>
       </Navbar.Collapse>

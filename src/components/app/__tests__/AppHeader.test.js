@@ -1,11 +1,11 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter, Route } from 'react-router-dom';
 import AppHeader from '../AppHeader';
 
 describe('<AppHeader />', () => {
   describe('Rendering', () => {
-    it('renders and activates "Home" link when the path is "/"', () => {
+    it('renders and activates "Posts" link when the path is "/"', () => {
       render(
         <MemoryRouter initialEntries={['/']}>
           <AppHeader />
@@ -13,7 +13,7 @@ describe('<AppHeader />', () => {
       );
 
       screen.getByTestId('appHeader');
-      expect(screen.getByTestId('homeLink')).toHaveClass('active');
+      expect(screen.getByTestId('postsLink')).toHaveClass('active');
     });
   });
 
@@ -38,17 +38,21 @@ describe('<AppHeader />', () => {
     it('navigates to "/" when clicking <Navbar.Brand />', () => {
       expect(testLocation.pathname).toBe('/invalid-path');
 
-      const brand = document.querySelector('.navbar-brand');
-      fireEvent.click(brand);
+      act(() => {
+        const brand = document.querySelector('.navbar-brand');
+        fireEvent.click(brand);
+      });
 
       expect(testLocation.pathname).toBe('/');
     });
 
-    it('navigates to "/" when clicking the "Home" link', () => {
+    it('navigates to "/" when clicking the "Posts" link', () => {
       expect(testLocation.pathname).toBe('/invalid-path');
 
-      const homeLink = screen.getByTestId('homeLink');
-      fireEvent.click(homeLink);
+      act(() => {
+        const postsLink = screen.getByTestId('postsLink');
+        fireEvent.click(postsLink);
+      });
 
       expect(testLocation.pathname).toBe('/');
     });
