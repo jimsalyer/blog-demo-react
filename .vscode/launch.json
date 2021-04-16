@@ -1,14 +1,25 @@
 {
   "configurations": [
     {
-      "name": "Launch Chrome",
-      "request": "launch",
+      "name": "Launch Application",
       "type": "pwa-chrome",
+      "request": "launch",
       "url": "http://localhost:3080",
       "webRoot": "${workspaceFolder}/src",
       "sourceMapPathOverrides": {
         "webpack:///src/*": "${webRoot}/*"
       }
+    },
+    {
+      "name": "Debug Tests",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceRoot}",
+      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/react-scripts",
+      "args": ["test", "--runInBand", "--no-cache", "--env=jsdom"],
+      "protocol": "inspector",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
     }
   ]
 }
