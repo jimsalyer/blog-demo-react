@@ -1,5 +1,5 @@
 export const apiUrl = 'http://www.example.com';
-process.env.API_URL = apiUrl;
+process.env.REACT_APP_API_URL = apiUrl;
 
 export const mockClient = {
   delete: jest.fn(),
