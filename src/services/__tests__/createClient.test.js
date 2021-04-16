@@ -1,5 +1,5 @@
 import axios, { apiUrl } from 'axios';
-import createClient from './createClient';
+import createClient from '../createClient';
 
 describe('createClient()', () => {
   let createSpy;

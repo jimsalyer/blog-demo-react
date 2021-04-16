@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
-import AppContent from './AppContent';
+import AppContent from '../AppContent';
 
 describe('<AppContent />', () => {
   it('renders <HomePage /> if the path is exactly "/"', () => {

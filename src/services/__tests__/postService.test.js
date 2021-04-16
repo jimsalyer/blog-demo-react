@@ -1,5 +1,5 @@
 import { mockClient } from 'axios';
-import * as postService from './postService';
+import * as postService from '../postService';
 
 describe('postService', () => {
   describe('createPost()', () => {
