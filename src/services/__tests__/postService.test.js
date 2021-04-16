@@ -17,7 +17,7 @@ describe('postService', () => {
       const actualPost = await postService.createPost(expectedPost);
 
       expect(postSpy).toHaveBeenCalledWith('/', expectedPost);
-      expect(actualPost).toBe(expectedPost);
+      expect(actualPost).toStrictEqual(expectedPost);
 
       postSpy.mockRestore();
     });
@@ -53,15 +53,32 @@ describe('postService', () => {
       const actualPost = await postService.getPost(expectedId);
 
       expect(getSpy).toHaveBeenCalledWith(`/${expectedId}`);
-      expect(actualPost).toBe(expectedPost);
+      expect(actualPost).toStrictEqual(expectedPost);
 
       getSpy.mockRestore();
     });
   });
 
   describe('searchPosts()', () => {
-    it('makes a GET request and returns the result', async () => {
-      const expectedPosts = [
+    let getSpy;
+
+    beforeEach(() => {
+      getSpy = jest.spyOn(mockClient, 'get');
+    });
+
+    afterEach(() => {
+      getSpy.mockRestore();
+    });
+
+    it('makes a GET request with the given parameters and returns the resulting data and pagination values', async () => {
+      const expectedParams = {
+        limit: 5,
+        page: 2,
+        sort: 'id',
+        order: 'asc',
+      };
+
+      const expectedData = [
         {
           id: 1,
           title: 'test title',
@@ -76,16 +93,28 @@ describe('postService', () => {
         },
       ];
 
-      const getSpy = jest.spyOn(mockClient, 'get').mockResolvedValue({
-        data: expectedPosts,
-      });
+      const mockResponse = {
+        data: expectedData,
+      };
 
-      const actualPosts = await postService.searchPosts();
+      getSpy.mockResolvedValue(mockResponse);
 
-      expect(getSpy).toHaveBeenCalledWith('/');
-      expect(actualPosts).toBe(expectedPosts);
+      const actualResult = await postService.searchPosts(expectedParams);
 
-      getSpy.mockRestore();
+      expect(getSpy).toHaveBeenCalledWith(
+        `/?_limit=${expectedParams.limit}&_page=${expectedParams.page}&_sort=${expectedParams.sort}&_order=${expectedParams.order}`
+      );
+      expect(actualResult.data).toStrictEqual(expectedData);
+    });
+
+    it('sets the parameters to default values if they are not provided', async () => {
+      const expectedUrl = '/?_limit=10&_page=1&_sort=id&_order=asc';
+
+      getSpy.mockResolvedValue({ data: [] });
+
+      await postService.searchPosts();
+
+      expect(getSpy).toHaveBeenCalledWith(expectedUrl);
     });
   });
 
@@ -106,7 +135,7 @@ describe('postService', () => {
       const actualPost = await postService.updatePost(expectedId, expectedPost);
 
       expect(putSpy).toHaveBeenCalledWith(`/${expectedId}`, expectedPost);
-      expect(actualPost).toBe(expectedPost);
+      expect(actualPost).toStrictEqual(expectedPost);
 
       putSpy.mockRestore();
     });
