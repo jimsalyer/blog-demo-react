@@ -3,9 +3,9 @@ import React from 'react';
 import { MemoryRouter, Route } from 'react-router-dom';
 import AppHeader from './AppHeader';
 
-describe('AppHeader Component', () => {
+describe('<AppHeader />', () => {
   describe('Rendering', () => {
-    it('renders header element and activates "Home" link when the path is "/"', () => {
+    it('renders and activates "Home" link when the path is "/"', () => {
       render(
         <MemoryRouter initialEntries={['/']}>
           <AppHeader />
@@ -35,7 +35,7 @@ describe('AppHeader Component', () => {
       );
     });
 
-    it('navigates to "/" when clicking the Navbar.Brand component', () => {
+    it('navigates to "/" when clicking <Navbar.Brand />', () => {
       expect(testLocation.pathname).toBe('/invalid-path');
 
       const brand = document.querySelector('.navbar-brand');

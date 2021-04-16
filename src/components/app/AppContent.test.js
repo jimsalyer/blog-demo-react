@@ -3,8 +3,8 @@ import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import AppContent from './AppContent';
 
-describe('AppContent Component', () => {
-  it('renders the HomePage component if the path is exactly "/"', () => {
+describe('<AppContent />', () => {
+  it('renders <HomePage /> if the path is exactly "/"', () => {
     render(
       <MemoryRouter initialEntries={['/']}>
         <AppContent />
@@ -13,7 +13,7 @@ describe('AppContent Component', () => {
     screen.getByTestId('homePage');
   });
 
-  it('renders the NotFoundPage component if the path does not have a corresponding route', () => {
+  it('renders <NotFoundPage /> if the path does not have a corresponding route', () => {
     render(
       <MemoryRouter initialEntries={['/invalid-path']}>
         <AppContent />

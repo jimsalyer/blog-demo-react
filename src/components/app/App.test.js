@@ -3,8 +3,8 @@ import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import App from './App';
 
-describe('App Component', () => {
-  it('renders the AppHeader, AppContent, and AppFooter components', () => {
+describe('<App />', () => {
+  it('renders <AppHeader />, <AppContent />, and <AppFooter />', () => {
     render(
       <MemoryRouter initialEntries={['/']}>
         <App />
