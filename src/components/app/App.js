@@ -1,4 +1,4 @@
-import '../../styles/App.scss';
+import './App.scss';
 import React from 'react';
 import AppContent from './AppContent';
 import AppFooter from './AppFooter';
