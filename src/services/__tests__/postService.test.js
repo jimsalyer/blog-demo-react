@@ -74,8 +74,6 @@ describe('postService', () => {
       const expectedParams = {
         limit: 5,
         page: 2,
-        sort: 'id',
-        order: 'asc',
       };
 
       const expectedData = [
@@ -102,13 +100,13 @@ describe('postService', () => {
       const actualResult = await postService.searchPosts(expectedParams);
 
       expect(getSpy).toHaveBeenCalledWith(
-        `/?_limit=${expectedParams.limit}&_page=${expectedParams.page}&_sort=${expectedParams.sort}&_order=${expectedParams.order}`
+        `/?_limit=${expectedParams.limit}&_page=${expectedParams.page}`
       );
       expect(actualResult.data).toStrictEqual(expectedData);
     });
 
     it('sets the parameters to default values if they are not provided', async () => {
-      const expectedUrl = '/?_limit=10&_page=1&_sort=id&_order=asc';
+      const expectedUrl = '/?_limit=10&_page=1';
 
       getSpy.mockResolvedValue({ data: [] });
 

@@ -18,17 +18,12 @@ export async function getPost(id) {
 }
 
 export async function searchPosts(
-  { limit, page, order, sort } = {
+  { limit, page } = {
     limit: 10,
     page: 1,
-    order: 'asc',
-    sort: 'id',
   }
 ) {
-  const response = await client.get(
-    `/?_limit=${limit}&_page=${page}&_sort=${sort}&_order=${order}`
-  );
-
+  const response = await client.get(`/?_limit=${limit}&_page=${page}`);
   const result = {
     pagination: parsePaginationValues(response),
     data: response.data,
