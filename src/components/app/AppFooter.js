@@ -6,7 +6,7 @@ export default function AppFooter() {
     <Container
       as="footer"
       fluid
-      className="fixed-bottom border-top py-2 bg-light"
+      className="fixed-bottom border-top py-2 bg-light small"
       data-testid="appFooter"
     >
       Logo by{' '}

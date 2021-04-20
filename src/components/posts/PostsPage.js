@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, Card, Col, Pagination, Row, Spinner } from 'react-bootstrap';
+import { Alert, Card, Spinner } from 'react-bootstrap';
 import { useLocation } from 'react-router-dom';
 import { searchPosts } from '../../services/postService';
+import Pager from '../common/Pager';
 
 export default function PostsPage() {
   const location = useLocation();
@@ -12,22 +13,30 @@ export default function PostsPage() {
   const [pagination, setPagination] = useState(null);
   const [posts, setPosts] = useState([]);
 
-  function handlePageChange(event, pageValue) {
-    event.preventDefault();
-    setPage(pageValue);
+  function handleLimitChange(value) {
+    if (!Number.isNaN(value)) {
+      setLimit(value);
+      setPage(1);
+    }
+  }
+
+  function handlePageChange(value) {
+    setPage(value);
   }
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
-
     if (queryParams.has('limit')) {
-      const limitValue = parseInt(queryParams.get('limit'), 10);
-      setLimit(limitValue);
-    }
-
-    if (queryParams.has('page')) {
-      const pageValue = parseInt(queryParams.get('page'), 10);
-      setPage(pageValue);
+      const value = parseInt(queryParams.get('limit'), 10);
+      if (!Number.isNaN(value)) {
+        setLimit(value);
+        setPage(1);
+      }
+    } else if (queryParams.has('page')) {
+      const value = parseInt(queryParams.get('page'), 10);
+      if (!Number.isNaN(value)) {
+        setPage(value);
+      }
     }
   }, [location]);
 
@@ -61,38 +70,14 @@ export default function PostsPage() {
       )}
       {!loading && !apiError && (
         <>
-          {pagination && pagination.last > 1 && (
-            <Row className="align-items-baseline">
-              <Col>
-                <Pagination data-testid="pagination">
-                  {page > 1 && (
-                    <Pagination.First
-                      onClick={(event) => handlePageChange(event, 1)}
-                    />
-                  )}
-                  {pagination.prev > 0 && (
-                    <Pagination.Prev
-                      onClick={(event) => handlePageChange(event, page - 1)}
-                    />
-                  )}
-                  {pagination.next > 0 && (
-                    <Pagination.Next
-                      onClick={(event) => handlePageChange(event, page + 1)}
-                    />
-                  )}
-                  {page < pagination.last && (
-                    <Pagination.Last
-                      onClick={(event) =>
-                        handlePageChange(event, pagination.last)
-                      }
-                    />
-                  )}
-                </Pagination>
-              </Col>
-              <Col className="col-auto ml-auto" data-testid="paginationStatus">
-                Page {page} of {pagination.last}
-              </Col>
-            </Row>
+          {pagination && (
+            <Pager
+              selectedLimit={limit}
+              currentPage={page}
+              pageCount={pagination.last}
+              onLimitChange={handleLimitChange}
+              onPageChange={handlePageChange}
+            />
           )}
           {!(posts && posts.length > 0) && (
             <Alert variant="warning">No posts were found.</Alert>
@@ -107,6 +92,15 @@ export default function PostsPage() {
                 </Card.Body>
               </Card>
             ))}
+          {pagination && (
+            <Pager
+              selectedLimit={limit}
+              currentPage={page}
+              pageCount={pagination.last || 1}
+              onLimitChange={handleLimitChange}
+              onPageChange={handlePageChange}
+            />
+          )}
         </>
       )}
     </div>
