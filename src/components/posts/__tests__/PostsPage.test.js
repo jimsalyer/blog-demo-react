@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import * as postService from '../../../services/postService';
@@ -13,6 +13,7 @@ describe('<PostsPage />', () => {
 
   afterEach(() => {
     searchPostsSpy.mockRestore();
+    cleanup();
   });
 
   it('renders a list of posts with pagination controls', async () => {
@@ -55,20 +56,11 @@ describe('<PostsPage />', () => {
       expect(searchPostsSpy).toHaveBeenCalled();
       screen.getByTestId('postsPage');
 
-      const pagination = screen.getByTestId('pagination');
-      const pageItems = pagination.querySelectorAll('.page-item');
+      const paginations = screen.getAllByTestId('pagination');
+      expect(paginations).toHaveLength(2);
 
-      expect(pageItems).toHaveLength(4);
-      expect(pageItems[0].querySelector('.sr-only').textContent).toBe('First');
-      expect(pageItems[1].querySelector('.sr-only').textContent).toBe(
-        'Previous'
-      );
-      expect(pageItems[2].querySelector('.sr-only').textContent).toBe('Next');
-      expect(pageItems[3].querySelector('.sr-only').textContent).toBe('Last');
-
-      expect(screen.getByTestId('paginationStatus').textContent).toBe(
-        `Page ${expectedPage} of ${expectedPagination.last}`
-      );
+      const pageStatuses = screen.getAllByTestId('pageStatus');
+      expect(pageStatuses).toHaveLength(2);
 
       const posts = screen.getAllByTestId('post');
       expect(posts).toHaveLength(2);

@@ -1,3 +1,4 @@
+import queryString from 'query-string';
 import React, { useEffect, useState } from 'react';
 import { Alert, Card, Spinner } from 'react-bootstrap';
 import { useLocation } from 'react-router-dom';
@@ -14,10 +15,8 @@ export default function PostsPage() {
   const [posts, setPosts] = useState([]);
 
   function handleLimitChange(value) {
-    if (!Number.isNaN(value)) {
-      setLimit(value);
-      setPage(1);
-    }
+    setLimit(value);
+    setPage(1);
   }
 
   function handlePageChange(value) {
@@ -25,35 +24,32 @@ export default function PostsPage() {
   }
 
   useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    if (queryParams.has('limit')) {
-      const value = parseInt(queryParams.get('limit'), 10);
-      if (!Number.isNaN(value)) {
-        setLimit(value);
-        setPage(1);
-      }
-    } else if (queryParams.has('page')) {
-      const value = parseInt(queryParams.get('page'), 10);
-      if (!Number.isNaN(value)) {
-        setPage(value);
-      }
+    const queryParams = queryString.parse(location.search, {
+      parseNumbers: true,
+    });
+
+    if (queryParams.limit > 0) {
+      setLimit(queryParams.limit);
+      setPage(1);
+    } else if (queryParams.page > 0) {
+      setPage(queryParams.page);
     }
   }, [location]);
 
   useEffect(() => {
-    async function loadSearchResults() {
+    async function loadPosts() {
       setLoading(true);
       try {
         const result = await searchPosts({ limit, page });
         setPagination(result.pagination);
         setPosts(result.data);
       } catch (error) {
+        console.error(error);
         setApiError(error);
       }
       setLoading(false);
     }
-
-    loadSearchResults();
+    loadPosts();
   }, [limit, page]);
 
   return (
@@ -66,7 +62,7 @@ export default function PostsPage() {
         </>
       )}
       {!loading && apiError && (
-        <Alert variant="danger">An error occurred.</Alert>
+        <Alert variant="danger">{apiError.message}</Alert>
       )}
       {!loading && !apiError && (
         <>

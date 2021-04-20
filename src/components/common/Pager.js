@@ -24,7 +24,7 @@ export default function Pager({
     <Row className="align-items-baseline mb-3">
       <Col sm="auto">
         <Dropdown>
-          <Dropdown.Toggle variant="light" data-testId="limitToggle">
+          <Dropdown.Toggle variant="light" data-testid="limitToggle">
             {currentLimit} Per Page
           </Dropdown.Toggle>
           <Dropdown.Menu>
