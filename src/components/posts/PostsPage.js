@@ -20,10 +20,6 @@ export default function PostsPage() {
     setPage(1);
   }
 
-  function handlePageChange(value) {
-    setPage(value);
-  }
-
   useEffect(() => {
     const queryParams = queryString.parse(location.search, {
       parseNumbers: true,
@@ -75,7 +71,7 @@ export default function PostsPage() {
               currentPage={page}
               pageCount={pagination.last}
               onLimitChange={handleLimitChange}
-              onPageChange={handlePageChange}
+              onPageChange={setPage}
             />
           )}
           {posts.map((post) => (
@@ -92,7 +88,7 @@ export default function PostsPage() {
               currentPage={page}
               pageCount={pagination.last || 1}
               onLimitChange={handleLimitChange}
-              onPageChange={handlePageChange}
+              onPageChange={setPage}
             />
           )}
         </>
