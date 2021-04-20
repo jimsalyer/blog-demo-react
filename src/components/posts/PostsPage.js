@@ -1,22 +1,39 @@
 import queryString from 'query-string';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Alert, Card, Spinner } from 'react-bootstrap';
-import { useLocation } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { searchPosts } from '../../services/postService';
 import ErrorMessage from '../common/ErrorMessage';
 import Pager from '../common/Pager';
 
 export default function PostsPage() {
+  const defaultLimit = 10;
   const [error, setError] = useState(null);
+  const history = useHistory();
   const location = useLocation();
   const [pageCount, setPageCount] = useState(1);
   const [loading, setLoading] = useState(true);
+  const pageLoaded = useRef(false);
   const [posts, setPosts] = useState([]);
-  const [queryParams, setQueryParams] = useState(getQueryParams());
+  const [queryParams, setQueryParams] = useState(initQueryParams());
 
-  function getQueryParams() {
+  function handleLimitChange(value) {
+    setQueryParams({
+      limit: value,
+      page: 1,
+    });
+  }
+
+  function handlePageChange(value) {
+    setQueryParams({
+      ...queryParams,
+      page: value,
+    });
+  }
+
+  function initQueryParams() {
     const returnValues = {
-      limit: 10,
+      limit: defaultLimit,
       page: 1,
     };
 
@@ -36,20 +53,6 @@ export default function PostsPage() {
     return returnValues;
   }
 
-  function handleLimitChange(value) {
-    setQueryParams({
-      limit: value,
-      page: 1,
-    });
-  }
-
-  function handlePageChange(value) {
-    setQueryParams({
-      ...queryParams,
-      page: value,
-    });
-  }
-
   useEffect(() => {
     async function loadPosts() {
       setLoading(true);
@@ -61,9 +64,32 @@ export default function PostsPage() {
         setError(loadError);
       }
       setLoading(false);
+
+      if (pageLoaded.current) {
+        updateQueryString();
+      } else {
+        pageLoaded.current = true;
+      }
     }
+
+    function updateQueryString() {
+      const values = {};
+
+      if (queryParams.limit !== defaultLimit) {
+        values.limit = queryParams.limit;
+      }
+
+      if (queryParams.page !== 1) {
+        values.page = queryParams.page;
+      }
+
+      history.push({
+        search: queryString.stringify(values),
+      });
+    }
+
     loadPosts();
-  }, [queryParams]);
+  }, [history, queryParams]);
 
   return (
     <div data-testid="postsPage">
