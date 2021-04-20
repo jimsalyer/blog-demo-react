@@ -10,7 +10,9 @@ export default function ErrorMessage({ error }) {
         'An unhandled error has occurred.'}
       {process.env.NODE_ENV !== 'production' && (
         <>
-          <h5 className="alert-heading">{error.message}</h5>
+          <h5 className="alert-heading" data-testid="errorMessageHeading">
+            {error.message}
+          </h5>
           {stack.map((line, index) => {
             const classNames = ['d-none', 'd-md-block'];
             if (index > 0) {
@@ -18,7 +20,11 @@ export default function ErrorMessage({ error }) {
             }
 
             return (
-              <div key={line} className={classNames.join(' ')}>
+              <div
+                key={line}
+                className={classNames.join(' ')}
+                data-testid="errorMessageStackLine"
+              >
                 {line}
               </div>
             );
