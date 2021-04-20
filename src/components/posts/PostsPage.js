@@ -10,9 +10,9 @@ export default function PostsPage() {
   const location = useLocation();
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
+  const [pageCount, setPageCount] = useState(1);
   const [apiError, setApiError] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [pagination, setPagination] = useState(null);
   const [posts, setPosts] = useState([]);
 
   function handleLimitChange(value) {
@@ -38,7 +38,7 @@ export default function PostsPage() {
       setLoading(true);
       try {
         const result = await searchPosts({ limit, page });
-        setPagination(result.pagination);
+        setPageCount(result.pagination.last);
         setPosts(result.data);
       } catch (error) {
         setApiError(error);
@@ -65,15 +65,13 @@ export default function PostsPage() {
       )}
       {!loading && !apiError && posts && posts.length > 0 && (
         <>
-          {pagination && (
-            <Pager
-              selectedLimit={limit}
-              currentPage={page}
-              pageCount={pagination.last}
-              onLimitChange={handleLimitChange}
-              onPageChange={setPage}
-            />
-          )}
+          <Pager
+            selectedLimit={limit}
+            currentPage={page}
+            pageCount={pageCount}
+            onLimitChange={handleLimitChange}
+            onPageChange={setPage}
+          />
           {posts.map((post) => (
             <Card key={post.id} className="mb-3" data-testid="post">
               <Card.Body>
@@ -82,15 +80,13 @@ export default function PostsPage() {
               </Card.Body>
             </Card>
           ))}
-          {pagination && (
-            <Pager
-              selectedLimit={limit}
-              currentPage={page}
-              pageCount={pagination.last || 1}
-              onLimitChange={handleLimitChange}
-              onPageChange={setPage}
-            />
-          )}
+          <Pager
+            selectedLimit={limit}
+            currentPage={page}
+            pageCount={pageCount}
+            onLimitChange={handleLimitChange}
+            onPageChange={setPage}
+          />
         </>
       )}
     </div>
