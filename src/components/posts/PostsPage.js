@@ -7,46 +7,63 @@ import ErrorMessage from '../common/ErrorMessage';
 import Pager from '../common/Pager';
 
 export default function PostsPage() {
+  const [error, setError] = useState(null);
   const location = useLocation();
-  const [limit, setLimit] = useState(10);
-  const [page, setPage] = useState(1);
   const [pageCount, setPageCount] = useState(1);
-  const [apiError, setApiError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState([]);
+  const [queryParams, setQueryParams] = useState(getQueryParams());
 
-  function handleLimitChange(value) {
-    setLimit(value);
-    setPage(1);
-  }
+  function getQueryParams() {
+    const returnValues = {
+      limit: 10,
+      page: 1,
+    };
 
-  useEffect(() => {
-    const queryParams = queryString.parse(location.search, {
+    const queryValues = queryString.parse(location.search, {
+      parseBooleans: true,
       parseNumbers: true,
     });
 
-    if (queryParams.limit > 0) {
-      setLimit(queryParams.limit);
-      setPage(1);
-    } else if (queryParams.page > 0) {
-      setPage(queryParams.page);
+    if (queryValues.limit > 0) {
+      returnValues.limit = queryValues.limit;
     }
-  }, [location]);
+
+    if (queryValues.page > 0) {
+      returnValues.page = queryValues.page;
+    }
+
+    return returnValues;
+  }
+
+  function handleLimitChange(value) {
+    setQueryParams({
+      limit: value,
+      page: 1,
+    });
+  }
+
+  function handlePageChange(value) {
+    setQueryParams({
+      ...queryParams,
+      page: value,
+    });
+  }
 
   useEffect(() => {
     async function loadPosts() {
       setLoading(true);
       try {
-        const result = await searchPosts({ limit, page });
+        const result = await searchPosts(queryParams);
         setPageCount(result.pagination.last);
         setPosts(result.data);
-      } catch (error) {
-        setApiError(error);
+      } catch (loadError) {
+        setError(loadError);
       }
       setLoading(false);
     }
     loadPosts();
-  }, [limit, page]);
+  }, [queryParams]);
 
   return (
     <div data-testid="postsPage">
@@ -57,20 +74,20 @@ export default function PostsPage() {
           <strong>Loading results...</strong>
         </div>
       )}
-      {!loading && apiError && <ErrorMessage error={apiError} />}
-      {!loading && !apiError && (!posts || posts.length === 0) && (
+      {!loading && error && <ErrorMessage error={error} />}
+      {!loading && !error && (!posts || posts.length === 0) && (
         <Alert variant="warning" data-testid="warningMessage">
           No posts were found.
         </Alert>
       )}
-      {!loading && !apiError && posts && posts.length > 0 && (
+      {!loading && !error && posts && posts.length > 0 && (
         <>
           <Pager
-            selectedLimit={limit}
-            currentPage={page}
+            selectedLimit={queryParams.limit}
+            currentPage={queryParams.page}
             pageCount={pageCount}
             onLimitChange={handleLimitChange}
-            onPageChange={setPage}
+            onPageChange={handlePageChange}
           />
           {posts.map((post) => (
             <Card key={post.id} className="mb-3" data-testid="post">
@@ -81,11 +98,11 @@ export default function PostsPage() {
             </Card>
           ))}
           <Pager
-            selectedLimit={limit}
-            currentPage={page}
+            selectedLimit={queryParams.limit}
+            currentPage={queryParams.page}
             pageCount={pageCount}
             onLimitChange={handleLimitChange}
-            onPageChange={setPage}
+            onPageChange={handlePageChange}
           />
         </>
       )}
