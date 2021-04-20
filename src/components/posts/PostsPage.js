@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Alert, Card, Spinner } from 'react-bootstrap';
 import { useLocation } from 'react-router-dom';
 import { searchPosts } from '../../services/postService';
+import ErrorMessage from '../common/ErrorMessage';
 import Pager from '../common/Pager';
 
 export default function PostsPage() {
@@ -44,7 +45,6 @@ export default function PostsPage() {
         setPagination(result.pagination);
         setPosts(result.data);
       } catch (error) {
-        console.error(error);
         setApiError(error);
       }
       setLoading(false);
@@ -56,15 +56,18 @@ export default function PostsPage() {
     <div data-testid="postsPage">
       <h2>Posts</h2>
       {loading && (
-        <>
+        <div data-testid="loadingMessage">
           <Spinner animation="border" role="status" size="sm" />{' '}
           <strong>Loading results...</strong>
-        </>
+        </div>
       )}
-      {!loading && apiError && (
-        <Alert variant="danger">{apiError.message}</Alert>
+      {!loading && apiError && <ErrorMessage error={apiError} />}
+      {!loading && !apiError && (!posts || posts.length === 0) && (
+        <Alert variant="warning" data-testid="warningMessage">
+          No posts were found.
+        </Alert>
       )}
-      {!loading && !apiError && (
+      {!loading && !apiError && posts && posts.length > 0 && (
         <>
           {pagination && (
             <Pager
@@ -75,19 +78,14 @@ export default function PostsPage() {
               onPageChange={handlePageChange}
             />
           )}
-          {!(posts && posts.length > 0) && (
-            <Alert variant="warning">No posts were found.</Alert>
-          )}
-          {posts &&
-            posts.length > 0 &&
-            posts.map((post) => (
-              <Card key={post.id} className="mb-3" data-testid="post">
-                <Card.Body>
-                  <Card.Title>{post.title}</Card.Title>
-                  <Card.Text>{post.body}</Card.Text>
-                </Card.Body>
-              </Card>
-            ))}
+          {posts.map((post) => (
+            <Card key={post.id} className="mb-3" data-testid="post">
+              <Card.Body>
+                <Card.Title>{post.title}</Card.Title>
+                <Card.Text>{post.body}</Card.Text>
+              </Card.Body>
+            </Card>
+          ))}
           {pagination && (
             <Pager
               selectedLimit={limit}

@@ -21,7 +21,7 @@ export default function Pager({
   }
 
   return (
-    <Row className="align-items-baseline mb-3">
+    <Row className="align-items-baseline mb-3" data-testid="pager">
       <Col sm="auto">
         <Dropdown>
           <Dropdown.Toggle variant="light" data-testid="limitToggle">

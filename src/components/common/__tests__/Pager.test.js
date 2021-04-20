@@ -3,25 +3,54 @@ import React from 'react';
 import Pager from '../Pager';
 
 describe('<Pager />', () => {
+  let onLimitChangeMock;
+  let onPageChangeMock;
+
+  beforeAll(() => {
+    onLimitChangeMock = jest.fn();
+    onPageChangeMock = jest.fn();
+  });
+
+  afterAll(() => {
+    onLimitChangeMock.mockRestore();
+    onPageChangeMock.mockRestore();
+  });
+
   afterEach(() => {
     cleanup();
   });
 
   describe('Limiting', () => {
-    it('displays a dropdown with the choices that correspond to the paging limits set on the component', () => {
-      render(<Pager limits={[1, 2, 3]} currentLimit={1} pageCount={3} />);
+    it('displays a dropdown with the choices that correspond to the paging limits set on the component', async () => {
+      render(
+        <Pager
+          limits={[1, 2, 3]}
+          currentLimit={1}
+          pageCount={3}
+          onLimitChange={onLimitChangeMock}
+          onPageChange={onPageChangeMock}
+        />
+      );
 
       const limitToggle = screen.getByTestId('limitToggle');
 
       fireEvent.click(limitToggle);
 
-      const limitItems = screen.getAllByTestId('limitItem');
+      const limitItems = await screen.findAllByTestId('limitItem');
 
       expect(limitItems).toHaveLength(3);
     });
 
     it('displays the text of "{x} Per Page" on the limit dropdown toggler where x is the selected limit', () => {
-      render(<Pager limits={[1, 2, 3]} currentLimit={2} pageCount={3} />);
+      render(
+        <Pager
+          limits={[1, 2, 3]}
+          currentLimit={2}
+          pageCount={3}
+          onLimitChange={onLimitChangeMock}
+          onPageChange={onPageChangeMock}
+        />
+      );
 
       const limitToggle = screen.getByTestId('limitToggle');
 
@@ -29,14 +58,13 @@ describe('<Pager />', () => {
     });
 
     it('triggers the onLimitChange handler with a value of 3 when clicking the corresponding limit item', () => {
-      const onLimitChangeMock = jest.fn();
-
       render(
         <Pager
           limits={[1, 2, 3]}
           currentLimit={1}
           pageCount={3}
           onLimitChange={onLimitChangeMock}
+          onPageChange={onPageChangeMock}
         />
       );
 
@@ -54,10 +82,13 @@ describe('<Pager />', () => {
 
   describe('Paging', () => {
     it('triggers the onPageChange handler with a value of 1 when clicking the "first" page link', () => {
-      const onPageChangeMock = jest.fn();
-
       render(
-        <Pager pageCount={10} currentPage={3} onPageChange={onPageChangeMock} />
+        <Pager
+          pageCount={10}
+          currentPage={3}
+          onLimitChange={onLimitChangeMock}
+          onPageChange={onPageChangeMock}
+        />
       );
 
       const pageLink = screen.getByTestId('firstPageLink');
@@ -68,10 +99,13 @@ describe('<Pager />', () => {
     });
 
     it('triggers the onPageChange handler with a value of 2 when clicking the "previous" page link when the current page is 3', () => {
-      const onPageChangeMock = jest.fn();
-
       render(
-        <Pager pageCount={10} currentPage={3} onPageChange={onPageChangeMock} />
+        <Pager
+          pageCount={10}
+          currentPage={3}
+          onLimitChange={onLimitChangeMock}
+          onPageChange={onPageChangeMock}
+        />
       );
 
       const pageLink = screen.getByTestId('prevPageLink');
@@ -82,10 +116,13 @@ describe('<Pager />', () => {
     });
 
     it('triggers the onPageChange handler with a value of 3 when clicking the "next" page link when the current page is 2', () => {
-      const onPageChangeMock = jest.fn();
-
       render(
-        <Pager pageCount={10} currentPage={2} onPageChange={onPageChangeMock} />
+        <Pager
+          pageCount={10}
+          currentPage={2}
+          onLimitChange={onLimitChangeMock}
+          onPageChange={onPageChangeMock}
+        />
       );
 
       const pageLink = screen.getByTestId('nextPageLink');
@@ -96,10 +133,13 @@ describe('<Pager />', () => {
     });
 
     it('triggers the onPageChange handler with a value of 10 when clicking the "last" page link', () => {
-      const onPageChangeMock = jest.fn();
-
       render(
-        <Pager pageCount={10} currentPage={2} onPageChange={onPageChangeMock} />
+        <Pager
+          pageCount={10}
+          currentPage={2}
+          onLimitChange={onLimitChangeMock}
+          onPageChange={onPageChangeMock}
+        />
       );
 
       const pageLink = screen.getByTestId('lastPageLink');
@@ -110,7 +150,14 @@ describe('<Pager />', () => {
     });
 
     it('hides the "first" page link if the current page is less than 3', () => {
-      render(<Pager pageCount={10} currentPage={2} />);
+      render(
+        <Pager
+          pageCount={10}
+          currentPage={2}
+          onLimitChange={onLimitChangeMock}
+          onPageChange={onPageChangeMock}
+        />
+      );
 
       const pageLink = screen.queryByTestId('firstPageLink');
 
@@ -118,7 +165,14 @@ describe('<Pager />', () => {
     });
 
     it('hides the "previous" page link if the current page is less than 2', () => {
-      render(<Pager pageCount={10} currentPage={1} />);
+      render(
+        <Pager
+          pageCount={10}
+          currentPage={1}
+          onLimitChange={onLimitChangeMock}
+          onPageChange={onPageChangeMock}
+        />
+      );
 
       const pageLink = screen.queryByTestId('prevPageLink');
 
@@ -126,7 +180,14 @@ describe('<Pager />', () => {
     });
 
     it('hides the "next" page link if the current page is the last page (page count)', () => {
-      render(<Pager pageCount={10} currentPage={10} />);
+      render(
+        <Pager
+          pageCount={10}
+          currentPage={10}
+          onLimitChange={onLimitChangeMock}
+          onPageChange={onPageChangeMock}
+        />
+      );
 
       const pageLink = screen.queryByTestId('nextPageLink');
 
@@ -134,7 +195,14 @@ describe('<Pager />', () => {
     });
 
     it('hides the "last" page link if the current page is the next to the last page (page count - 1)', () => {
-      render(<Pager pageCount={10} currentPage={9} />);
+      render(
+        <Pager
+          pageCount={10}
+          currentPage={9}
+          onLimitChange={onLimitChangeMock}
+          onPageChange={onPageChangeMock}
+        />
+      );
 
       const pageLink = screen.queryByTestId('pageCountLink');
 
@@ -142,7 +210,13 @@ describe('<Pager />', () => {
     });
 
     it('hides all the paging links if the page count is 1', () => {
-      render(<Pager pageCount={1} />);
+      render(
+        <Pager
+          pageCount={1}
+          onLimitChange={onLimitChangeMock}
+          onPageChange={onPageChangeMock}
+        />
+      );
 
       const pagination = screen.queryByTestId('pagination');
 
@@ -154,7 +228,14 @@ describe('<Pager />', () => {
     it('displays Page {x} of {y} where x is the current page and y is the page count', () => {
       const pageCount = 5;
       for (let page = 1; page <= 5; page += 1) {
-        render(<Pager pageCount={pageCount} currentPage={page} />);
+        render(
+          <Pager
+            pageCount={pageCount}
+            currentPage={page}
+            onLimitChange={onLimitChangeMock}
+            onPageChange={onPageChangeMock}
+          />
+        );
 
         const pageStatus = screen.getByTestId('pageStatus');
 
