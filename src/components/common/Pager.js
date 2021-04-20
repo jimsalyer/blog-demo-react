@@ -22,28 +22,9 @@ export default function Pager({
 
   return (
     <Row className="align-items-baseline mb-3" data-testid="pager">
-      <Col sm="auto">
-        <Dropdown>
-          <Dropdown.Toggle variant="light" data-testid="limitToggle">
-            {currentLimit} Per Page
-          </Dropdown.Toggle>
-          <Dropdown.Menu>
-            {limits.map((limit) => (
-              <Dropdown.Item
-                active={limit === currentLimit}
-                key={limit}
-                data-testid="limitItem"
-                onClick={(event) => handleLimitChange(event, limit)}
-              >
-                {limit}
-              </Dropdown.Item>
-            ))}
-          </Dropdown.Menu>
-        </Dropdown>
-      </Col>
       {pageCount > 1 && (
         <>
-          <Col sm="auto" className="pt-2 pt-sm-0">
+          <Col sm="auto">
             <Pagination className="m-0" data-testid="pagination">
               {currentPage > 2 && (
                 <Pagination.First
@@ -77,6 +58,28 @@ export default function Pager({
         </>
       )}
       <Col />
+      <Col sm="auto" className={pageCount > 1 ? 'pt-2 pt-sm-0' : ''}>
+        <Dropdown>
+          <Dropdown.Toggle
+            variant="outline-secondary"
+            data-testid="limitToggle"
+          >
+            {currentLimit} Per Page
+          </Dropdown.Toggle>
+          <Dropdown.Menu>
+            {limits.map((limit) => (
+              <Dropdown.Item
+                active={limit === currentLimit}
+                key={limit}
+                data-testid="limitItem"
+                onClick={(event) => handleLimitChange(event, limit)}
+              >
+                {limit}
+              </Dropdown.Item>
+            ))}
+          </Dropdown.Menu>
+        </Dropdown>
+      </Col>
     </Row>
   );
 }
