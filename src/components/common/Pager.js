@@ -46,7 +46,7 @@ export default function Pager({
               {currentPage > pageLength && (
                 <Pagination.Ellipsis
                   className="d-none d-md-list-item"
-                  data-testid="ellipsisLeftPageLink"
+                  data-testid="ellipsisBackPageLink"
                   onClick={(event) => handlePageChange(event, pageStart - 1)}
                 />
               )}
@@ -63,6 +63,7 @@ export default function Pager({
                   className={
                     pageNumber === currentPage ? null : 'd-none d-md-list-item'
                   }
+                  data-testid="pageNumberLink"
                   onClick={(event) => handlePageChange(event, pageNumber)}
                 >
                   {pageNumber}
@@ -77,7 +78,7 @@ export default function Pager({
               {currentPage < pageCount - pageLength && (
                 <Pagination.Ellipsis
                   className="d-none d-md-list-item"
-                  data-testid="ellipsisRightPageLink"
+                  data-testid="ellipsisForwardPageLink"
                   onClick={(event) => handlePageChange(event, pageEnd + 1)}
                 />
               )}

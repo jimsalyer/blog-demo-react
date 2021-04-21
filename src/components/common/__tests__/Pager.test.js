@@ -81,6 +81,44 @@ describe('<Pager />', () => {
   });
 
   describe('Paging', () => {
+    it('only shows page number links 3, 4, and 5 if the current page is 4, the page length is 3, and the page count is 10', () => {
+      render(
+        <Pager
+          pageCount={10}
+          pageLength={3}
+          currentPage={4}
+          onLimitChange={onLimitChangeMock}
+          onPageChange={onPageChangeMock}
+        />
+      );
+
+      const pageNumberLinks = screen.getAllByTestId('pageNumberLink');
+
+      expect(pageNumberLinks).toHaveLength(3);
+      expect(pageNumberLinks[0]).toHaveTextContent('3');
+      expect(pageNumberLinks[1]).toHaveTextContent('4');
+      expect(pageNumberLinks[2]).toHaveTextContent('5');
+    });
+
+    it('highlights the active page number link', () => {
+      render(
+        <Pager
+          pageCount={10}
+          pageLength={3}
+          currentPage={4}
+          onLimitChange={onLimitChangeMock}
+          onPageChange={onPageChangeMock}
+        />
+      );
+
+      const pageNumberLinks = screen.getAllByTestId('pageNumberLink');
+      const activePageNumberLink = pageNumberLinks.find((pageNumberLink) =>
+        pageNumberLink.parentElement.classList.contains('active')
+      );
+
+      expect(activePageNumberLink).toHaveTextContent('4');
+    });
+
     it('triggers the onPageChange handler with a value of 1 when clicking the "first" page link', () => {
       render(
         <Pager
@@ -109,7 +147,7 @@ describe('<Pager />', () => {
         />
       );
 
-      const pageLink = screen.getByTestId('ellipsisLeftPageLink');
+      const pageLink = screen.getByTestId('ellipsisBackPageLink');
 
       fireEvent.click(pageLink);
 
@@ -131,6 +169,26 @@ describe('<Pager />', () => {
       fireEvent.click(pageLink);
 
       expect(onPageChangeMock).toHaveBeenCalledWith(2);
+    });
+
+    it('triggers the onPageChange handler with a value of 5 when the page number link labeled 5 is clicked', () => {
+      render(
+        <Pager
+          pageCount={10}
+          currentPage={2}
+          onLimitChange={onLimitChangeMock}
+          onPageChange={onPageChangeMock}
+        />
+      );
+
+      const pageNumberLinks = screen.getAllByTestId('pageNumberLink');
+      const targetPageNumberLink = pageNumberLinks.find(
+        (pageNumberLink) => pageNumberLink.textContent === '5'
+      );
+
+      fireEvent.click(targetPageNumberLink);
+
+      expect(onPageChangeMock).toHaveBeenCalledWith(5);
     });
 
     it('triggers the onPageChange handler with a value of 3 when clicking the "next" page link when the current page is 2', () => {
@@ -161,7 +219,7 @@ describe('<Pager />', () => {
         />
       );
 
-      const pageLink = screen.getByTestId('ellipsisRightPageLink');
+      const pageLink = screen.getByTestId('ellipsisForwardPageLink');
 
       fireEvent.click(pageLink);
 
@@ -211,7 +269,7 @@ describe('<Pager />', () => {
         />
       );
 
-      const pageLink = screen.queryByTestId('ellipsisLeftPageLink');
+      const pageLink = screen.queryByTestId('ellipsisBackPageLink');
 
       expect(pageLink).not.toBeInTheDocument();
     });
@@ -257,7 +315,7 @@ describe('<Pager />', () => {
         />
       );
 
-      const pageLink = screen.queryByTestId('ellipsisRightPageLink');
+      const pageLink = screen.queryByTestId('ellipsisForwardPageLink');
 
       expect(pageLink).not.toBeInTheDocument();
     });
