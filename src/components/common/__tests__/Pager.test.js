@@ -24,9 +24,9 @@ describe('<Pager />', () => {
     it('displays a dropdown with the choices that correspond to the paging limits set on the component', async () => {
       render(
         <Pager
-          limits={[1, 2, 3]}
-          currentLimit={1}
-          pageCount={3}
+          limits={[5, 15, 25]}
+          currentLimit={5}
+          pageCount={10}
           onLimitChange={onLimitChangeMock}
           onPageChange={onPageChangeMock}
         />
@@ -41,12 +41,12 @@ describe('<Pager />', () => {
       expect(limitItems).toHaveLength(3);
     });
 
-    it('displays the text of "{x} Per Page" on the limit dropdown toggler where x is the selected limit', () => {
+    it('displays the text of "10 Per Page" on the limit dropdown toggler when 10 is the selected limit', () => {
       render(
         <Pager
-          limits={[1, 2, 3]}
-          currentLimit={2}
-          pageCount={3}
+          limits={[5, 10, 20]}
+          currentLimit={10}
+          pageCount={10}
           onLimitChange={onLimitChangeMock}
           onPageChange={onPageChangeMock}
         />
@@ -54,15 +54,15 @@ describe('<Pager />', () => {
 
       const limitToggle = screen.getByTestId('limitToggle');
 
-      expect(limitToggle).toHaveTextContent('2 Per Page');
+      expect(limitToggle).toHaveTextContent('10 Per Page');
     });
 
-    it('triggers the onLimitChange handler with a value of 3 when clicking the corresponding limit item', () => {
+    it('triggers the onLimitChange handler with a value of 5 when clicking the corresponding limit item', () => {
       render(
         <Pager
-          limits={[1, 2, 3]}
-          currentLimit={1}
-          pageCount={3}
+          limits={[5, 15, 25]}
+          currentLimit={5}
+          pageCount={10}
           onLimitChange={onLimitChangeMock}
           onPageChange={onPageChangeMock}
         />
@@ -76,7 +76,7 @@ describe('<Pager />', () => {
 
       fireEvent.click(limitItems[1]);
 
-      expect(onLimitChangeMock).toHaveBeenCalledWith(2);
+      expect(onLimitChangeMock).toHaveBeenCalledWith(15);
     });
   });
 
@@ -96,6 +96,24 @@ describe('<Pager />', () => {
       fireEvent.click(pageLink);
 
       expect(onPageChangeMock).toHaveBeenCalledWith(1);
+    });
+
+    it('triggers the onPageChange handler with a value of 3 when clicking the "..." page link on the left when the current page is 5, the page count is 10, and the page length is 3', () => {
+      render(
+        <Pager
+          pageCount={10}
+          pageLength={3}
+          currentPage={5}
+          onLimitChange={onLimitChangeMock}
+          onPageChange={onPageChangeMock}
+        />
+      );
+
+      const pageLink = screen.getByTestId('ellipsisLeftPageLink');
+
+      fireEvent.click(pageLink);
+
+      expect(onPageChangeMock).toHaveBeenCalledWith(3);
     });
 
     it('triggers the onPageChange handler with a value of 2 when clicking the "previous" page link when the current page is 3', () => {
@@ -132,7 +150,25 @@ describe('<Pager />', () => {
       expect(onPageChangeMock).toHaveBeenCalledWith(3);
     });
 
-    it('triggers the onPageChange handler with a value of 10 when clicking the "last" page link', () => {
+    it('triggers the onPageChange handler with a value of 5 when clicking the "..." page link on the right when the current page is 3, the page count is 10, and the page length is 3', () => {
+      render(
+        <Pager
+          pageCount={10}
+          pageLength={3}
+          currentPage={3}
+          onLimitChange={onLimitChangeMock}
+          onPageChange={onPageChangeMock}
+        />
+      );
+
+      const pageLink = screen.getByTestId('ellipsisRightPageLink');
+
+      fireEvent.click(pageLink);
+
+      expect(onPageChangeMock).toHaveBeenCalledWith(5);
+    });
+
+    it('triggers the onPageChange handler with a value of 10 when clicking the "last" page link when the page count is 10', () => {
       render(
         <Pager
           pageCount={10}
@@ -164,6 +200,22 @@ describe('<Pager />', () => {
       expect(pageLink).not.toBeInTheDocument();
     });
 
+    it('hides the left "..." page link if the current page is less than the page length + 1', () => {
+      render(
+        <Pager
+          pageCount={10}
+          pageLength={3}
+          currentPage={3}
+          onLimitChange={onLimitChangeMock}
+          onPageChange={onPageChangeMock}
+        />
+      );
+
+      const pageLink = screen.queryByTestId('ellipsisLeftPageLink');
+
+      expect(pageLink).not.toBeInTheDocument();
+    });
+
     it('hides the "previous" page link if the current page is less than 2', () => {
       render(
         <Pager
@@ -190,6 +242,22 @@ describe('<Pager />', () => {
       );
 
       const pageLink = screen.queryByTestId('nextPageLink');
+
+      expect(pageLink).not.toBeInTheDocument();
+    });
+
+    it('hides the right "..." page link if the current page is less than the page count - page length', () => {
+      render(
+        <Pager
+          pageCount={10}
+          pageLength={3}
+          currentPage={7}
+          onLimitChange={onLimitChangeMock}
+          onPageChange={onPageChangeMock}
+        />
+      );
+
+      const pageLink = screen.queryByTestId('ellipsisRightPageLink');
 
       expect(pageLink).not.toBeInTheDocument();
     });
@@ -227,7 +295,7 @@ describe('<Pager />', () => {
   describe('Status', () => {
     it('displays Page {x} of {y} where x is the current page and y is the page count', () => {
       const pageCount = 5;
-      for (let page = 1; page <= 5; page += 1) {
+      for (let page = 1; page <= pageCount; page += 1) {
         render(
           <Pager
             pageCount={pageCount}

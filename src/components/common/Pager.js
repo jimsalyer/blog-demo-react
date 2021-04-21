@@ -6,10 +6,21 @@ export default function Pager({
   limits,
   currentLimit,
   pageCount,
+  pageLength,
   currentPage,
   onLimitChange,
   onPageChange,
 }) {
+  const pageBuffer = Math.floor(pageLength / 2);
+  const pageEnd =
+    currentPage + pageBuffer < pageCount
+      ? Math.max(currentPage + pageBuffer, pageLength)
+      : pageCount;
+  const pageStart = pageEnd > pageLength ? pageEnd - pageLength + 1 : 1;
+  const pageNumbers = Array(pageEnd - pageStart + 1)
+    .fill()
+    .map((_, index) => pageStart + index);
+
   function handleLimitChange(event, limit) {
     event.preventDefault();
     onLimitChange(limit);
@@ -32,16 +43,42 @@ export default function Pager({
                   onClick={(event) => handlePageChange(event, 1)}
                 />
               )}
+              {currentPage > pageLength && (
+                <Pagination.Ellipsis
+                  className="d-none d-md-list-item"
+                  data-testid="ellipsisLeftPageLink"
+                  onClick={(event) => handlePageChange(event, pageStart - 1)}
+                />
+              )}
               {currentPage > 1 && (
                 <Pagination.Prev
                   data-testid="prevPageLink"
                   onClick={(event) => handlePageChange(event, currentPage - 1)}
                 />
               )}
+              {pageNumbers.map((pageNumber) => (
+                <Pagination.Item
+                  key={pageNumber}
+                  active={pageNumber === currentPage}
+                  className={
+                    pageNumber === currentPage ? null : 'd-none d-md-list-item'
+                  }
+                  onClick={(event) => handlePageChange(event, pageNumber)}
+                >
+                  {pageNumber}
+                </Pagination.Item>
+              ))}
               {currentPage < pageCount && (
                 <Pagination.Next
                   data-testid="nextPageLink"
                   onClick={(event) => handlePageChange(event, currentPage + 1)}
+                />
+              )}
+              {currentPage < pageCount - pageLength && (
+                <Pagination.Ellipsis
+                  className="d-none d-md-list-item"
+                  data-testid="ellipsisRightPageLink"
+                  onClick={(event) => handlePageChange(event, pageEnd + 1)}
                 />
               )}
               {currentPage < pageCount - 1 && (
@@ -88,6 +125,7 @@ Pager.defaultProps = {
   limits: [5, 10, 20, 50, 100],
   currentLimit: 10,
   pageCount: 1,
+  pageLength: 5,
   currentPage: 1,
 };
 
@@ -95,6 +133,7 @@ Pager.propTypes = {
   limits: PropTypes.arrayOf(PropTypes.number),
   currentLimit: PropTypes.number,
   pageCount: PropTypes.number,
+  pageLength: PropTypes.number,
   currentPage: PropTypes.number,
   onLimitChange: PropTypes.func.isRequired,
   onPageChange: PropTypes.func.isRequired,
