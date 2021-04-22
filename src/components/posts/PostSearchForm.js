@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Accordion, Button, Card, Col, Form, Row } from 'react-bootstrap';
 import { listUsers } from '../../services/userService';
 
-export default function PostSearchForm({ queryParams, onError, onSearch }) {
+export default function PostSearchForm({ values, onError, onSearch }) {
   const [active, setActive] = useState(false);
   const [author, setAuthor] = useState(0);
   const [loadingUsers, setLoadingUsers] = useState(true);
@@ -50,9 +50,9 @@ export default function PostSearchForm({ queryParams, onError, onSearch }) {
   }, [onError]);
 
   useEffect(() => {
-    setAuthor(queryParams.author || 0);
-    setText(queryParams.text || '');
-  }, [queryParams]);
+    setAuthor(values.author || 0);
+    setText(values.text || '');
+  }, [values]);
 
   useEffect(() => {
     setActive(author > 0 || text);
@@ -117,7 +117,10 @@ export default function PostSearchForm({ queryParams, onError, onSearch }) {
 }
 
 PostSearchForm.propTypes = {
-  queryParams: PropTypes.object.isRequired,
+  values: PropTypes.shape({
+    author: PropTypes.number,
+    text: PropTypes.string,
+  }).isRequired,
   onError: PropTypes.func.isRequired,
   onSearch: PropTypes.func.isRequired,
 };

@@ -1,11 +1,23 @@
-export function parsePaginationValue(links, name) {
+import queryString from 'query-string';
+
+export function parsePageValue(links, name) {
   let page = 0;
   if (links && links.length && name) {
-    const link = links.find((l) => l.includes(`rel="${name}"`));
-    if (link) {
+    const namedLink = links.find((link) => link.includes(`rel="${name}"`));
+    if (namedLink) {
       try {
-        const url = new URL(link.replace(/<([^>]+)>/, '$1'));
-        page = Number(url.searchParams.get('_page'));
+        const matches = /<([^>]+)>/.exec(namedLink);
+        if (matches && matches.length > 1) {
+          const url = new URL(matches[1]);
+          const queryParams = queryString.parse(url.search, {
+            parseBooleans: true,
+            parseNumbers: true,
+          });
+
+          if (queryParams._page > 0) {
+            page = queryParams._page;
+          }
+        }
       } catch {
         // Do nothing
       }
@@ -24,10 +36,10 @@ export function parsePaginationValues(response) {
 
   if (response && response.headers && response.headers.link) {
     const links = response.headers.link.split(',');
-    pagination.first = parsePaginationValue(links, 'first');
-    pagination.prev = parsePaginationValue(links, 'prev');
-    pagination.next = parsePaginationValue(links, 'next');
-    pagination.last = parsePaginationValue(links, 'last');
+    pagination.first = parsePageValue(links, 'first');
+    pagination.prev = parsePageValue(links, 'prev');
+    pagination.next = parsePageValue(links, 'next');
+    pagination.last = parsePageValue(links, 'last');
   }
   return pagination;
 }

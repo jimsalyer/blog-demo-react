@@ -121,7 +121,7 @@ export default function PostsPage() {
     <div data-testid="postsPage">
       <h2>Posts</h2>
       <PostSearchForm
-        queryParams={queryParams}
+        values={queryParams}
         onError={setError}
         onSearch={handleSearch}
       />

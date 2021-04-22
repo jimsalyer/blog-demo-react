@@ -1,29 +1,29 @@
 import { apiUrl } from 'axios';
 import * as serviceUtils from '../serviceUtils';
 
-function generatePaginationLink(currentUrl, page, rel) {
+function generateLink(currentUrl, page, rel) {
   const newUrl = new URL(currentUrl);
   const { searchParams } = newUrl;
   searchParams.set('_page', page);
   return `<${newUrl.toString()}>; rel="${rel}"`;
 }
 
-function generatePaginationHeader(currentUrl, pagination) {
+function generateHeader(currentUrl, pagination) {
   const links = Object.keys(pagination).map((key) => {
-    const link = generatePaginationLink(currentUrl, pagination[key], key);
+    const link = generateLink(currentUrl, pagination[key], key);
     return link;
   });
   return links.join(',');
 }
 
 describe('serviceUtils', () => {
-  describe('parsePaginationValue()', () => {
+  describe('parsePageValue()', () => {
     it('returns the value of the "_page" query string parameter in a header link', () => {
       const expectedValue = 4;
 
-      const link = generatePaginationLink(apiUrl, expectedValue, 'next');
+      const link = generateLink(apiUrl, expectedValue, 'next');
 
-      const actualValue = serviceUtils.parsePaginationValue([link], 'next');
+      const actualValue = serviceUtils.parsePageValue([link], 'next');
 
       expect(actualValue).toStrictEqual(expectedValue);
     });
@@ -31,7 +31,7 @@ describe('serviceUtils', () => {
     it('returns zero if the links array is null', () => {
       const expectedValue = 0;
 
-      const actualValue = serviceUtils.parsePaginationValue();
+      const actualValue = serviceUtils.parsePageValue();
 
       expect(actualValue).toStrictEqual(expectedValue);
     });
@@ -39,7 +39,7 @@ describe('serviceUtils', () => {
     it('returns zero if the links array is empty', () => {
       const expectedValue = 0;
 
-      const actualValue = serviceUtils.parsePaginationValue([]);
+      const actualValue = serviceUtils.parsePageValue([]);
 
       expect(actualValue).toStrictEqual(expectedValue);
     });
@@ -47,9 +47,9 @@ describe('serviceUtils', () => {
     it('returns zero if no name is provided', () => {
       const expectedValue = 0;
 
-      const link = generatePaginationLink(apiUrl, expectedValue, 'next');
+      const link = generateLink(apiUrl, expectedValue, 'next');
 
-      const actualValue = serviceUtils.parsePaginationValue([link]);
+      const actualValue = serviceUtils.parsePageValue([link]);
 
       expect(actualValue).toStrictEqual(expectedValue);
     });
@@ -57,9 +57,9 @@ describe('serviceUtils', () => {
     it('returns zero if the named link is not found', () => {
       const expectedValue = 0;
 
-      const link = generatePaginationLink(apiUrl, expectedValue, 'next');
+      const link = generateLink(apiUrl, expectedValue, 'next');
 
-      const actualValue = serviceUtils.parsePaginationValue([link], 'prev');
+      const actualValue = serviceUtils.parsePageValue([link], 'prev');
 
       expect(actualValue).toStrictEqual(expectedValue);
     });
@@ -69,7 +69,7 @@ describe('serviceUtils', () => {
       ['', '<>', '<invalid_url>'].forEach((value) => {
         const link = `${value}; rel="next"`;
 
-        const actualValue = serviceUtils.parsePaginationValue([link], 'next');
+        const actualValue = serviceUtils.parsePageValue([link], 'next');
 
         expect(actualValue).toStrictEqual(expectedValue);
       });
@@ -87,7 +87,7 @@ describe('serviceUtils', () => {
 
       const response = {
         headers: {
-          link: generatePaginationHeader(apiUrl, expectedPagination),
+          link: generateHeader(apiUrl, expectedPagination),
         },
       };
 
