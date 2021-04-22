@@ -1,3 +1,4 @@
+import queryString from 'query-string';
 import createClient from './createClient';
 import { parsePaginationValues } from './serviceUtils';
 
@@ -18,12 +19,25 @@ export async function getPost(id) {
 }
 
 export async function searchPosts(
-  { limit, page } = {
+  { author, text, limit, page } = {
     limit: 10,
     page: 1,
   }
 ) {
-  const response = await client.get(`/?_limit=${limit}&_page=${page}`);
+  const queryParams = {
+    _limit: limit,
+    _page: page,
+  };
+
+  if (author > 0) {
+    queryParams.userId = author;
+  }
+
+  if (text) {
+    queryParams.q = text;
+  }
+
+  const response = await client.get(`/?${queryString.stringify(queryParams)}`);
   const result = {
     pagination: parsePaginationValues(response),
     data: response.data,

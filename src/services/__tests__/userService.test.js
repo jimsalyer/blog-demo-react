@@ -5,18 +5,12 @@ describe('userService', () => {
   describe('createUser()', () => {
     it('makes a POST request with the given data and returns the result', async () => {
       const expectedUser = {
-        name: 'Test User',
-        username: 'Test',
-        email: 'test.user@example.com',
-        address: {
-          street: '1234 Test St',
-          city: 'Test',
-          zipcode: '12345',
-          geo: {
-            lat: '37.2090',
-            lng: '93.2923',
-          },
-        },
+        firstName: 'Test',
+        lastName: 'User',
+        emailAddress: 'test.user@example.com',
+        username: 'tuser',
+        createUtc: '2020-01-01T00:00:00Z',
+        modifyUtc: '2020-01-02T00:00:00Z',
       };
 
       const postSpy = jest.spyOn(mockClient, 'post').mockResolvedValue({
@@ -50,18 +44,12 @@ describe('userService', () => {
       const expectedId = 1;
       const expectedUser = {
         id: expectedId,
-        name: 'Test User',
-        username: 'Test',
-        email: 'test.user@example.com',
-        address: {
-          street: '1234 Test St',
-          city: 'Test',
-          zipcode: '12345',
-          geo: {
-            lat: '37.2090',
-            lng: '93.2923',
-          },
-        },
+        firstName: 'Test',
+        lastName: 'User',
+        emailAddress: 'test.user@example.com',
+        username: 'tuser',
+        createUtc: '2020-01-01T00:00:00Z',
+        modifyUtc: '2020-01-02T00:00:00Z',
       };
 
       const getSpy = jest.spyOn(mockClient, 'get').mockResolvedValue({
@@ -82,33 +70,21 @@ describe('userService', () => {
       const expectedData = [
         {
           id: 1,
-          name: 'Test User',
-          username: 'Test',
-          email: 'test.user@example.com',
-          address: {
-            street: '1234 Test St',
-            city: 'Test',
-            zipcode: '12345',
-            geo: {
-              lat: '37.2090',
-              lng: '93.2923',
-            },
-          },
+          firstName: 'Test',
+          lastName: 'User',
+          emailAddress: 'test.user@example.com',
+          username: 'tuser',
+          createUtc: '2020-01-01T00:00:00Z',
+          modifyUtc: '2020-01-02T00:00:00Z',
         },
         {
           id: 2,
-          name: 'Sample User',
-          username: 'Sample',
-          email: 'sample.user@example.com',
-          address: {
-            street: '1234 Sample St',
-            city: 'Sample',
-            zipcode: '12345',
-            geo: {
-              lat: '37.0842',
-              lng: '94.5133',
-            },
-          },
+          firstName: 'Sample',
+          lastName: 'User',
+          emailAddress: 'sample.user@example.com',
+          username: 'suser',
+          createUtc: '2020-01-01T00:00:00Z',
+          modifyUtc: '2020-01-02T00:00:00Z',
         },
       ];
 
@@ -132,18 +108,12 @@ describe('userService', () => {
       const expectedId = 1;
       const expectedUser = {
         id: expectedId,
-        name: 'Test User',
-        username: 'Test',
-        email: 'test.user@example.com',
-        address: {
-          street: '1234 Test St',
-          city: 'Test',
-          zipcode: '12345',
-          geo: {
-            lat: '37.2090',
-            lng: '93.2923',
-          },
-        },
+        firstName: 'Test',
+        lastName: 'User',
+        emailAddress: 'test.user@example.com',
+        username: 'tuser',
+        createUtc: '2020-01-01T00:00:00Z',
+        modifyUtc: '2020-01-02T00:00:00Z',
       };
 
       const putSpy = jest.spyOn(mockClient, 'put').mockResolvedValue({

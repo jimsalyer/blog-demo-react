@@ -5,6 +5,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 import { searchPosts } from '../../services/postService';
 import ErrorMessage from '../common/ErrorMessage';
 import Pager from '../common/Pager';
+import PostSearchForm from './PostSearchForm';
 
 export default function PostsPage() {
   const defaultLimit = 10;
@@ -19,6 +20,7 @@ export default function PostsPage() {
 
   function handleLimitChange(value) {
     setQueryParams({
+      ...queryParams,
       limit: value,
       page: 1,
     });
@@ -28,6 +30,14 @@ export default function PostsPage() {
     setQueryParams({
       ...queryParams,
       page: value,
+    });
+  }
+
+  function handleSearch({ author, text }) {
+    setQueryParams({
+      ...queryParams,
+      author,
+      text,
     });
   }
 
@@ -41,6 +51,14 @@ export default function PostsPage() {
       parseBooleans: true,
       parseNumbers: true,
     });
+
+    if (queryValues.author > 0) {
+      returnValues.author = queryValues.author;
+    }
+
+    if (queryValues.text) {
+      returnValues.text = queryValues.text;
+    }
 
     if (queryValues.limit > 0) {
       returnValues.limit = queryValues.limit;
@@ -60,8 +78,8 @@ export default function PostsPage() {
         const result = await searchPosts(queryParams);
         setPageCount(result.pagination.last);
         setPosts(result.data);
-      } catch (loadError) {
-        setError(loadError);
+      } catch (loadPostsError) {
+        setError(loadPostsError);
       }
       setLoading(false);
 
@@ -74,6 +92,14 @@ export default function PostsPage() {
 
     function updateQueryString() {
       const values = {};
+
+      if (queryParams.author) {
+        values.author = queryParams.author;
+      }
+
+      if (queryParams.text) {
+        values.text = queryParams.text;
+      }
 
       if (queryParams.limit !== defaultLimit) {
         values.limit = queryParams.limit;
@@ -94,6 +120,11 @@ export default function PostsPage() {
   return (
     <div data-testid="postsPage">
       <h2>Posts</h2>
+      <PostSearchForm
+        queryParams={queryParams}
+        onError={setError}
+        onSearch={handleSearch}
+      />
       {loading && (
         <div data-testid="loadingMessage">
           <Spinner animation="border" role="status" size="sm" />{' '}
@@ -119,7 +150,7 @@ export default function PostsPage() {
             <Card key={post.id} className="mb-3" data-testid="post">
               <Card.Body>
                 <Card.Title>{post.title}</Card.Title>
-                <Card.Text>{post.body}</Card.Text>
+                <Card.Text>{post.excerpt}</Card.Text>
               </Card.Body>
             </Card>
           ))}

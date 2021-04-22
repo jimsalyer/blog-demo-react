@@ -1,4 +1,5 @@
 import { mockClient } from 'axios';
+import queryString from 'query-string';
 import * as postService from '../postService';
 
 describe('postService', () => {
@@ -7,7 +8,12 @@ describe('postService', () => {
       const expectedPost = {
         title: 'test title',
         body: 'test body',
+        excerpt: 'test excerpt',
+        imageUrl: 'http://example.com/images/image.jpg',
         userId: 1,
+        createUtc: '2020-01-01T00:00:00Z',
+        publishUtc: '2020-01-02T00:00:00Z',
+        modifyUtc: '2020-01-03T:00:00:00Z',
       };
 
       const postSpy = jest.spyOn(mockClient, 'post').mockResolvedValue({
@@ -43,7 +49,12 @@ describe('postService', () => {
         id: expectedId,
         title: 'test title',
         body: 'test body',
+        excerpt: 'test excerpt',
+        imageUrl: 'http://example.com/images/image.jpg',
         userId: 1,
+        createUtc: '2020-01-01T00:00:00Z',
+        publishUtc: '2020-01-02T00:00:00Z',
+        modifyUtc: '2020-01-03T:00:00:00Z',
       };
 
       const getSpy = jest.spyOn(mockClient, 'get').mockResolvedValue({
@@ -72,8 +83,17 @@ describe('postService', () => {
 
     it('makes a GET request with the given parameters and returns the resulting data and pagination values', async () => {
       const expectedParams = {
+        author: 1,
+        text: 'test',
         limit: 5,
         page: 2,
+      };
+
+      const expectedQueryParams = {
+        userId: expectedParams.author,
+        q: expectedParams.text,
+        _limit: expectedParams.limit,
+        _page: expectedParams.page,
       };
 
       const expectedData = [
@@ -81,13 +101,23 @@ describe('postService', () => {
           id: 1,
           title: 'test title',
           body: 'test body',
+          excerpt: 'test excerpt',
+          imageUrl: 'http://example.com/images/image.jpg',
           userId: 1,
+          createUtc: '2020-01-01T00:00:00Z',
+          publishUtc: '2020-01-02T00:00:00Z',
+          modifyUtc: '2020-01-03T:00:00:00Z',
         },
         {
           id: 2,
           title: 'test title 2',
           body: 'test body 2',
-          userId: 2,
+          excerpt: 'test excerpt 2',
+          imageUrl: 'http://example.com/images/image2.jpg',
+          userId: 1,
+          createUtc: '2020-01-01T00:00:00Z',
+          publishUtc: '2020-01-02T00:00:00Z',
+          modifyUtc: '2020-01-03T:00:00:00Z',
         },
       ];
 
@@ -100,7 +130,7 @@ describe('postService', () => {
       const actualResult = await postService.searchPosts(expectedParams);
 
       expect(getSpy).toHaveBeenCalledWith(
-        `/?_limit=${expectedParams.limit}&_page=${expectedParams.page}`
+        `/?${queryString.stringify(expectedQueryParams)}`
       );
       expect(actualResult.data).toStrictEqual(expectedData);
     });
