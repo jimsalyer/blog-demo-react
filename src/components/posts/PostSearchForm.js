@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Accordion, Button, Card, Col, Form, Row } from 'react-bootstrap';
 import { listUsers } from '../../services/userService';
 
@@ -7,24 +7,26 @@ export default function PostSearchForm({ queryParams, onError, onSearch }) {
   const [active, setActive] = useState(false);
   const [author, setAuthor] = useState(0);
   const [loadingUsers, setLoadingUsers] = useState(true);
+  const searchFormToggle = useRef();
   const [text, setText] = useState('');
   const [users, setUsers] = useState([]);
 
   function handleAuthorChange(event) {
     event.preventDefault();
-    const value = parseInt(event.target.value, 10);
-    setAuthor(value);
+    setAuthor(Number(event.target.value));
   }
 
   function handleReset(event) {
     event.preventDefault();
     setAuthor(0);
     setText('');
-    onSearch({ author, title: text });
+    searchFormToggle.current.click();
+    onSearch({});
   }
 
   function handleSubmit(event) {
     event.preventDefault();
+    searchFormToggle.current.click();
     onSearch({ author, text });
   }
 
@@ -62,6 +64,7 @@ export default function PostSearchForm({ queryParams, onError, onSearch }) {
         <Accordion.Toggle
           as={Card.Header}
           eventKey="searchForm"
+          ref={searchFormToggle}
           className={active ? 'bg-primary text-white' : null}
         >
           <h5 className="m-0">Search Posts</h5>
