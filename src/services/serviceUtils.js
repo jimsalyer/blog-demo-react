@@ -5,7 +5,7 @@ export function parsePaginationValue(links, name) {
     if (link) {
       try {
         const url = new URL(link.replace(/<([^>]+)>/, '$1'));
-        page = parseInt(url.searchParams.get('_page'), 10);
+        page = Number(url.searchParams.get('_page'));
       } catch {
         // Do nothing
       }
