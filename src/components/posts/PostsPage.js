@@ -14,9 +14,12 @@ export default function PostsPage() {
   const location = useLocation();
   const [pageCount, setPageCount] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [pageLoading, setPageLoading] = useState(true);
   const [posts, setPosts] = useState([]);
-  const [queryParams, setQueryParams] = useState({});
+
+  const [queryParams, setQueryParams] = useState(
+    () => parseQueryParams(location.search),
+    (value) => sanitizeQueryParams(value)
+  );
 
   function handleLimitChange(value) {
     setQueryParams({
@@ -41,81 +44,53 @@ export default function PostsPage() {
     });
   }
 
+  function parseQueryParams(value) {
+    return queryString.parse(value, {
+      parseBooleans: true,
+      parseNumbers: true,
+    });
+  }
+
+  function sanitizeQueryParams(value) {
+    const safeValue = value || {};
+    return {
+      author: safeValue.author || undefined,
+      text: safeValue.text || undefined,
+      limit: safeValue.limit > 0 ? safeValue.limit : defaultLimit,
+      page: safeValue.page > 0 ? safeValue.page : 1,
+    };
+  }
+
+  function stringifyQueryParams(value) {
+    return queryString.stringify(value, {
+      skipEmptyString: true,
+      skipNull: true,
+    });
+  }
+
   useEffect(() => {
-    function initQueryParams() {
-      const queryParamValues = {
-        limit: defaultLimit,
-        page: 1,
-      };
-
-      const queryValues = queryString.parse(location.search, {
-        parseBooleans: true,
-        parseNumbers: true,
-      });
-
-      if (queryValues.author > 0) {
-        queryParamValues.author = queryValues.author;
-      }
-
-      if (queryValues.text) {
-        queryParamValues.text = queryValues.text;
-      }
-
-      if (queryValues.limit > 0) {
-        queryParamValues.limit = queryValues.limit;
-      }
-
-      if (queryValues.page > 0) {
-        queryParamValues.page = queryValues.page;
-      }
-
-      setQueryParams(queryParamValues);
-    }
-
     async function loadPosts() {
-      setLoading(true);
-      try {
-        const result = await searchPosts(queryParams);
-        setPageCount(result.pagination.last);
-        setPosts(result.data);
-      } catch (loadPostsError) {
-        setError(loadPostsError);
+      const currentQueryParams = parseQueryParams(location.search);
+      const currentQueryString = stringifyQueryParams(currentQueryParams);
+      const newQueryString = stringifyQueryParams(queryParams);
+
+      if (newQueryString !== currentQueryString) {
+        history.push({ search: newQueryString });
+      } else {
+        setLoading(true);
+        try {
+          const result = await searchPosts(queryParams);
+          setPageCount(result.pagination.last);
+          setPosts(result.data);
+        } catch (loadPostsError) {
+          setError(loadPostsError);
+        }
+        setLoading(false);
       }
-      setLoading(false);
     }
 
-    function updateQueryString() {
-      const values = {};
-
-      if (queryParams.author) {
-        values.author = queryParams.author;
-      }
-
-      if (queryParams.text) {
-        values.text = queryParams.text;
-      }
-
-      if (queryParams.limit !== defaultLimit) {
-        values.limit = queryParams.limit;
-      }
-
-      if (queryParams.page !== 1) {
-        values.page = queryParams.page;
-      }
-
-      history.push({
-        search: queryString.stringify(values),
-      });
-    }
-
-    if (pageLoading) {
-      initQueryParams();
-      setPageLoading(false);
-    } else {
-      updateQueryString();
-      loadPosts();
-    }
-  }, [history, location.search, pageLoading, queryParams]);
+    loadPosts();
+  }, [history, location.search, queryParams]);
 
   return (
     <div data-testid="postsPage">

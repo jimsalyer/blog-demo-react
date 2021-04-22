@@ -66,13 +66,21 @@ export default function PostSearchForm({ values, onError, onSearch }) {
           eventKey="searchForm"
           ref={searchFormToggle}
           className={active ? 'bg-primary text-white' : null}
+          data-testid="searchFormToggle"
         >
           <h5 className="m-0">Search Posts</h5>
           {active && <span className="sr-only">Active</span>}
         </Accordion.Toggle>
-        <Accordion.Collapse eventKey="searchForm">
+        <Accordion.Collapse
+          eventKey="searchForm"
+          data-testid="searchFormCollapse"
+        >
           <Card.Body>
-            <Form onReset={handleReset} onSubmit={handleSubmit}>
+            <Form
+              onReset={handleReset}
+              onSubmit={handleSubmit}
+              data-testid="searchForm"
+            >
               <Form.Row as={Row} xs={1} md={2} lg={3} xl={4}>
                 <Form.Group as={Col} controlId="author">
                   <Form.Label>Search by Author</Form.Label>

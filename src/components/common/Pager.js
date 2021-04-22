@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Col, Dropdown, Pagination, Row } from 'react-bootstrap';
@@ -17,9 +18,7 @@ export default function Pager({
       ? Math.max(currentPage + pageBuffer, pageLength)
       : pageCount;
   const pageStart = pageEnd > pageLength ? pageEnd - pageLength + 1 : 1;
-  const pageNumbers = Array(pageEnd - pageStart + 1)
-    .fill()
-    .map((_, index) => pageStart + index);
+  const pageNumbers = _.range(pageStart, pageEnd + 1);
 
   function handleLimitChange(event, limit) {
     event.preventDefault();
