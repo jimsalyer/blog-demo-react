@@ -1,5 +1,5 @@
 import queryString from 'query-string';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, Card, Spinner } from 'react-bootstrap';
 import { useHistory, useLocation } from 'react-router-dom';
 import { searchPosts } from '../../services/postService';
@@ -14,9 +14,9 @@ export default function PostsPage() {
   const location = useLocation();
   const [pageCount, setPageCount] = useState(1);
   const [loading, setLoading] = useState(true);
-  const pageLoaded = useRef(false);
+  const [pageLoading, setPageLoading] = useState(true);
   const [posts, setPosts] = useState([]);
-  const [queryParams, setQueryParams] = useState(initQueryParams());
+  const [queryParams, setQueryParams] = useState({});
 
   function handleLimitChange(value) {
     setQueryParams({
@@ -41,37 +41,37 @@ export default function PostsPage() {
     });
   }
 
-  function initQueryParams() {
-    const returnValues = {
-      limit: defaultLimit,
-      page: 1,
-    };
-
-    const queryValues = queryString.parse(location.search, {
-      parseBooleans: true,
-      parseNumbers: true,
-    });
-
-    if (queryValues.author > 0) {
-      returnValues.author = queryValues.author;
-    }
-
-    if (queryValues.text) {
-      returnValues.text = queryValues.text;
-    }
-
-    if (queryValues.limit > 0) {
-      returnValues.limit = queryValues.limit;
-    }
-
-    if (queryValues.page > 0) {
-      returnValues.page = queryValues.page;
-    }
-
-    return returnValues;
-  }
-
   useEffect(() => {
+    function initQueryParams() {
+      const queryParamValues = {
+        limit: defaultLimit,
+        page: 1,
+      };
+
+      const queryValues = queryString.parse(location.search, {
+        parseBooleans: true,
+        parseNumbers: true,
+      });
+
+      if (queryValues.author > 0) {
+        queryParamValues.author = queryValues.author;
+      }
+
+      if (queryValues.text) {
+        queryParamValues.text = queryValues.text;
+      }
+
+      if (queryValues.limit > 0) {
+        queryParamValues.limit = queryValues.limit;
+      }
+
+      if (queryValues.page > 0) {
+        queryParamValues.page = queryValues.page;
+      }
+
+      setQueryParams(queryParamValues);
+    }
+
     async function loadPosts() {
       setLoading(true);
       try {
@@ -82,12 +82,6 @@ export default function PostsPage() {
         setError(loadPostsError);
       }
       setLoading(false);
-
-      if (pageLoaded.current) {
-        updateQueryString();
-      } else {
-        pageLoaded.current = true;
-      }
     }
 
     function updateQueryString() {
@@ -114,8 +108,14 @@ export default function PostsPage() {
       });
     }
 
-    loadPosts();
-  }, [history, queryParams]);
+    if (pageLoading) {
+      initQueryParams();
+      setPageLoading(false);
+    } else {
+      updateQueryString();
+      loadPosts();
+    }
+  }, [history, location.search, pageLoading, queryParams]);
 
   return (
     <div data-testid="postsPage">
@@ -140,7 +140,7 @@ export default function PostsPage() {
       {!loading && !error && posts && posts.length > 0 && (
         <>
           <Pager
-            selectedLimit={queryParams.limit}
+            currentLimit={queryParams.limit}
             currentPage={queryParams.page}
             pageCount={pageCount}
             onLimitChange={handleLimitChange}
@@ -155,7 +155,7 @@ export default function PostsPage() {
             </Card>
           ))}
           <Pager
-            selectedLimit={queryParams.limit}
+            currentLimit={queryParams.limit}
             currentPage={queryParams.page}
             pageCount={pageCount}
             onLimitChange={handleLimitChange}

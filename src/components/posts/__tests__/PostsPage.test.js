@@ -2,16 +2,20 @@ import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import * as postService from '../../../services/postService';
+import * as userService from '../../../services/userService';
 import PostsPage from '../PostsPage';
 
 describe('<PostsPage />', () => {
+  let listUsersSpy;
   let searchPostsSpy;
 
   beforeEach(() => {
+    listUsersSpy = jest.spyOn(userService, 'listUsers');
     searchPostsSpy = jest.spyOn(postService, 'searchPosts');
   });
 
   afterEach(() => {
+    listUsersSpy.mockRestore();
     searchPostsSpy.mockRestore();
     cleanup();
   });
@@ -27,17 +31,29 @@ describe('<PostsPage />', () => {
     const expectedData = [
       {
         id: 1,
-        title: 'post title 1',
-        body: 'post body 1',
+        title: 'test title',
+        body: 'test body',
+        excerpt: 'test excerpt',
+        imageUrl: 'http://example.com/images/image.jpg',
         userId: 1,
+        createUtc: '2020-01-01T00:00:00Z',
+        publishUtc: '2020-01-02T00:00:00Z',
+        modifyUtc: '2020-01-03T:00:00:00Z',
       },
       {
         id: 2,
-        title: 'post title 2',
-        body: 'post body 2',
-        userId: 2,
+        title: 'test title 2',
+        body: 'test body 2',
+        excerpt: 'test excerpt 2',
+        imageUrl: 'http://example.com/images/image2.jpg',
+        userId: 1,
+        createUtc: '2020-01-01T00:00:00Z',
+        publishUtc: '2020-01-02T00:00:00Z',
+        modifyUtc: '2020-01-03T:00:00:00Z',
       },
     ];
+
+    listUsersSpy.mockResolvedValue([]);
 
     searchPostsSpy.mockResolvedValue({
       pagination: expectedPagination,
@@ -65,7 +81,7 @@ describe('<PostsPage />', () => {
           expectedData[index].title
         );
         expect(post.querySelector('.card-text').textContent).toBe(
-          expectedData[index].body
+          expectedData[index].excerpt
         );
       });
     });
@@ -82,17 +98,29 @@ describe('<PostsPage />', () => {
     const expectedData = [
       {
         id: 1,
-        title: 'post title 1',
-        body: 'post body 1',
+        title: 'test title',
+        body: 'test body',
+        excerpt: 'test excerpt',
+        imageUrl: 'http://example.com/images/image.jpg',
         userId: 1,
+        createUtc: '2020-01-01T00:00:00Z',
+        publishUtc: '2020-01-02T00:00:00Z',
+        modifyUtc: '2020-01-03T:00:00:00Z',
       },
       {
         id: 2,
-        title: 'post title 2',
-        body: 'post body 2',
-        userId: 2,
+        title: 'test title 2',
+        body: 'test body 2',
+        excerpt: 'test excerpt 2',
+        imageUrl: 'http://example.com/images/image2.jpg',
+        userId: 1,
+        createUtc: '2020-01-01T00:00:00Z',
+        publishUtc: '2020-01-02T00:00:00Z',
+        modifyUtc: '2020-01-03T:00:00:00Z',
       },
     ];
+
+    listUsersSpy.mockResolvedValue([]);
 
     searchPostsSpy.mockResolvedValue({
       pagination: expectedPagination,
@@ -130,6 +158,7 @@ describe('<PostsPage />', () => {
       last: 1,
     };
 
+    listUsersSpy.mockResolvedValue([]);
     searchPostsSpy.mockResolvedValue({ pagination: expectedPagination });
 
     render(
@@ -160,6 +189,8 @@ describe('<PostsPage />', () => {
       last: 1,
     };
 
+    listUsersSpy.mockResolvedValue([]);
+
     searchPostsSpy.mockResolvedValue({
       pagination: expectedPagination,
       data: [],
@@ -186,6 +217,7 @@ describe('<PostsPage />', () => {
   });
 
   it('does not display any Pager components if no pagination object is returned from the API', async () => {
+    listUsersSpy.mockResolvedValue([]);
     searchPostsSpy.mockResolvedValue({ data: [] });
 
     render(
@@ -206,6 +238,7 @@ describe('<PostsPage />', () => {
   it('displays an error message if the API call fails', async () => {
     const expectedError = new Error('test error message');
 
+    listUsersSpy.mockResolvedValue([]);
     searchPostsSpy.mockRejectedValue(expectedError);
 
     render(
