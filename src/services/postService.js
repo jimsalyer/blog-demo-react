@@ -1,8 +1,12 @@
-import queryString from 'query-string';
 import createClient from './createClient';
-import { parsePaginationValues } from './serviceUtils';
+import { parsePageCount, stringifyQueryParams } from './serviceUtils';
 
 const client = createClient('/posts');
+
+export const defaultSearchParams = {
+  limit: 10,
+  page: 1,
+};
 
 export async function createPost(post) {
   const response = await client.post('/', post);
@@ -18,28 +22,22 @@ export async function getPost(id) {
   return response.data;
 }
 
-export async function searchPosts(
-  { author, text, limit, page } = {
-    limit: 10,
-    page: 1,
-  }
-) {
-  const queryParams = {
-    _limit: limit,
-    _page: page,
+export async function searchPosts(params) {
+  const searchParams = {
+    ...defaultSearchParams,
+    ...params,
   };
 
-  if (author > 0) {
-    queryParams.userId = author;
-  }
+  const queryParams = {
+    _limit: searchParams.limit,
+    _page: searchParams.page,
+    q: searchParams.text,
+    userId: searchParams.author,
+  };
 
-  if (text) {
-    queryParams.q = text;
-  }
-
-  const response = await client.get(`/?${queryString.stringify(queryParams)}`);
+  const response = await client.get(`/?${stringifyQueryParams(queryParams)}`);
   const result = {
-    pagination: parsePaginationValues(response),
+    pageCount: parsePageCount(response),
     data: response.data,
   };
   return result;

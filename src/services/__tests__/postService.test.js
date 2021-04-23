@@ -1,6 +1,7 @@
 import { mockClient } from 'axios';
 import queryString from 'query-string';
 import * as postService from '../postService';
+import { stringifyQueryParams } from '../serviceUtils';
 
 describe('postService', () => {
   describe('createPost()', () => {
@@ -136,7 +137,12 @@ describe('postService', () => {
     });
 
     it('sets the parameters to default values if they are not provided', async () => {
-      const expectedUrl = '/?_limit=10&_page=1';
+      const queryParams = {
+        _limit: postService.defaultSearchParams.limit,
+        _page: postService.defaultSearchParams.page,
+      };
+      const query = stringifyQueryParams(queryParams);
+      const expectedUrl = `/?${query}`;
 
       getSpy.mockResolvedValue({ data: [] });
 

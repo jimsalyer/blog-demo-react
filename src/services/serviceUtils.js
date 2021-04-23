@@ -1,21 +1,23 @@
 import queryString from 'query-string';
 
-export function parsePageValue(links, name) {
-  let page = 0;
-  if (links && links.length && name) {
-    const namedLink = links.find((link) => link.includes(`rel="${name}"`));
-    if (namedLink) {
+export function parsePageCount(response) {
+  if (
+    response &&
+    response.headers &&
+    typeof response.headers.link === 'string'
+  ) {
+    const links = response.headers.link.split(',');
+    const lastLink = links.find((link) => link.includes('rel="last"'));
+
+    if (lastLink) {
       try {
-        const matches = /<([^>]+)>/.exec(namedLink);
+        const matches = /<([^>]+)>/.exec(lastLink);
         if (matches && matches.length > 1) {
           const url = new URL(matches[1]);
-          const queryParams = queryString.parse(url.search, {
-            parseBooleans: true,
-            parseNumbers: true,
-          });
+          const queryParams = parseQueryString(url.search);
 
           if (queryParams._page > 0) {
-            page = queryParams._page;
+            return queryParams._page;
           }
         }
       } catch {
@@ -23,23 +25,19 @@ export function parsePageValue(links, name) {
       }
     }
   }
-  return page;
+  return 1;
 }
 
-export function parsePaginationValues(response) {
-  const pagination = {
-    first: 0,
-    prev: 0,
-    next: 0,
-    last: 0,
-  };
+export function parseQueryString(value) {
+  return queryString.parse(value, {
+    parseBooleans: true,
+    parseNumbers: true,
+  });
+}
 
-  if (response && response.headers && response.headers.link) {
-    const links = response.headers.link.split(',');
-    pagination.first = parsePageValue(links, 'first');
-    pagination.prev = parsePageValue(links, 'prev');
-    pagination.next = parsePageValue(links, 'next');
-    pagination.last = parsePageValue(links, 'last');
-  }
-  return pagination;
+export function stringifyQueryParams(value) {
+  return queryString.stringify(value, {
+    skipEmptyString: true,
+    skipNull: true,
+  });
 }

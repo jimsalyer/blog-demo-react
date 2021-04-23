@@ -20,14 +20,7 @@ describe('<PostsPage />', () => {
     cleanup();
   });
 
-  it('renders a list of posts with pagination controls', async () => {
-    const expectedPagination = {
-      first: 1,
-      prev: 1,
-      next: 3,
-      last: 4,
-    };
-
+  it('renders a list of posts', async () => {
     const expectedData = [
       {
         id: 1,
@@ -56,7 +49,7 @@ describe('<PostsPage />', () => {
     listUsersSpy.mockResolvedValue([]);
 
     searchPostsSpy.mockResolvedValue({
-      pagination: expectedPagination,
+      pageCount: 4,
       data: expectedData,
     });
 
@@ -69,9 +62,6 @@ describe('<PostsPage />', () => {
     await waitFor(() => {
       expect(searchPostsSpy).toHaveBeenCalled();
       screen.getByTestId('postsPage');
-
-      const paginations = screen.getAllByTestId('pagination');
-      expect(paginations).toHaveLength(2);
 
       const posts = screen.getAllByTestId('post');
       expect(posts).toHaveLength(2);
@@ -88,13 +78,6 @@ describe('<PostsPage />', () => {
   });
 
   it('displays a loading message until the API call finishes', async () => {
-    const expectedPagination = {
-      first: 1,
-      prev: 0,
-      next: 2,
-      last: 10,
-    };
-
     const expectedData = [
       {
         id: 1,
@@ -123,7 +106,7 @@ describe('<PostsPage />', () => {
     listUsersSpy.mockResolvedValue([]);
 
     searchPostsSpy.mockResolvedValue({
-      pagination: expectedPagination,
+      pageCount: 10,
       data: expectedData,
     });
 
@@ -142,24 +125,73 @@ describe('<PostsPage />', () => {
       const loadingMessage = screen.queryByTestId('loadingMessage');
       expect(loadingMessage).not.toBeInTheDocument();
 
-      const paginations = screen.queryAllByTestId('pagination');
-      expect(paginations).toHaveLength(2);
-
       const posts = screen.queryAllByTestId('post');
       expect(posts).toHaveLength(2);
     });
   });
 
-  it('displays a warning message if no data is returned from the API call', async () => {
-    const expectedPagination = {
-      first: 1,
-      prev: 0,
-      next: 0,
-      last: 1,
-    };
+  it('gets paging and search parameters from the current query string when the page loads', async () => {
+    const expectedAuthor = 8;
+    const expectedLimit = 5;
+    const expectedPage = 4;
+    const expectedText = 'something';
+
+    const expectedData = [
+      {
+        id: 1,
+        title: 'test title',
+        body: 'test body',
+        excerpt: 'test excerpt',
+        imageUrl: 'http://example.com/images/image.jpg',
+        userId: 1,
+        createUtc: '2020-01-01T00:00:00Z',
+        publishUtc: '2020-01-02T00:00:00Z',
+        modifyUtc: '2020-01-03T:00:00:00Z',
+      },
+      {
+        id: 2,
+        title: 'test title 2',
+        body: 'test body 2',
+        excerpt: 'test excerpt 2',
+        imageUrl: 'http://example.com/images/image2.jpg',
+        userId: 1,
+        createUtc: '2020-01-01T00:00:00Z',
+        publishUtc: '2020-01-02T00:00:00Z',
+        modifyUtc: '2020-01-03T:00:00:00Z',
+      },
+    ];
 
     listUsersSpy.mockResolvedValue([]);
-    searchPostsSpy.mockResolvedValue({ pagination: expectedPagination });
+
+    searchPostsSpy.mockResolvedValue({
+      pageCount: 10,
+      data: expectedData,
+    });
+
+    render(
+      <MemoryRouter
+        initialEntries={[
+          `/?author=${expectedAuthor}&text=${expectedText}&limit=${expectedLimit}&page=${expectedPage}`,
+        ]}
+      >
+        <PostsPage />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(searchPostsSpy).toHaveBeenCalledWith({
+        author: expectedAuthor,
+        limit: expectedLimit,
+        page: expectedPage,
+        text: expectedText,
+      });
+      screen.getByTestId('postsPage');
+    });
+  });
+
+  it('displays a warning message if no data is returned from the API call', async () => {
+    listUsersSpy.mockResolvedValue([]);
+    searchPostsSpy.mockResolvedValue({ pageCount: 1 });
 
     render(
       <MemoryRouter initialEntries={['/']}>
@@ -171,9 +203,6 @@ describe('<PostsPage />', () => {
       expect(searchPostsSpy).toHaveBeenCalled();
       screen.getByTestId('postsPage');
 
-      const pagers = screen.queryAllByTestId('pager');
-      expect(pagers).toHaveLength(0);
-
       const posts = screen.queryAllByTestId('post');
       expect(posts).toHaveLength(0);
 
@@ -182,17 +211,10 @@ describe('<PostsPage />', () => {
   });
 
   it('displays a warning message if no posts are returned from the API call', async () => {
-    const expectedPagination = {
-      first: 1,
-      prev: 0,
-      next: 0,
-      last: 1,
-    };
-
     listUsersSpy.mockResolvedValue([]);
 
     searchPostsSpy.mockResolvedValue({
-      pagination: expectedPagination,
+      pageCount: 1,
       data: [],
     });
 
@@ -206,32 +228,10 @@ describe('<PostsPage />', () => {
       expect(searchPostsSpy).toHaveBeenCalled();
       screen.getByTestId('postsPage');
 
-      const pagers = screen.queryAllByTestId('pagers');
-      expect(pagers).toHaveLength(0);
-
       const posts = screen.queryAllByTestId('post');
       expect(posts).toHaveLength(0);
 
       screen.getByTestId('warningMessage');
-    });
-  });
-
-  it('does not display any Pager components if no pagination object is returned from the API', async () => {
-    listUsersSpy.mockResolvedValue([]);
-    searchPostsSpy.mockResolvedValue({ data: [] });
-
-    render(
-      <MemoryRouter initialEntries={['/']}>
-        <PostsPage />
-      </MemoryRouter>
-    );
-
-    await waitFor(() => {
-      expect(searchPostsSpy).toHaveBeenCalled();
-      screen.getByTestId('postsPage');
-
-      const pagers = screen.queryAllByTestId('pager');
-      expect(pagers).toHaveLength(0);
     });
   });
 

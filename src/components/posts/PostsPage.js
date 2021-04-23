@@ -2,16 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { Alert, Card, Spinner } from 'react-bootstrap';
 import { useHistory, useLocation } from 'react-router-dom';
 import {
-  fromQueryString,
-  toQueryString,
-} from '../../helpers/queryStringHelpers';
+  parseQueryString,
+  stringifyQueryParams,
+} from '../../services/serviceUtils';
 import { searchPosts } from '../../services/postService';
 import ErrorMessage from '../common/ErrorMessage';
 import Pager from '../common/Pager';
 import PostSearchForm from './PostSearchForm';
 
 export default function PostsPage() {
-  const defaultLimit = 10;
   const [error, setError] = useState(null);
   const history = useHistory();
   const location = useLocation();
@@ -20,8 +19,7 @@ export default function PostsPage() {
   const [posts, setPosts] = useState([]);
 
   const [queryParams, setQueryParams] = useState(
-    () => sanitizeQueryParams(fromQueryString(location.search)),
-    (value) => sanitizeQueryParams(value)
+    parseQueryString(location.search)
   );
 
   function handleLimitChange(value) {
@@ -47,29 +45,19 @@ export default function PostsPage() {
     });
   }
 
-  function sanitizeQueryParams(value) {
-    const safeValue = value || {};
-    return {
-      author: safeValue.author || undefined,
-      text: safeValue.text || undefined,
-      limit: safeValue.limit > 0 ? safeValue.limit : defaultLimit,
-      page: safeValue.page > 0 ? safeValue.page : 1,
-    };
-  }
-
   useEffect(() => {
     async function loadPosts() {
-      const currentQueryParams = fromQueryString(location.search);
-      const currentQueryString = toQueryString(currentQueryParams);
-      const newQueryString = toQueryString(queryParams);
+      const currentQueryString =
+        location.search && location.search.substring(1);
+      const queryParamString = stringifyQueryParams(queryParams);
 
-      if (newQueryString !== currentQueryString) {
-        history.push({ search: newQueryString });
+      if (queryParamString !== currentQueryString) {
+        history.push({ search: queryParamString });
       } else {
         setLoading(true);
         try {
           const result = await searchPosts(queryParams);
-          setPageCount(result.pagination.last);
+          setPageCount(result.pageCount);
           setPosts(result.data);
         } catch (loadPostsError) {
           setError(loadPostsError);
