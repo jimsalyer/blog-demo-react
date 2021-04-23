@@ -20,7 +20,7 @@ export default function PostsPage() {
   const [posts, setPosts] = useState([]);
 
   const [queryParams, setQueryParams] = useState(
-    () => fromQueryString(location.search),
+    () => sanitizeQueryParams(fromQueryString(location.search)),
     (value) => sanitizeQueryParams(value)
   );
 
