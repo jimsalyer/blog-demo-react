@@ -1,7 +1,10 @@
-import queryString from 'query-string';
 import React, { useEffect, useState } from 'react';
 import { Alert, Card, Spinner } from 'react-bootstrap';
 import { useHistory, useLocation } from 'react-router-dom';
+import {
+  fromQueryString,
+  toQueryString,
+} from '../../helpers/queryStringHelpers';
 import { searchPosts } from '../../services/postService';
 import ErrorMessage from '../common/ErrorMessage';
 import Pager from '../common/Pager';
@@ -17,7 +20,7 @@ export default function PostsPage() {
   const [posts, setPosts] = useState([]);
 
   const [queryParams, setQueryParams] = useState(
-    () => parseQueryParams(location.search),
+    () => fromQueryString(location.search),
     (value) => sanitizeQueryParams(value)
   );
 
@@ -44,13 +47,6 @@ export default function PostsPage() {
     });
   }
 
-  function parseQueryParams(value) {
-    return queryString.parse(value, {
-      parseBooleans: true,
-      parseNumbers: true,
-    });
-  }
-
   function sanitizeQueryParams(value) {
     const safeValue = value || {};
     return {
@@ -61,18 +57,11 @@ export default function PostsPage() {
     };
   }
 
-  function stringifyQueryParams(value) {
-    return queryString.stringify(value, {
-      skipEmptyString: true,
-      skipNull: true,
-    });
-  }
-
   useEffect(() => {
     async function loadPosts() {
-      const currentQueryParams = parseQueryParams(location.search);
-      const currentQueryString = stringifyQueryParams(currentQueryParams);
-      const newQueryString = stringifyQueryParams(queryParams);
+      const currentQueryParams = fromQueryString(location.search);
+      const currentQueryString = toQueryString(currentQueryParams);
+      const newQueryString = toQueryString(queryParams);
 
       if (newQueryString !== currentQueryString) {
         history.push({ search: newQueryString });
