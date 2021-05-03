@@ -1,10 +1,4 @@
-import {
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import * as postService from '../../../services/postService';
@@ -65,21 +59,20 @@ describe('<PostsPage />', () => {
       </MemoryRouter>
     );
 
-    await waitFor(() => {
-      expect(searchPostsSpy).toHaveBeenCalled();
-      screen.getByTestId('postsPage');
+    screen.getByTestId('postsPage');
 
-      const posts = screen.getAllByTestId('post');
-      expect(posts).toHaveLength(2);
+    const posts = await screen.findAllByTestId('post');
+    expect(posts).toHaveLength(2);
 
-      posts.forEach((post, index) => {
-        expect(post.querySelector('.card-title').textContent).toBe(
-          expectedData[index].title
-        );
-        expect(post.querySelector('.card-text').textContent).toBe(
-          expectedData[index].excerpt
-        );
-      });
+    expect(searchPostsSpy).toHaveBeenCalled();
+
+    posts.forEach((post, index) => {
+      expect(post.querySelector('.card-title').textContent).toBe(
+        expectedData[index].title
+      );
+      expect(post.querySelector('.card-text').textContent).toBe(
+        expectedData[index].excerpt
+      );
     });
   });
 
@@ -122,18 +115,16 @@ describe('<PostsPage />', () => {
       </MemoryRouter>
     );
 
+    screen.getByTestId('postsPage');
     screen.getByTestId('loadingMessage');
 
-    await waitFor(() => {
-      expect(searchPostsSpy).toHaveBeenCalled();
-      screen.getByTestId('postsPage');
+    const posts = await screen.findAllByTestId('post');
+    expect(posts).toHaveLength(2);
 
-      const loadingMessage = screen.queryByTestId('loadingMessage');
-      expect(loadingMessage).not.toBeInTheDocument();
+    expect(searchPostsSpy).toHaveBeenCalled();
 
-      const posts = screen.queryAllByTestId('post');
-      expect(posts).toHaveLength(2);
-    });
+    const loadingMessage = screen.queryByTestId('loadingMessage');
+    expect(loadingMessage).not.toBeInTheDocument();
   });
 
   it('gets paging and search parameters from the current query string when the page loads', async () => {
@@ -184,14 +175,15 @@ describe('<PostsPage />', () => {
       </MemoryRouter>
     );
 
-    await waitFor(() => {
-      expect(searchPostsSpy).toHaveBeenCalledWith({
-        author: expectedAuthor,
-        limit: expectedLimit,
-        page: expectedPage,
-        text: expectedText,
-      });
-      screen.getByTestId('postsPage');
+    await screen.findAllByTestId('post');
+
+    screen.getByTestId('postsPage');
+
+    expect(searchPostsSpy).toHaveBeenCalledWith({
+      author: expectedAuthor,
+      limit: expectedLimit,
+      page: expectedPage,
+      text: expectedText,
     });
   });
 
