@@ -165,6 +165,48 @@ describe('<PostSearchForm />', () => {
       });
     });
 
+    it('changes the visual state of the form when a user is selected', async () => {
+      const expectedUsers = [
+        {
+          id: 1,
+          firstName: 'Test',
+          lastName: 'User1',
+        },
+        {
+          id: 2,
+          firstName: 'Test',
+          lastName: 'User2',
+        },
+      ];
+      const expectedAuthor = expectedUsers[1];
+
+      listUsersSpy.mockResolvedValue(expectedUsers);
+
+      render(
+        <PostSearchForm
+          values={{}}
+          onError={onErrorMock}
+          onSearch={onSearchMock}
+        />
+      );
+
+      await screen.findAllByTestId('authorListItem');
+      const list = screen.getByTestId('authorList');
+
+      const container = screen.getByTestId('searchFormContainer');
+      expect(container).not.toHaveClass('border-primary');
+
+      fireEvent.change(list, {
+        target: {
+          value: expectedAuthor.id,
+        },
+      });
+
+      await waitFor(() => {
+        expect(container).toHaveClass('border-primary');
+      });
+    });
+
     it('passes the selected user to the onSearch handler', async () => {
       const expectedUsers = [
         {
@@ -225,6 +267,82 @@ describe('<PostSearchForm />', () => {
         'authorNotFoundMessage'
       );
       expect(notFoundMessage).toHaveTextContent('No users were found.');
+    });
+  });
+
+  describe('Free Text Filter', () => {
+    it('defaults to the text provided (if applicable)', async () => {
+      const expectedText = 'test text';
+
+      listUsersSpy.mockResolvedValue([]);
+
+      render(
+        <PostSearchForm
+          values={{ text: expectedText }}
+          onError={onErrorMock}
+          onSearch={onSearchMock}
+        />
+      );
+
+      const fullTextSearch = await screen.findByTestId('fullTextSearch');
+      expect(fullTextSearch).toHaveValue(expectedText);
+    });
+
+    it('changes the visual state of the form when the value changes', async () => {
+      const expectedText = 'test text';
+
+      listUsersSpy.mockResolvedValue([]);
+
+      render(
+        <PostSearchForm
+          values={{}}
+          onError={onErrorMock}
+          onSearch={onSearchMock}
+        />
+      );
+
+      const container = screen.getByTestId('searchFormContainer');
+      expect(container).not.toHaveClass('border-primary');
+
+      const fullTextSearch = screen.getByTestId('fullTextSearch');
+      fireEvent.change(fullTextSearch, {
+        target: {
+          value: expectedText,
+        },
+      });
+
+      await waitFor(() => {
+        expect(container).toHaveClass('border-primary');
+      });
+    });
+
+    it('passes the entered text to the onSearch handler', async () => {
+      const expectedText = 'test text';
+
+      listUsersSpy.mockResolvedValue([]);
+
+      render(
+        <PostSearchForm
+          values={{}}
+          onError={onErrorMock}
+          onSearch={onSearchMock}
+        />
+      );
+
+      const fullTextSearch = screen.getByTestId('fullTextSearch');
+      fireEvent.change(fullTextSearch, {
+        target: {
+          value: expectedText,
+        },
+      });
+
+      const submitButton = await screen.findByText('Search');
+      fireEvent.click(submitButton);
+
+      expect(onSearchMock).toHaveBeenCalledWith({
+        author: 0,
+        text: expectedText,
+      });
     });
   });
 });

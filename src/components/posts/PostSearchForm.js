@@ -60,7 +60,11 @@ export default function PostSearchForm({ values, onError, onSearch }) {
 
   return (
     <Accordion>
-      <Card border={active ? 'primary' : null} className="mb-3">
+      <Card
+        border={active ? 'primary' : null}
+        className="mb-3"
+        data-testid="searchFormContainer"
+      >
         <Accordion.Toggle
           as={Card.Header}
           eventKey="searchForm"
@@ -118,7 +122,11 @@ export default function PostSearchForm({ values, onError, onSearch }) {
                 </Form.Group>
                 <Form.Group as={Col} controlId="text">
                   <Form.Label>Full Text Search</Form.Label>
-                  <Form.Control value={text} onChange={handleTextChange} />
+                  <Form.Control
+                    value={text}
+                    onChange={handleTextChange}
+                    data-testid="fullTextSearch"
+                  />
                 </Form.Group>
               </Form.Row>
               <Button type="submit">Search</Button>{' '}
