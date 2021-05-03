@@ -1,4 +1,10 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import * as postService from '../../../services/postService';
@@ -244,6 +250,88 @@ describe('<PostsPage />', () => {
     expect(newLimitToggle).toHaveTextContent(`${newLimit} Per Page`);
   });
 
+  it('calls the API with the filter values from the search form when it is submitted', async () => {
+    const expectedPosts = [
+      {
+        id: 1,
+        title: 'test title',
+        body: 'test body',
+        excerpt: 'test excerpt',
+        imageUrl: 'http://example.com/images/image.jpg',
+        userId: 1,
+        createUtc: '2020-01-01T00:00:00Z',
+        publishUtc: '2020-01-02T00:00:00Z',
+        modifyUtc: '2020-01-03T:00:00:00Z',
+      },
+      {
+        id: 2,
+        title: 'test title 2',
+        body: 'test body 2',
+        excerpt: 'test excerpt 2',
+        imageUrl: 'http://example.com/images/image2.jpg',
+        userId: 1,
+        createUtc: '2020-01-01T00:00:00Z',
+        publishUtc: '2020-01-02T00:00:00Z',
+        modifyUtc: '2020-01-03T:00:00:00Z',
+      },
+    ];
+
+    const expectedUsers = [
+      {
+        id: 1,
+        firstName: 'Test',
+        lastName: 'User1',
+      },
+      {
+        id: 2,
+        firstName: 'Test',
+        lastName: 'User2',
+      },
+    ];
+
+    const expectedAuthor = expectedUsers[0];
+    const expectedText = 'test';
+
+    listUsersSpy.mockResolvedValue(expectedUsers);
+    searchPostsSpy.mockResolvedValue({
+      pageCount: 10,
+      data: expectedPosts,
+    });
+
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <PostsPage />
+      </MemoryRouter>
+    );
+
+    await screen.findAllByTestId('authorListItem');
+    await screen.findAllByTestId('post');
+
+    const list = screen.getByTestId('authorList');
+    fireEvent.change(list, {
+      target: {
+        value: expectedAuthor.id,
+      },
+    });
+
+    const fullTextSearch = screen.getByTestId('fullTextSearch');
+    fireEvent.change(fullTextSearch, {
+      target: {
+        value: expectedText,
+      },
+    });
+
+    const submitButton = await screen.findByText('Search');
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      expect(searchPostsSpy).toHaveBeenNthCalledWith(2, {
+        author: expectedAuthor.id,
+        text: expectedText,
+      });
+    });
+  });
+
   it('displays a warning message if no data is returned from the API call', async () => {
     listUsersSpy.mockResolvedValue([]);
     searchPostsSpy.mockResolvedValue({ pageCount: 1 });
@@ -280,11 +368,30 @@ describe('<PostsPage />', () => {
     expect(posts).toHaveLength(0);
   });
 
-  it('displays an error message if the API call fails', async () => {
+  it('displays an error message if the main API call fails', async () => {
     const expectedError = new Error('test error message');
 
     listUsersSpy.mockResolvedValue([]);
     searchPostsSpy.mockRejectedValue(expectedError);
+
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <PostsPage />
+      </MemoryRouter>
+    );
+
+    const errorMessage = await screen.findByTestId('errorMessage');
+    expect(errorMessage).toHaveTextContent(expectedError.message);
+
+    const posts = screen.queryAllByTestId('post');
+    expect(posts).toHaveLength(0);
+  });
+
+  it('displays an error message if the users API call fails', async () => {
+    const expectedError = new Error('test error message');
+
+    listUsersSpy.mockRejectedValue(expectedError);
+    searchPostsSpy.mockResolvedValue([]);
 
     render(
       <MemoryRouter initialEntries={['/']}>
