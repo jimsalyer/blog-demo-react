@@ -71,6 +71,54 @@ describe('<PostSearchForm />', () => {
         expect(searchFormCollapse).toHaveClass('show');
       });
     });
+
+    it('resets the filter fields, collapses, and triggers the onSearch handler with no values when the reset button is clicked', async () => {
+      const expectedUsers = [
+        {
+          id: 1,
+          firstName: 'Test',
+          lastName: 'User1',
+        },
+        {
+          id: 2,
+          firstName: 'Test',
+          lastName: 'User2',
+        },
+      ];
+      const expectedAuthor = expectedUsers[1];
+      const expectedText = 'test text';
+
+      listUsersSpy.mockResolvedValue(expectedUsers);
+
+      render(
+        <PostSearchForm
+          values={{ author: expectedAuthor.id, text: expectedText }}
+          onError={onErrorMock}
+          onSearch={onSearchMock}
+        />
+      );
+
+      await screen.findAllByTestId('authorListItem');
+
+      const container = screen.getByTestId('searchFormContainer');
+      expect(container).toHaveClass('border-primary');
+
+      const list = screen.getByTestId('authorList');
+      expect(list).toHaveValue(expectedAuthor.id.toString());
+
+      const fullTextSearch = screen.getByTestId('fullTextSearch');
+      expect(fullTextSearch).toHaveValue(expectedText);
+
+      const resetButton = screen.getByText('Reset');
+      fireEvent.click(resetButton);
+
+      await waitFor(() => {
+        expect(container).not.toHaveClass('border-primary');
+        expect(list).toHaveValue('0');
+        expect(fullTextSearch).toHaveValue('');
+        expect(onSearchMock).toHaveBeenCalledWith({});
+      });
+    });
   });
 
   describe('Author Filter', () => {
