@@ -33,36 +33,33 @@ describe('<PostSearchForm />', () => {
     cleanup();
   });
 
-  it('renders the form collapsed by default', async () => {
-    listUsersSpy.mockResolvedValue([]);
+  describe('Form State', () => {
+    it('is collapsed by default', async () => {
+      listUsersSpy.mockResolvedValue([]);
 
-    render(
-      <PostSearchForm
-        values={{}}
-        onError={onErrorMock}
-        onSearch={onSearchMock}
-      />
-    );
+      render(
+        <PostSearchForm
+          values={{}}
+          onError={onErrorMock}
+          onSearch={onSearchMock}
+        />
+      );
 
-    await waitFor(() => {
       const searchFormCollapse = screen.getByTestId('searchFormCollapse');
-
       expect(searchFormCollapse).not.toHaveClass('show');
     });
-  });
 
-  it('expands the form when clicking the header', async () => {
-    listUsersSpy.mockResolvedValue([]);
+    it('expands when clicking the header', async () => {
+      listUsersSpy.mockResolvedValue([]);
 
-    render(
-      <PostSearchForm
-        values={{}}
-        onError={onErrorMock}
-        onSearch={onSearchMock}
-      />
-    );
+      render(
+        <PostSearchForm
+          values={{}}
+          onError={onErrorMock}
+          onSearch={onSearchMock}
+        />
+      );
 
-    await waitFor(() => {
       const searchFormCollapse = screen.getByTestId('searchFormCollapse');
       const searchFormToggle = screen.getByTestId('searchFormToggle');
 
@@ -70,7 +67,9 @@ describe('<PostSearchForm />', () => {
 
       fireEvent.click(searchFormToggle);
 
-      expect(searchFormCollapse).toHaveClass('show');
+      await waitFor(() => {
+        expect(searchFormCollapse).toHaveClass('show');
+      });
     });
   });
 });
