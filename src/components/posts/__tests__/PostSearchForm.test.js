@@ -33,7 +33,7 @@ describe('<PostSearchForm />', () => {
     cleanup();
   });
 
-  describe('Form State', () => {
+  describe('Form', () => {
     it('is collapsed by default', async () => {
       listUsersSpy.mockResolvedValue([]);
 
@@ -70,6 +70,161 @@ describe('<PostSearchForm />', () => {
       await waitFor(() => {
         expect(searchFormCollapse).toHaveClass('show');
       });
+    });
+  });
+
+  describe('Author Filter', () => {
+    it('displays a loading message until the list of users loads', async () => {
+      listUsersSpy.mockResolvedValue([]);
+
+      render(
+        <PostSearchForm
+          values={{}}
+          onError={onErrorMock}
+          onSearch={onSearchMock}
+        />
+      );
+
+      screen.getByTestId('authorList');
+
+      const loadingMessage = screen.getByTestId('authorLoadingMessage');
+      expect(loadingMessage).toHaveTextContent('Loading users...');
+
+      await waitFor(() => {
+        expect(loadingMessage).not.toBeInTheDocument();
+      });
+    });
+
+    it('displays a list of users by name', async () => {
+      const expectedUsers = [
+        {
+          id: 1,
+          firstName: 'Test',
+          lastName: 'User1',
+        },
+        {
+          id: 2,
+          firstName: 'Test',
+          lastName: 'User2',
+        },
+      ];
+
+      listUsersSpy.mockResolvedValue(expectedUsers);
+
+      render(
+        <PostSearchForm
+          values={{}}
+          onError={onErrorMock}
+          onSearch={onSearchMock}
+        />
+      );
+
+      screen.getByTestId('authorList');
+
+      const listItems = await screen.findAllByTestId('authorListItem');
+      expect(listItems).toHaveLength(2);
+
+      listItems.forEach((listItem, index) => {
+        const user = expectedUsers[index];
+        expect(listItem).toHaveValue(user.id.toString());
+        expect(listItem).toHaveTextContent(
+          `${user.firstName} ${user.lastName}`
+        );
+      });
+    });
+
+    it('selects the user with the ID provided in the values', async () => {
+      const expectedUsers = [
+        {
+          id: 1,
+          firstName: 'Test',
+          lastName: 'User1',
+        },
+        {
+          id: 2,
+          firstName: 'Test',
+          lastName: 'User2',
+        },
+      ];
+      const expectedAuthor = expectedUsers[1];
+
+      listUsersSpy.mockResolvedValue(expectedUsers);
+
+      render(
+        <PostSearchForm
+          values={{ author: expectedAuthor.id }}
+          onError={onErrorMock}
+          onSearch={onSearchMock}
+        />
+      );
+
+      const list = screen.getByTestId('authorList');
+
+      await waitFor(() => {
+        expect(list).toHaveValue(expectedAuthor.id.toString());
+      });
+    });
+
+    it('passes the selected user to the onSearch handler', async () => {
+      const expectedUsers = [
+        {
+          id: 1,
+          firstName: 'Test',
+          lastName: 'User1',
+        },
+        {
+          id: 2,
+          firstName: 'Test',
+          lastName: 'User2',
+        },
+      ];
+      const expectedAuthor = expectedUsers[0];
+
+      listUsersSpy.mockResolvedValue(expectedUsers);
+
+      render(
+        <PostSearchForm
+          values={{}}
+          onError={onErrorMock}
+          onSearch={onSearchMock}
+        />
+      );
+
+      await screen.findAllByTestId('authorListItem');
+      const list = screen.getByTestId('authorList');
+
+      fireEvent.change(list, {
+        target: {
+          value: expectedAuthor.id,
+        },
+      });
+
+      const submitButton = await screen.findByText('Search');
+      fireEvent.click(submitButton);
+
+      expect(onSearchMock).toHaveBeenCalledWith({
+        author: expectedAuthor.id,
+        text: '',
+      });
+    });
+
+    it('displays an appropriate message when no users are found', async () => {
+      listUsersSpy.mockResolvedValue([]);
+
+      render(
+        <PostSearchForm
+          values={{}}
+          onError={onErrorMock}
+          onSearch={onSearchMock}
+        />
+      );
+
+      screen.getByTestId('authorList');
+
+      const notFoundMessage = await screen.findByTestId(
+        'authorNotFoundMessage'
+      );
+      expect(notFoundMessage).toHaveTextContent('No users were found.');
     });
   });
 });

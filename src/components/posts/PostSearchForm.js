@@ -89,19 +89,28 @@ export default function PostSearchForm({ values, onError, onSearch }) {
                     custom
                     value={author}
                     onChange={handleAuthorChange}
+                    data-testid="authorList"
                   >
                     <option value={0}>Select user</option>
                     {loadingUsers && (
-                      <option value={-1}>Loading users...</option>
+                      <option value={-1} data-testid="authorLoadingMessage">
+                        Loading users...
+                      </option>
                     )}
                     {!loadingUsers && (!users || users.length === 0) && (
-                      <option value={-1}>No users were found.</option>
+                      <option value={-1} data-testid="authorNotFoundMessage">
+                        No users were found.
+                      </option>
                     )}
                     {!loadingUsers &&
                       users &&
                       users.length > 0 &&
                       users.map((user) => (
-                        <option key={user.id} value={user.id}>
+                        <option
+                          key={user.id}
+                          value={user.id}
+                          data-testid="authorListItem"
+                        >
                           {user.firstName} {user.lastName}
                         </option>
                       ))}
