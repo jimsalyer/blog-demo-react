@@ -250,6 +250,65 @@ describe('<PostsPage />', () => {
     expect(newLimitToggle).toHaveTextContent(`${newLimit} Per Page`);
   });
 
+  it('updates the current page when a new page is clicked in one of the pagers', async () => {
+    const expectedData = [
+      {
+        id: 1,
+        title: 'test title',
+        body: 'test body',
+        excerpt: 'test excerpt',
+        imageUrl: 'http://example.com/images/image.jpg',
+        userId: 1,
+        createUtc: '2020-01-01T00:00:00Z',
+        publishUtc: '2020-01-02T00:00:00Z',
+        modifyUtc: '2020-01-03T:00:00:00Z',
+      },
+      {
+        id: 2,
+        title: 'test title 2',
+        body: 'test body 2',
+        excerpt: 'test excerpt 2',
+        imageUrl: 'http://example.com/images/image2.jpg',
+        userId: 1,
+        createUtc: '2020-01-01T00:00:00Z',
+        publishUtc: '2020-01-02T00:00:00Z',
+        modifyUtc: '2020-01-03T:00:00:00Z',
+      },
+    ];
+
+    const initialPage = 2;
+    const newPage = 4;
+    const pageCount = 10;
+
+    listUsersSpy.mockResolvedValue([]);
+    searchPostsSpy.mockResolvedValue({
+      pageCount,
+      data: expectedData,
+    });
+
+    render(
+      <MemoryRouter initialEntries={[`/?page=${initialPage}`]}>
+        <PostsPage />
+      </MemoryRouter>
+    );
+
+    await screen.findAllByTestId('post');
+
+    let pageStatus = screen.getAllByTestId('pageStatus');
+    expect(pageStatus[0]).toHaveTextContent(
+      `Page ${initialPage} of ${pageCount}`
+    );
+
+    const pageNumberLinks = screen.getAllByTestId('pageNumberLink');
+    const newPageNumberLink = pageNumberLinks.find(
+      (pageNumberLink) => pageNumberLink.textContent === newPage.toString()
+    );
+    fireEvent.click(newPageNumberLink);
+
+    pageStatus = await screen.findAllByTestId('pageStatus');
+    expect(pageStatus[0]).toHaveTextContent(`Page ${newPage} of ${pageCount}`);
+  });
+
   it('calls the API with the filter values from the search form when it is submitted', async () => {
     const expectedPosts = [
       {

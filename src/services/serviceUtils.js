@@ -12,7 +12,7 @@ export function parsePageCount(response) {
     if (lastLink) {
       try {
         const matches = /<([^>]+)>/.exec(lastLink);
-        if (matches && matches.length > 1) {
+        if (matches) {
           const url = new URL(matches[1]);
           const queryParams = parseQueryString(url.search);
 

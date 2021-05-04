@@ -73,10 +73,7 @@ describe('serviceUtils', () => {
 
       let actualValue = serviceUtils.parsePageCount({
         headers: {
-          link: [
-            createHeaderLink('first', 1),
-            createHeaderLink('last', 10, ''),
-          ].join(','),
+          link: [createHeaderLink('first', 1), '<>; rel="last"'].join(','),
         },
       });
       expect(actualValue).toBe(expectedValue);
