@@ -45,6 +45,8 @@ describe('<PostSearchForm />', () => {
         />
       );
 
+      await screen.findByTestId('authorNotFoundMessage');
+
       const searchFormCollapse = screen.getByTestId('searchFormCollapse');
       expect(searchFormCollapse).not.toHaveClass('show');
     });
@@ -110,14 +112,13 @@ describe('<PostSearchForm />', () => {
       expect(fullTextSearch).toHaveValue(expectedText);
 
       const resetButton = screen.getByText('Reset');
+
       fireEvent.click(resetButton);
 
-      await waitFor(() => {
-        expect(container).not.toHaveClass('border-primary');
-        expect(list).toHaveValue('0');
-        expect(fullTextSearch).toHaveValue('');
-        expect(onSearchMock).toHaveBeenCalledWith({});
-      });
+      expect(container).not.toHaveClass('border-primary');
+      expect(list).toHaveValue('0');
+      expect(fullTextSearch).toHaveValue('');
+      expect(onSearchMock).toHaveBeenCalledWith({});
     });
   });
 
@@ -250,9 +251,7 @@ describe('<PostSearchForm />', () => {
         },
       });
 
-      await waitFor(() => {
-        expect(container).toHaveClass('border-primary');
-      });
+      expect(container).toHaveClass('border-primary');
     });
 
     it('passes the selected user to the onSearch handler', async () => {
@@ -289,7 +288,7 @@ describe('<PostSearchForm />', () => {
         },
       });
 
-      const submitButton = await screen.findByText('Search');
+      const submitButton = screen.getByText('Search');
       fireEvent.click(submitButton);
 
       expect(onSearchMock).toHaveBeenCalledWith({
@@ -349,19 +348,20 @@ describe('<PostSearchForm />', () => {
         />
       );
 
+      await screen.findByTestId('authorNotFoundMessage');
+
       const container = screen.getByTestId('searchFormContainer');
       expect(container).not.toHaveClass('border-primary');
 
       const fullTextSearch = screen.getByTestId('fullTextSearch');
+
       fireEvent.change(fullTextSearch, {
         target: {
           value: expectedText,
         },
       });
 
-      await waitFor(() => {
-        expect(container).toHaveClass('border-primary');
-      });
+      expect(container).toHaveClass('border-primary');
     });
 
     it('passes the entered text to the onSearch handler', async () => {
@@ -377,6 +377,8 @@ describe('<PostSearchForm />', () => {
         />
       );
 
+      await screen.findByTestId('authorNotFoundMessage');
+
       const fullTextSearch = screen.getByTestId('fullTextSearch');
       fireEvent.change(fullTextSearch, {
         target: {
@@ -384,7 +386,7 @@ describe('<PostSearchForm />', () => {
         },
       });
 
-      const submitButton = await screen.findByText('Search');
+      const submitButton = screen.getByText('Search');
       fireEvent.click(submitButton);
 
       expect(onSearchMock).toHaveBeenCalledWith({
