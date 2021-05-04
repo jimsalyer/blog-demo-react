@@ -233,3 +233,6 @@ $RECYCLE.BIN/
 
 # JSON Server API
 api/db.json
+
+# React
+build/

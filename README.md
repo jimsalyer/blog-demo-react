@@ -1,70 +1,75 @@
-# Getting Started with Create React App
+# React Based Blog Demo
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project is a blog demo that uses React for the frontend and JSON Server for the backend
 
-## Available Scripts
+## Requirements
 
-In the project directory, you can run:
+- Node.js
+- Yarn
 
-### `yarn start`
+## Initializing
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### Setup
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+1. Make a copy of `.env.example` and `api/.env.example` called `.env` and `api/.env`
+1. In `.env`, set `REACT_APP_API_URL` to the URL of the API. This will usually be `localhost:3030`, where `3030` is the port the API will run on.
+1. In `api/.env`, set `PORT` to the port the API will run on. Make sure this is the same as the port referenced in the URL above.
 
-### `yarn test`
+JSON Server will want to use port 3000 as the default, so it's a good idea to explicitly set the port for the API using the corresponding environment variable referenced above. Using port 3000 for the API will force you to change the port that the React frontend will run on.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Installation
 
-### `yarn build`
+```
+yarn init
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Starting
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Start the API
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```
+yarn api
+```
 
-### `yarn eject`
+Each time the API starts, it will make a copy of `data.json` as `db.json`. Any updates that are done through the API will be reflected in `db.json`. `data.json` will remain unchanged unless directly updated.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+### Start the React App
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```
+yarn start
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## Testing
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```
+yarn test
+yarn test:watch
+```
 
-## Learn More
+For doing a one time run through of the tests, use the `test` command. For running tests automatically as you're developing, use the `test:watch` command.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Formatting
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```
+yarn format
+yarn format:fix
+```
 
-### Code Splitting
+Use the `format` command to view the formatting issues without actually fixing them. The `format:fix` command will automatically fix the issues and save the files.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Linting
 
-### Analyzing the Bundle Size
+```
+yarn lint
+yarn lint:fix
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Use the `lint` command to view the linting issues without actually fixing them. The `lint:fix` command will automatically fix the issues and save the files.
 
-### Making a Progressive Web App
+## Publishing
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```
+yarn build
+```
 
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Output from the `build` command will be placed in a `build` directory in the root of the project.
