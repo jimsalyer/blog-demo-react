@@ -1,7 +1,7 @@
 {
   "name": "blog-demo-react",
   "version": "0.1.0",
-  "description": "Simple blog with data pulled from JSONPlaceholder",
+  "description": "Simple blog using JSON Server as a backend",
   "license": "MIT",
   "main": "src/index.js",
   "scripts": {
