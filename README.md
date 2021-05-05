@@ -23,6 +23,14 @@ JSON Server will want to use port 3000 as the default, so it's a good idea to ex
 yarn init
 ```
 
+### Generating API Data
+
+The following command will generate a `db.json` file in the `api` directory that will be used as the "database" for the API. If the file already exists, the command will overwrite it.
+
+```
+yarn api:data
+```
+
 ## Starting
 
 ### Start the API
