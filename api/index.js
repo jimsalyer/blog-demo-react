@@ -14,10 +14,24 @@ fs.copyFileSync(
 );
 
 const middlewares = jsonServer.defaults();
-const router = jsonServer.router('api/db.json');
+const router = jsonServer.router('db.json');
 const server = jsonServer.create();
 
 server.use(middlewares);
+server.use(jsonServer.bodyParser);
+
+server.post('/users/login', (req, res) => {
+  const user = router.db
+    .get('users')
+    .find({ username: req.body.username, password: req.body.password })
+    .value();
+
+  if (user) {
+    return res.json(user);
+  }
+  return res.status(404);
+});
+
 server.use(router);
 
 server.listen(process.env.PORT, () => {

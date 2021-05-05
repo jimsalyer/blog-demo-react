@@ -9,6 +9,7 @@ describe('userService', () => {
         lastName: 'User',
         emailAddress: 'test.user@example.com',
         username: 'tuser',
+        password: 'p@ssw0rd',
         createUtc: '2020-01-01T00:00:00Z',
         modifyUtc: '2020-01-02T00:00:00Z',
       };
@@ -41,13 +42,13 @@ describe('userService', () => {
 
   describe('getUser()', () => {
     it('makes a GET request with the given ID and returns the result', async () => {
-      const expectedId = 1;
       const expectedUser = {
-        id: expectedId,
+        id: 1,
         firstName: 'Test',
         lastName: 'User',
         emailAddress: 'test.user@example.com',
         username: 'tuser',
+        password: 'p@ssw0rd',
         createUtc: '2020-01-01T00:00:00Z',
         modifyUtc: '2020-01-02T00:00:00Z',
       };
@@ -56,9 +57,9 @@ describe('userService', () => {
         data: expectedUser,
       });
 
-      const actualUser = await userService.getUser(expectedId);
+      const actualUser = await userService.getUser(expectedUser.id);
 
-      expect(getSpy).toHaveBeenCalledWith(`/${expectedId}`);
+      expect(getSpy).toHaveBeenCalledWith(`/${expectedUser.id}`);
       expect(actualUser).toStrictEqual(expectedUser);
 
       getSpy.mockRestore();
@@ -74,6 +75,7 @@ describe('userService', () => {
           lastName: 'User',
           emailAddress: 'test.user@example.com',
           username: 'tuser',
+          password: 'p@ssw0rd',
           createUtc: '2020-01-01T00:00:00Z',
           modifyUtc: '2020-01-02T00:00:00Z',
         },
@@ -83,6 +85,7 @@ describe('userService', () => {
           lastName: 'User',
           emailAddress: 'sample.user@example.com',
           username: 'suser',
+          password: 'p@ssw0rd',
           createUtc: '2020-01-01T00:00:00Z',
           modifyUtc: '2020-01-02T00:00:00Z',
         },
@@ -103,15 +106,49 @@ describe('userService', () => {
     });
   });
 
-  describe('updateUser()', () => {
-    it('makes a PUT request with the given ID and data and returns the result', async () => {
-      const expectedId = 1;
+  describe('loginUser()', () => {
+    it('makes a POST request with the given username and password and returns the result', async () => {
       const expectedUser = {
-        id: expectedId,
+        id: 1,
         firstName: 'Test',
         lastName: 'User',
         emailAddress: 'test.user@example.com',
         username: 'tuser',
+        password: 'p@ssw0rd',
+        createUtc: '2020-01-01T00:00:00Z',
+        modifyUtc: '2020-01-02T00:00:00Z',
+      };
+
+      const expectedBody = {
+        username: expectedUser.username,
+        password: expectedUser.password,
+      };
+
+      const postSpy = jest.spyOn(mockClient, 'post').mockResolvedValue({
+        data: expectedUser,
+      });
+
+      const actualUser = await userService.loginUser(
+        expectedUser.username,
+        expectedUser.password
+      );
+
+      expect(postSpy).toHaveBeenCalledWith('/login', expectedBody);
+      expect(actualUser).toStrictEqual(expectedUser);
+
+      postSpy.mockRestore();
+    });
+  });
+
+  describe('updateUser()', () => {
+    it('makes a PUT request with the given ID and data and returns the result', async () => {
+      const expectedUser = {
+        id: 1,
+        firstName: 'Test',
+        lastName: 'User',
+        emailAddress: 'test.user@example.com',
+        username: 'tuser',
+        password: 'p@ssw0rd',
         createUtc: '2020-01-01T00:00:00Z',
         modifyUtc: '2020-01-02T00:00:00Z',
       };
@@ -120,9 +157,12 @@ describe('userService', () => {
         data: expectedUser,
       });
 
-      const actualUser = await userService.updateUser(expectedId, expectedUser);
+      const actualUser = await userService.updateUser(
+        expectedUser.id,
+        expectedUser
+      );
 
-      expect(putSpy).toHaveBeenCalledWith(`/${expectedId}`, expectedUser);
+      expect(putSpy).toHaveBeenCalledWith(`/${expectedUser.id}`, expectedUser);
       expect(actualUser).toStrictEqual(expectedUser);
 
       putSpy.mockRestore();

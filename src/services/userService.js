@@ -21,6 +21,11 @@ export async function listUsers() {
   return response.data;
 }
 
+export async function loginUser(username, password) {
+  const response = await client.post('/login', { username, password });
+  return response.data;
+}
+
 export async function updateUser(id, user) {
   const response = await client.put(`/${id}`, user);
   return response.data;
