@@ -5,13 +5,8 @@ describe('userService', () => {
   describe('createUser()', () => {
     it('makes a POST request with the given data and returns the result', async () => {
       const expectedUser = {
-        firstName: 'Test',
-        lastName: 'User',
-        emailAddress: 'test.user@example.com',
         username: 'tuser',
         password: 'p@ssw0rd',
-        createUtc: '2020-01-01T00:00:00Z',
-        modifyUtc: '2020-01-02T00:00:00Z',
       };
 
       const postSpy = jest.spyOn(mockClient, 'post').mockResolvedValue({
@@ -44,13 +39,8 @@ describe('userService', () => {
     it('makes a GET request with the given ID and returns the result', async () => {
       const expectedUser = {
         id: 1,
-        firstName: 'Test',
-        lastName: 'User',
-        emailAddress: 'test.user@example.com',
         username: 'tuser',
         password: 'p@ssw0rd',
-        createUtc: '2020-01-01T00:00:00Z',
-        modifyUtc: '2020-01-02T00:00:00Z',
       };
 
       const getSpy = jest.spyOn(mockClient, 'get').mockResolvedValue({
@@ -71,23 +61,13 @@ describe('userService', () => {
       const expectedData = [
         {
           id: 1,
-          firstName: 'Test',
-          lastName: 'User',
-          emailAddress: 'test.user@example.com',
           username: 'tuser',
           password: 'p@ssw0rd',
-          createUtc: '2020-01-01T00:00:00Z',
-          modifyUtc: '2020-01-02T00:00:00Z',
         },
         {
           id: 2,
-          firstName: 'Sample',
-          lastName: 'User',
-          emailAddress: 'sample.user@example.com',
           username: 'suser',
           password: 'p@ssw0rd',
-          createUtc: '2020-01-01T00:00:00Z',
-          modifyUtc: '2020-01-02T00:00:00Z',
         },
       ];
 
@@ -106,51 +86,12 @@ describe('userService', () => {
     });
   });
 
-  describe('loginUser()', () => {
-    it('makes a POST request with the given username and password and returns the result', async () => {
-      const expectedUser = {
-        id: 1,
-        firstName: 'Test',
-        lastName: 'User',
-        emailAddress: 'test.user@example.com',
-        username: 'tuser',
-        password: 'p@ssw0rd',
-        createUtc: '2020-01-01T00:00:00Z',
-        modifyUtc: '2020-01-02T00:00:00Z',
-      };
-
-      const expectedBody = {
-        username: expectedUser.username,
-        password: expectedUser.password,
-      };
-
-      const postSpy = jest.spyOn(mockClient, 'post').mockResolvedValue({
-        data: expectedUser,
-      });
-
-      const actualUser = await userService.loginUser(
-        expectedUser.username,
-        expectedUser.password
-      );
-
-      expect(postSpy).toHaveBeenCalledWith('/login', expectedBody);
-      expect(actualUser).toStrictEqual(expectedUser);
-
-      postSpy.mockRestore();
-    });
-  });
-
   describe('updateUser()', () => {
     it('makes a PUT request with the given ID and data and returns the result', async () => {
       const expectedUser = {
         id: 1,
-        firstName: 'Test',
-        lastName: 'User',
-        emailAddress: 'test.user@example.com',
         username: 'tuser',
         password: 'p@ssw0rd',
-        createUtc: '2020-01-01T00:00:00Z',
-        modifyUtc: '2020-01-02T00:00:00Z',
       };
 
       const putSpy = jest.spyOn(mockClient, 'put').mockResolvedValue({

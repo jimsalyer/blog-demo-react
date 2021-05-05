@@ -9,12 +9,6 @@ describe('postService', () => {
       const expectedPost = {
         title: 'test title',
         body: 'test body',
-        excerpt: 'test excerpt',
-        imageUrl: 'http://example.com/images/image.jpg',
-        userId: 1,
-        createUtc: '2020-01-01T00:00:00Z',
-        publishUtc: '2020-01-02T00:00:00Z',
-        modifyUtc: '2020-01-03T:00:00:00Z',
       };
 
       const postSpy = jest.spyOn(mockClient, 'post').mockResolvedValue({
@@ -45,26 +39,19 @@ describe('postService', () => {
 
   describe('getPost()', () => {
     it('makes a GET request with the given ID and returns the result', async () => {
-      const expectedId = 1;
       const expectedPost = {
-        id: expectedId,
+        id: 1,
         title: 'test title',
         body: 'test body',
-        excerpt: 'test excerpt',
-        imageUrl: 'http://example.com/images/image.jpg',
-        userId: 1,
-        createUtc: '2020-01-01T00:00:00Z',
-        publishUtc: '2020-01-02T00:00:00Z',
-        modifyUtc: '2020-01-03T:00:00:00Z',
       };
 
       const getSpy = jest.spyOn(mockClient, 'get').mockResolvedValue({
         data: expectedPost,
       });
 
-      const actualPost = await postService.getPost(expectedId);
+      const actualPost = await postService.getPost(expectedPost.id);
 
-      expect(getSpy).toHaveBeenCalledWith(`/${expectedId}`);
+      expect(getSpy).toHaveBeenCalledWith(`/${expectedPost.id}`);
       expect(actualPost).toStrictEqual(expectedPost);
 
       getSpy.mockRestore();
@@ -102,23 +89,13 @@ describe('postService', () => {
           id: 1,
           title: 'test title',
           body: 'test body',
-          excerpt: 'test excerpt',
-          imageUrl: 'http://example.com/images/image.jpg',
           userId: 1,
-          createUtc: '2020-01-01T00:00:00Z',
-          publishUtc: '2020-01-02T00:00:00Z',
-          modifyUtc: '2020-01-03T:00:00:00Z',
         },
         {
           id: 2,
           title: 'test title 2',
           body: 'test body 2',
-          excerpt: 'test excerpt 2',
-          imageUrl: 'http://example.com/images/image2.jpg',
           userId: 1,
-          createUtc: '2020-01-01T00:00:00Z',
-          publishUtc: '2020-01-02T00:00:00Z',
-          modifyUtc: '2020-01-03T:00:00:00Z',
         },
       ];
 
@@ -154,21 +131,22 @@ describe('postService', () => {
 
   describe('updatePost()', () => {
     it('makes a PUT request with the given ID and data and returns the result', async () => {
-      const expectedId = 1;
       const expectedPost = {
-        id: expectedId,
+        id: 1,
         title: 'test title',
         body: 'test body',
-        userId: 1,
       };
 
       const putSpy = jest.spyOn(mockClient, 'put').mockResolvedValue({
         data: expectedPost,
       });
 
-      const actualPost = await postService.updatePost(expectedId, expectedPost);
+      const actualPost = await postService.updatePost(
+        expectedPost.id,
+        expectedPost
+      );
 
-      expect(putSpy).toHaveBeenCalledWith(`/${expectedId}`, expectedPost);
+      expect(putSpy).toHaveBeenCalledWith(`/${expectedPost.id}`, expectedPost);
       expect(actualPost).toStrictEqual(expectedPost);
 
       putSpy.mockRestore();
