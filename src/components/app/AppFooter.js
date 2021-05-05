@@ -13,15 +13,6 @@ export default function AppFooter() {
       <a href="https://www.flaticon.com/authors/flat-icons" title="Flat Icons">
         Flat Icons
       </a>
-      . Data from{' '}
-      <a
-        href="https://jsonplaceholder.typicode.com"
-        target="_blank"
-        rel="noreferrer"
-      >
-        JSONPlaceholder
-      </a>
-      .
     </Container>
   );
 }
