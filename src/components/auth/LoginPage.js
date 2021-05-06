@@ -1,114 +1,125 @@
+import { Formik } from 'formik';
 import React, { useState } from 'react';
-import { Alert, Button, Card, Col, Form, Row, Spinner } from 'react-bootstrap';
+import { Alert, Button, Card, Form, Spinner } from 'react-bootstrap';
+import * as yup from 'yup';
 import { login } from '../../services/authService';
 
 export default function LoginPage() {
-  const [loading, setLoading] = useState(false);
-  const [password, setPassword] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [serverError, setServerError] = useState(null);
-  const [username, setUsername] = useState('');
-  const [usernameError, setUsernameError] = useState('');
+  const initialValues = { username: '', password: '' };
+  const [serverError, setServerError] = useState('');
 
-  function passwordChangeHandler(event) {
-    setPassword(event.target.value);
-    setPasswordError('');
-  }
+  const validationSchema = yup.object().shape({
+    username: yup
+      .string()
+      .trim()
+      .required('Username is required.')
+      .min(2, 'Username must be at least 2 characters long.')
+      .matches(/\S{1,}/, 'Username is invalid.'),
+    password: yup
+      .string()
+      .trim()
+      .required('Password is required.')
+      .min(2, 'Password must be at least 2 characters long.')
+      .matches(/^\S+$/, 'Password cannot contain whitespace.'),
+  });
 
-  async function submitHandler(event) {
-    event.preventDefault();
-    if (!loading) {
-      setServerError(null);
-      setLoading(true);
+  async function handleFormikSubmit(values, { setFieldValue, setSubmitting }) {
+    try {
+      setServerError('');
 
-      if (validate()) {
-        try {
-          const user = await login(username, password);
-          console.log(user);
-        } catch (loginError) {
-          if (loginError.response && loginError.response.data) {
-            setServerError(loginError.response.data);
-          } else {
-            setServerError(loginError);
-          }
-        }
+      const username = values.username.trim();
+      setFieldValue('username', username);
+
+      const password = values.password.trim();
+      setFieldValue('password', password);
+
+      const user = await login(username, password);
+      console.log(user);
+    } catch (error) {
+      if (error.response && error.response.data) {
+        setServerError(error.response.data.message);
+      } else {
+        setServerError(error.message);
       }
-
-      setLoading(false);
     }
-  }
-
-  function usernameChangeHandler(event) {
-    setUsername(event.target.value);
-    setUsernameError('');
-  }
-
-  function validate() {
-    let result = true;
-
-    if (!username) {
-      setUsernameError('Username is required.');
-      result = false;
-    }
-
-    if (!password) {
-      setPasswordError('Password is required.');
-      result = false;
-    }
-
-    return result;
+    setSubmitting(false);
   }
 
   return (
     <div data-testid="loginPage">
-      <Form className="pt-2" onSubmit={submitHandler}>
-        <Row className="justify-content-center">
-          <Col md={6} lg={4} xl={3}>
-            <Card className="shadow-sm">
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={handleFormikSubmit}
+      >
+        {({
+          values,
+          errors,
+          touched,
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          isSubmitting,
+        }) => (
+          <Form onSubmit={handleSubmit}>
+            <Card
+              className="mt-2 mx-auto shadow-sm"
+              style={{ maxWidth: '32em' }}
+            >
               <Card.Body>
-                {serverError && (
-                  <Alert variant="danger">{serverError.message}</Alert>
-                )}
-                <Form.Group controlId="username">
+                {serverError && <Alert variant="danger">{serverError}</Alert>}
+                <Form.Group>
                   <Form.Label>Username</Form.Label>
                   <Form.Control
-                    disabled={loading}
-                    className={usernameError ? 'is-invalid' : ''}
-                    onChange={usernameChangeHandler}
+                    name="username"
+                    value={values.username}
+                    className={
+                      touched.username && errors.username ? 'is-invalid' : null
+                    }
+                    onBlur={handleBlur}
+                    onChange={handleChange}
                   />
-                  {usernameError && (
-                    <Form.Text className="text-danger">
-                      {usernameError}
+                  {touched.username && errors.username && (
+                    <Form.Text className="invalid-feedback">
+                      {errors.username}
                     </Form.Text>
                   )}
                 </Form.Group>
-                <Form.Group controlId="password">
+                <Form.Group>
                   <Form.Label>Password</Form.Label>
                   <Form.Control
+                    name="password"
                     type="password"
-                    disabled={loading}
-                    className={passwordError ? 'is-invalid' : ''}
-                    onChange={passwordChangeHandler}
+                    value={values.password}
+                    className={
+                      touched.password && errors.password ? 'is-invalid' : null
+                    }
+                    onBlur={handleBlur}
+                    onChange={handleChange}
                   />
-                  {passwordError && (
-                    <Form.Text className="text-danger">
-                      {passwordError}
+                  {touched.password && errors.password && (
+                    <Form.Text className="invalid-feedback">
+                      {errors.password}
                     </Form.Text>
                   )}
                 </Form.Group>
               </Card.Body>
               <Card.Footer>
-                <Button type="submit" disabled={loading} className="btn-block">
-                  {loading && (
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="btn-block"
+                >
+                  {isSubmitting && (
                     <Spinner animation="border" size="sm" className="mr-2" />
                   )}
                   Log In
                 </Button>
               </Card.Footer>
             </Card>
-          </Col>
-        </Row>
-      </Form>
+          </Form>
+        )}
+      </Formik>
     </div>
   );
 }
