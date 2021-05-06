@@ -13,8 +13,7 @@ export default function LoginPage() {
       .string()
       .trim()
       .required('Username is required.')
-      .min(2, 'Username must be at least 2 characters long.')
-      .matches(/\S{1,}/, 'Username is invalid.'),
+      .min(2, 'Username must be at least 2 characters long.'),
     password: yup
       .string()
       .trim()
@@ -67,7 +66,11 @@ export default function LoginPage() {
               style={{ maxWidth: '32em' }}
             >
               <Card.Body>
-                {serverError && <Alert variant="danger">{serverError}</Alert>}
+                {serverError && (
+                  <Alert variant="danger" data-testid="serverError">
+                    {serverError}
+                  </Alert>
+                )}
                 <Form.Group>
                   <Form.Label>Username</Form.Label>
                   <Form.Control
@@ -76,11 +79,15 @@ export default function LoginPage() {
                     className={
                       touched.username && errors.username ? 'is-invalid' : null
                     }
+                    data-testid="usernameField"
                     onBlur={handleBlur}
                     onChange={handleChange}
                   />
                   {touched.username && errors.username && (
-                    <Form.Text className="invalid-feedback">
+                    <Form.Text
+                      className="invalid-feedback"
+                      data-testid="usernameError"
+                    >
                       {errors.username}
                     </Form.Text>
                   )}
@@ -94,11 +101,15 @@ export default function LoginPage() {
                     className={
                       touched.password && errors.password ? 'is-invalid' : null
                     }
+                    data-testid="passwordField"
                     onBlur={handleBlur}
                     onChange={handleChange}
                   />
                   {touched.password && errors.password && (
-                    <Form.Text className="invalid-feedback">
+                    <Form.Text
+                      className="invalid-feedback"
+                      data-testid="passwordError"
+                    >
                       {errors.password}
                     </Form.Text>
                   )}
@@ -109,9 +120,15 @@ export default function LoginPage() {
                   type="submit"
                   disabled={isSubmitting}
                   className="btn-block"
+                  data-testid="submitButton"
                 >
                   {isSubmitting && (
-                    <Spinner animation="border" size="sm" className="mr-2" />
+                    <Spinner
+                      animation="border"
+                      size="sm"
+                      className="mr-2"
+                      data-testid="submitButtonSpinner"
+                    />
                   )}
                   Log In
                 </Button>
