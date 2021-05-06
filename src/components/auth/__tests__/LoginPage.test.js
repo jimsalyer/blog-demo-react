@@ -122,11 +122,14 @@ describe('<LoginPage />', () => {
   });
 
   describe('Submission Handling', () => {
-    it('calls the login method of the authentication service', async () => {
-      const expectedUsername = 'testusername';
-      const expectedPassword = 'testpassword';
+    it('calls the login method of the authentication service and logs the result to the console', async () => {
+      const expectedUser = {
+        username: 'testusername',
+        password: 'testpassword',
+      };
 
-      loginSpy.mockResolvedValue({});
+      const logSpy = jest.spyOn(console, 'log');
+      loginSpy.mockResolvedValue(expectedUser);
 
       render(<LoginPage />);
 
@@ -134,15 +137,16 @@ describe('<LoginPage />', () => {
       const passwordField = screen.getByTestId('passwordField');
       const submitButton = screen.getByTestId('submitButton');
 
-      userEvent.type(usernameField, expectedUsername);
-      userEvent.type(passwordField, expectedPassword);
+      userEvent.type(usernameField, expectedUser.username);
+      userEvent.type(passwordField, expectedUser.password);
       fireEvent.click(submitButton);
 
       await waitFor(() => {
         expect(loginSpy).toHaveBeenCalledWith(
-          expectedUsername,
-          expectedPassword
+          expectedUser.username,
+          expectedUser.password
         );
+        expect(logSpy).toHaveBeenCalledWith(expectedUser);
       });
     });
 
