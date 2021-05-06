@@ -1,4 +1,3 @@
-import { mockClient } from 'axios';
 import * as userService from '../userService';
 
 describe('userService', () => {
@@ -9,7 +8,7 @@ describe('userService', () => {
         password: 'p@ssw0rd',
       };
 
-      const postSpy = jest.spyOn(mockClient, 'post').mockResolvedValue({
+      const postSpy = jest.spyOn(userService.client, 'post').mockResolvedValue({
         data: expectedUser,
       });
 
@@ -25,7 +24,9 @@ describe('userService', () => {
   describe('deleteUser()', () => {
     it('makes a DELETE request with the given ID', async () => {
       const expectedId = 1;
-      const deleteSpy = jest.spyOn(mockClient, 'delete');
+      const deleteSpy = jest
+        .spyOn(userService.client, 'delete')
+        .mockResolvedValue(null);
 
       await userService.deleteUser(expectedId);
 
@@ -43,7 +44,7 @@ describe('userService', () => {
         password: 'p@ssw0rd',
       };
 
-      const getSpy = jest.spyOn(mockClient, 'get').mockResolvedValue({
+      const getSpy = jest.spyOn(userService.client, 'get').mockResolvedValue({
         data: expectedUser,
       });
 
@@ -76,7 +77,7 @@ describe('userService', () => {
       };
 
       const getSpy = jest
-        .spyOn(mockClient, 'get')
+        .spyOn(userService.client, 'get')
         .mockResolvedValue(mockResponse);
 
       const actualData = await userService.listUsers();
@@ -94,7 +95,7 @@ describe('userService', () => {
         password: 'p@ssw0rd',
       };
 
-      const putSpy = jest.spyOn(mockClient, 'put').mockResolvedValue({
+      const putSpy = jest.spyOn(userService.client, 'put').mockResolvedValue({
         data: expectedUser,
       });
 

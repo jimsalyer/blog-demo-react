@@ -11,11 +11,19 @@ This project is a blog demo that uses React for the frontend and JSON Server for
 
 ### Setup
 
-1. Make a copy of `.env.example` and `api/.env.example` called `.env` and `api/.env`
-1. In `.env`, set `REACT_APP_API_URL` to the URL of the API. This will usually be `localhost:3030`, where `3030` is the port the API will run on.
-1. In `api/.env`, set `PORT` to the port the API will run on. Make sure this is the same as the port referenced in the URL above.
+Make a copy of `.env.example` and `api/.env.example` called `.env` and `api/.env`
 
-JSON Server will want to use port 3000 as the default, so it's a good idea to explicitly set the port for the API using the corresponding environment variable referenced above. Using port 3000 for the API will force you to change the port that the React frontend will run on.
+In `.env`, set the following variables accordingly:
+
+- `REACT_APP_API_URL`: URL of the API. Default value is `http://localhost:5000`.
+
+In `api/.env`, set the following variables accordingly:
+
+- `DELAY_MAX`: Maximum delay for API requests. Default value is 0.
+- `DELAY_MIN`: Minimum delay for API requests. Default value is 0.
+- `PORT`: Port the API will run on. Make sure this is the same as the port referenced in the `REACT_APP_API_URL` variable above. Default value is 5000.
+
+Setting the `DELAY_*` variables above will add a random delay for each API request between the minimum and maximum values.
 
 ### Installation
 

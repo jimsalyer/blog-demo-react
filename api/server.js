@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const dotenv = require('dotenv');
 const jsonServer = require('json-server');
 
@@ -7,18 +8,18 @@ const middlewares = jsonServer.defaults();
 const router = jsonServer.router('db.json');
 const server = jsonServer.create();
 
+const delayMax = parseInt(process.env.DELAY_MAX, 10);
+const delayMin = parseInt(process.env.DELAY_MIN, 10);
+
 server.use(middlewares);
 server.use(jsonServer.bodyParser);
 
-server.use((req, res, next) => {
-  if (req.method === 'POST') {
-    req.body.createUtc = new Date().toISOString();
-    req.body.modifyUtc = req.body.createUtc;
-  } else if (req.method === 'PATCH' || req.method === 'PUT') {
-    req.body.modifyUtc = new Date().toISOString();
-  }
-  next();
-});
+if (!Number.isNaN(delayMin) && !Number.isNaN(delayMax) && delayMax > delayMin) {
+  server.use((req, res, next) => {
+    const delay = _.random(delayMin, delayMax);
+    return setTimeout(() => next(), delay);
+  });
+}
 
 server.post('/auth/login', (req, res) => {
   const { username, password } = req.body;
@@ -40,6 +41,7 @@ server.post('/auth/login', (req, res) => {
 
 server.use(router);
 
-server.listen(process.env.PORT, () => {
-  console.log(`API server running on port ${process.env.PORT}...`);
+const port = process.env.PORT || 5000;
+server.listen(port, () => {
+  console.log(`API server running on port ${port}...`);
 });

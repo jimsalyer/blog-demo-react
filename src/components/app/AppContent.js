@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container } from 'react-bootstrap';
 import { Route, Switch } from 'react-router-dom';
+import LoginPage from '../auth/LoginPage';
 import NotFoundPage from '../not-found/NotFoundPage';
 import PostsPage from '../posts/PostsPage';
 
@@ -10,6 +11,9 @@ export default function AppContent() {
       <Switch>
         <Route exact path="/">
           <PostsPage />
+        </Route>
+        <Route path="/login">
+          <LoginPage />
         </Route>
         <Route path="*">
           <NotFoundPage />

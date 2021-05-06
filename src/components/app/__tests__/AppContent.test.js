@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import AppContent from '../AppContent';
@@ -15,9 +15,17 @@ describe('<AppContent />', () => {
       </MemoryRouter>
     );
 
-    await waitFor(() => {
-      screen.getByTestId('postsPage');
-    });
+    await screen.findByTestId('postsPage');
+  });
+
+  it('renders <LoginPage /> if the path is "/login"', async () => {
+    render(
+      <MemoryRouter initialEntries={['/login']}>
+        <AppContent />
+      </MemoryRouter>
+    );
+
+    await screen.findByTestId('loginPage');
   });
 
   it('renders <NotFoundPage /> if the path does not have a corresponding route', () => {

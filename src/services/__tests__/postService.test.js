@@ -1,4 +1,3 @@
-import { mockClient } from 'axios';
 import queryString from 'query-string';
 import * as postService from '../postService';
 import { stringifyQueryParams } from '../serviceUtils';
@@ -11,7 +10,7 @@ describe('postService', () => {
         body: 'test body',
       };
 
-      const postSpy = jest.spyOn(mockClient, 'post').mockResolvedValue({
+      const postSpy = jest.spyOn(postService.client, 'post').mockResolvedValue({
         data: expectedPost,
       });
 
@@ -27,7 +26,9 @@ describe('postService', () => {
   describe('deletePost()', () => {
     it('makes a DELETE request with the given ID', async () => {
       const expectedId = 1;
-      const deleteSpy = jest.spyOn(mockClient, 'delete');
+      const deleteSpy = jest
+        .spyOn(postService.client, 'delete')
+        .mockResolvedValue(null);
 
       await postService.deletePost(expectedId);
 
@@ -45,7 +46,7 @@ describe('postService', () => {
         body: 'test body',
       };
 
-      const getSpy = jest.spyOn(mockClient, 'get').mockResolvedValue({
+      const getSpy = jest.spyOn(postService.client, 'get').mockResolvedValue({
         data: expectedPost,
       });
 
@@ -62,7 +63,7 @@ describe('postService', () => {
     let getSpy;
 
     beforeEach(() => {
-      getSpy = jest.spyOn(mockClient, 'get');
+      getSpy = jest.spyOn(postService.client, 'get');
     });
 
     afterEach(() => {
@@ -137,7 +138,7 @@ describe('postService', () => {
         body: 'test body',
       };
 
-      const putSpy = jest.spyOn(mockClient, 'put').mockResolvedValue({
+      const putSpy = jest.spyOn(postService.client, 'put').mockResolvedValue({
         data: expectedPost,
       });
 

@@ -1,7 +1,7 @@
 import createClient from './createClient';
 import { parsePageCount, stringifyQueryParams } from './serviceUtils';
 
-const client = createClient('/posts');
+export const client = createClient('/posts');
 
 export const defaultSearchParams = {
   limit: 10,

@@ -1,4 +1,3 @@
-import { mockClient } from 'axios';
 import * as authService from '../authService';
 
 describe('authService', () => {
@@ -15,7 +14,7 @@ describe('authService', () => {
         password: expectedUser.password,
       };
 
-      const postSpy = jest.spyOn(mockClient, 'post').mockResolvedValue({
+      const postSpy = jest.spyOn(authService.client, 'post').mockResolvedValue({
         data: expectedUser,
       });
 

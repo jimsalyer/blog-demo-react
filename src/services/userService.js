@@ -1,6 +1,6 @@
 import createClient from './createClient';
 
-const client = createClient('/users');
+export const client = createClient('/users');
 
 export async function createUser(user) {
   const response = await client.post('/', user);
