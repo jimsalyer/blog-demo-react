@@ -22,15 +22,23 @@ async function generateData() {
       lastName: result.name.last,
       emailAddress: result.email,
       avatar: result.picture.large,
-      avatarThumbnail: result.picture.thumbnail,
       registerUtc: result.registered.date,
     }));
+
+    users.push({
+      id: users.length + 1,
+      username: 'jsalyer',
+      password: 'jimbo',
+      firstName: 'Jim',
+      lastName: 'Salyer',
+      emailAddress: 'jim.salyer@gmail.com',
+      avatar: 'https://randomuser.me/api/portraits/lego/3.jpg',
+      registerUtc: new Date().toISOString(),
+    });
 
     console.log('Generating posts...');
     const posts = _.times(postCount, (index) => {
       const bodyParagraphCount = faker.datatype.number({ min: 4, max: 16 });
-      const imageWidth = faker.datatype.number({ min: 720, max: 1440 });
-      const imageHeight = Math.round(imageWidth * 0.625);
       const user = faker.random.arrayElement(users);
       const createUtc = faker.date.between(user.registerUtc, new Date());
       const publishUtc = faker.date.between(createUtc, new Date());
@@ -40,8 +48,7 @@ async function generateData() {
         title: faker.lorem.sentence(),
         body: faker.lorem.paragraphs(bodyParagraphCount),
         excerpt: faker.lorem.paragraph(),
-        image: faker.image.technics(imageWidth, imageHeight),
-        thumbnail: faker.image.technics(240, 150),
+        image: faker.image.technics(1200, 750),
         userId: user.id,
         createUtc,
         publishUtc,

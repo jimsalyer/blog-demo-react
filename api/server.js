@@ -21,6 +21,22 @@ if (!Number.isNaN(delayMin) && !Number.isNaN(delayMax) && delayMax > delayMin) {
   });
 }
 
+server.use((req, res, next) => {
+  const isUsersRequest = req.path.startsWith('/users');
+  const dateString = new Date().toISOString();
+
+  if (req.method === 'POST') {
+    if (isUsersRequest) {
+      req.body.registerUtc = dateString;
+    } else {
+      req.body.createUtc = dateString;
+    }
+  } else if (/^(patch|put)$/i.test(req.method) && !isUsersRequest) {
+    req.body.modifyUtc = dateString;
+  }
+  return next();
+});
+
 server.post('/auth/login', (req, res) => {
   const { username, password } = req.body;
   try {
