@@ -48,7 +48,10 @@ export default function AppHeader() {
           </Nav.Link>
         </Nav>
         {user && (
-          <NavDropdown title={`${user.firstName} ${user.lastName}`}>
+          <NavDropdown
+            title={`${user.firstName} ${user.lastName}`}
+            data-testid="userDropdown"
+          >
             <NavDropdown.Item eventKey="logout" data-testid="logoutLink">
               Log Out
             </NavDropdown.Item>
