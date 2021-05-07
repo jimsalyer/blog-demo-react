@@ -1,10 +1,13 @@
 import { Formik } from 'formik';
 import React, { useState } from 'react';
 import { Alert, Button, Card, Form, Spinner } from 'react-bootstrap';
+import { useDispatch } from 'react-redux';
 import * as yup from 'yup';
+import { setUser } from '../../redux/userSlice';
 import { login } from '../../services/authService';
 
 export default function LoginPage() {
+  const dispatch = useDispatch();
   const initialValues = { username: '', password: '' };
   const [serverError, setServerError] = useState('');
 
@@ -33,7 +36,7 @@ export default function LoginPage() {
       setFieldValue('password', password);
 
       const user = await login(username, password);
-      console.log(user);
+      dispatch(setUser(user));
     } catch (error) {
       if (error.response && error.response.data) {
         setServerError(error.response.data.message);
@@ -74,44 +77,41 @@ export default function LoginPage() {
                 <Form.Group>
                   <Form.Label>Username</Form.Label>
                   <Form.Control
+                    isInvalid={touched.username && errors.username}
                     name="username"
                     value={values.username}
-                    className={
-                      touched.username && errors.username ? 'is-invalid' : null
-                    }
                     data-testid="usernameField"
                     onBlur={handleBlur}
                     onChange={handleChange}
                   />
                   {touched.username && errors.username && (
-                    <Form.Text
-                      className="invalid-feedback"
+                    <Form.Control.Feedback
+                      type="invalid"
                       data-testid="usernameError"
                     >
                       {errors.username}
-                    </Form.Text>
+                    </Form.Control.Feedback>
                   )}
                 </Form.Group>
-                <Form.Group>
+                <Form.Group controlId="password">
                   <Form.Label>Password</Form.Label>
                   <Form.Control
+                    autoComplete="on"
+                    isInvalid={touched.password && errors.password}
                     name="password"
                     type="password"
                     value={values.password}
-                    className={
-                      touched.password && errors.password ? 'is-invalid' : null
-                    }
                     data-testid="passwordField"
                     onBlur={handleBlur}
                     onChange={handleChange}
                   />
                   {touched.password && errors.password && (
-                    <Form.Text
-                      className="invalid-feedback"
+                    <Form.Control.Feedback
+                      type="invalid"
                       data-testid="passwordError"
                     >
                       {errors.password}
-                    </Form.Text>
+                    </Form.Control.Feedback>
                   )}
                 </Form.Group>
               </Card.Body>

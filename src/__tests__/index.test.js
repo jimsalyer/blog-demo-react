@@ -1,7 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import App from '../components/app/App';
+import store from '../redux/store';
 
 jest.mock('react-dom', () => ({ render: jest.fn() }));
 
@@ -15,9 +17,11 @@ describe('index', () => {
     require('../index');
 
     expect(ReactDOM.render).toHaveBeenCalledWith(
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>,
+      <Provider store={store}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </Provider>,
       root
     );
   });

@@ -1,8 +1,19 @@
 import React from 'react';
-import { Nav, Navbar } from 'react-bootstrap';
+import { Nav, Navbar, NavDropdown } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
+import { clearUser, selectUser } from '../../redux/userSlice';
 
 export default function AppHeader() {
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+
+  function handleSelect(eventKey) {
+    if (eventKey === 'logout') {
+      dispatch(clearUser());
+    }
+  }
+
   return (
     <Navbar
       bg="light"
@@ -12,6 +23,7 @@ export default function AppHeader() {
       variant="light"
       className="shadow-sm"
       data-testid="appHeader"
+      onSelect={handleSelect}
     >
       <Navbar.Brand as={NavLink} exact to="/">
         <img
@@ -25,10 +37,35 @@ export default function AppHeader() {
       <Navbar.Toggle aria-controls="navbarContent" />
       <Navbar.Collapse id="navbarContent">
         <Nav className="mr-auto">
-          <Nav.Link as={NavLink} exact to="/" data-testid="postsLink">
+          <Nav.Link
+            as={NavLink}
+            eventKey="posts"
+            exact
+            to="/"
+            data-testid="postsLink"
+          >
             Posts
           </Nav.Link>
         </Nav>
+        {user && (
+          <NavDropdown title={`${user.firstName} ${user.lastName}`}>
+            <NavDropdown.Item eventKey="logout" data-testid="logoutLink">
+              Log Out
+            </NavDropdown.Item>
+          </NavDropdown>
+        )}
+        {!user && (
+          <Nav>
+            <Nav.Link
+              as={NavLink}
+              eventKey="login"
+              to="/login"
+              data-testid="loginLink"
+            >
+              Log In
+            </Nav.Link>
+          </Nav>
+        )}
       </Navbar.Collapse>
     </Navbar>
   );

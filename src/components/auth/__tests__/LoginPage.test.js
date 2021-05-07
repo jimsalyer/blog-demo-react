@@ -1,6 +1,8 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
+import { Provider } from 'react-redux';
+import store from '../../../redux/store';
 import * as authService from '../../../services/authService';
 import LoginPage from '../LoginPage';
 
@@ -17,7 +19,11 @@ describe('<LoginPage />', () => {
 
   describe('Username Field', () => {
     it('shows appropriate styling and message when it is blank', async () => {
-      render(<LoginPage />);
+      render(
+        <Provider store={store}>
+          <LoginPage />
+        </Provider>
+      );
 
       const usernameField = screen.getByTestId('usernameField');
 
@@ -30,7 +36,11 @@ describe('<LoginPage />', () => {
     });
 
     it('shows appropriate styling and message when it is all whitespace', async () => {
-      render(<LoginPage />);
+      render(
+        <Provider store={store}>
+          <LoginPage />
+        </Provider>
+      );
 
       const usernameField = screen.getByTestId('usernameField');
 
@@ -44,7 +54,11 @@ describe('<LoginPage />', () => {
     });
 
     it('shows appropriate styling and message when it is too short', async () => {
-      render(<LoginPage />);
+      render(
+        <Provider store={store}>
+          <LoginPage />
+        </Provider>
+      );
 
       const usernameField = screen.getByTestId('usernameField');
 
@@ -62,7 +76,11 @@ describe('<LoginPage />', () => {
 
   describe('Password Field', () => {
     it('shows appropriate styling and message when it is blank', async () => {
-      render(<LoginPage />);
+      render(
+        <Provider store={store}>
+          <LoginPage />
+        </Provider>
+      );
 
       const passwordField = screen.getByTestId('passwordField');
 
@@ -75,7 +93,11 @@ describe('<LoginPage />', () => {
     });
 
     it('shows appropriate styling and message when it is all whitespace', async () => {
-      render(<LoginPage />);
+      render(
+        <Provider store={store}>
+          <LoginPage />
+        </Provider>
+      );
 
       const passwordField = screen.getByTestId('passwordField');
 
@@ -89,7 +111,11 @@ describe('<LoginPage />', () => {
     });
 
     it('shows appropriate styling and message when it is too short', async () => {
-      render(<LoginPage />);
+      render(
+        <Provider store={store}>
+          <LoginPage />
+        </Provider>
+      );
 
       const passwordField = screen.getByTestId('passwordField');
 
@@ -105,7 +131,11 @@ describe('<LoginPage />', () => {
     });
 
     it('shows appropriate styling and message when it contains whitespace', async () => {
-      render(<LoginPage />);
+      render(
+        <Provider store={store}>
+          <LoginPage />
+        </Provider>
+      );
 
       const passwordField = screen.getByTestId('passwordField');
 
@@ -122,16 +152,20 @@ describe('<LoginPage />', () => {
   });
 
   describe('Submission Handling', () => {
-    it('calls the login method of the authentication service and logs the result to the console', async () => {
+    it('calls the login method of the authentication service and updates state with the result', async () => {
       const expectedUser = {
         username: 'testusername',
         password: 'testpassword',
       };
 
-      const logSpy = jest.spyOn(console, 'log');
+      const dispatchSpy = jest.spyOn(store, 'dispatch');
       loginSpy.mockResolvedValue(expectedUser);
 
-      render(<LoginPage />);
+      render(
+        <Provider store={store}>
+          <LoginPage />
+        </Provider>
+      );
 
       const usernameField = screen.getByTestId('usernameField');
       const passwordField = screen.getByTestId('passwordField');
@@ -146,14 +180,24 @@ describe('<LoginPage />', () => {
           expectedUser.username,
           expectedUser.password
         );
-        expect(logSpy).toHaveBeenCalledWith(expectedUser);
+
+        expect(dispatchSpy).toHaveBeenCalledWith({
+          payload: expectedUser,
+          type: 'user/setUser',
+        });
+
+        dispatchSpy.mockRestore();
       });
     });
 
     it('disables the submit button and shows a spinner while running', async () => {
       loginSpy.mockResolvedValue({});
 
-      render(<LoginPage />);
+      render(
+        <Provider store={store}>
+          <LoginPage />
+        </Provider>
+      );
 
       const usernameField = screen.getByTestId('usernameField');
       const passwordField = screen.getByTestId('passwordField');
@@ -182,7 +226,11 @@ describe('<LoginPage />', () => {
     it('trims the leading and trailing whitespace from Username and Password', async () => {
       loginSpy.mockResolvedValue({});
 
-      render(<LoginPage />);
+      render(
+        <Provider store={store}>
+          <LoginPage />
+        </Provider>
+      );
 
       const usernameField = screen.getByTestId('usernameField');
       const passwordField = screen.getByTestId('passwordField');
@@ -209,7 +257,11 @@ describe('<LoginPage />', () => {
         },
       });
 
-      render(<LoginPage />);
+      render(
+        <Provider store={store}>
+          <LoginPage />
+        </Provider>
+      );
 
       const usernameField = screen.getByTestId('usernameField');
       const passwordField = screen.getByTestId('passwordField');
@@ -232,7 +284,11 @@ describe('<LoginPage />', () => {
         throw new Error(expectedErrorMessage);
       });
 
-      render(<LoginPage />);
+      render(
+        <Provider store={store}>
+          <LoginPage />
+        </Provider>
+      );
 
       const usernameField = screen.getByTestId('usernameField');
       const passwordField = screen.getByTestId('passwordField');
