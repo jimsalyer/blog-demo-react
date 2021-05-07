@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 import { Alert, Button, Card, Form, Spinner } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import * as yup from 'yup';
-import { setUser } from '../../redux/userSlice';
-import { login } from '../../services/authService';
+import { login } from '../../redux/userSlice';
+import * as authService from '../../services/authService';
 
 export default function LoginPage() {
   const dispatch = useDispatch();
@@ -35,8 +35,8 @@ export default function LoginPage() {
       const password = values.password.trim();
       setFieldValue('password', password);
 
-      const user = await login(username, password);
-      dispatch(setUser(user));
+      const user = await authService.login(username, password);
+      dispatch(login(user));
     } catch (error) {
       if (error.response && error.response.data) {
         setServerError(error.response.data.message);

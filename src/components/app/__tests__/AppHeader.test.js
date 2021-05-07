@@ -3,7 +3,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter, Route } from 'react-router-dom';
 import store from '../../../redux/store';
-import { clearUser, setUser } from '../../../redux/userSlice';
+import { login, logout } from '../../../redux/userSlice';
 import AppHeader from '../AppHeader';
 
 describe('<AppHeader />', () => {
@@ -25,7 +25,7 @@ describe('<AppHeader />', () => {
       screen.getByTestId('loginLink');
       expect(screen.queryByTestId('logoutLink')).not.toBeInTheDocument();
 
-      store.dispatch(setUser(expectedUser));
+      store.dispatch(login(expectedUser));
 
       const userDropdown = await screen.findByTestId('userDropdown');
       const userDropdownToggle = userDropdown.querySelector('.dropdown-toggle');
@@ -39,7 +39,7 @@ describe('<AppHeader />', () => {
 
       await screen.findByTestId('logoutLink');
 
-      store.dispatch(clearUser());
+      store.dispatch(logout());
 
       await screen.findByTestId('loginLink');
     });
@@ -132,7 +132,7 @@ describe('<AppHeader />', () => {
 
       const dispatchSpy = jest.spyOn(store, 'dispatch');
 
-      store.dispatch(setUser(expectedUser));
+      store.dispatch(login(expectedUser));
 
       const userDropdown = await screen.findByTestId('userDropdown');
       const userDropdownToggle = userDropdown.querySelector('.dropdown-toggle');
@@ -144,7 +144,7 @@ describe('<AppHeader />', () => {
       await screen.findByTestId('loginLink');
       expect(dispatchSpy).toHaveBeenLastCalledWith({
         payload: undefined,
-        type: 'user/clearUser',
+        type: 'user/logout',
       });
 
       dispatchSpy.mockRestore();

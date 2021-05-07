@@ -2,7 +2,7 @@ import React from 'react';
 import { Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
-import { clearUser, selectUser } from '../../redux/userSlice';
+import { logout, selectUser } from '../../redux/userSlice';
 
 export default function AppHeader() {
   const dispatch = useDispatch();
@@ -10,7 +10,7 @@ export default function AppHeader() {
 
   function handleSelect(eventKey) {
     if (eventKey === 'logout') {
-      dispatch(clearUser());
+      dispatch(logout());
     }
   }
 

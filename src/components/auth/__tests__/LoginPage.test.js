@@ -183,7 +183,7 @@ describe('<LoginPage />', () => {
 
         expect(dispatchSpy).toHaveBeenCalledWith({
           payload: expectedUser,
-          type: 'user/setUser',
+          type: 'user/login',
         });
 
         dispatchSpy.mockRestore();
