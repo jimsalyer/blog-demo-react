@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import React from 'react';
+import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom';
+import store from '../../../redux/store';
 import AppContent from '../AppContent';
 
 jest.mock('../../../services/postService', () => ({
@@ -20,9 +22,11 @@ describe('<AppContent />', () => {
 
   it('renders <LoginPage /> if the path is "/login"', async () => {
     render(
-      <MemoryRouter initialEntries={['/login']}>
-        <AppContent />
-      </MemoryRouter>
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/login']}>
+          <AppContent />
+        </MemoryRouter>
+      </Provider>
     );
 
     await screen.findByTestId('loginPage');

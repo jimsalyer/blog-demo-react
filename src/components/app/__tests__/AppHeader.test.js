@@ -1,19 +1,36 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
+import { Provider } from 'react-redux';
 import { MemoryRouter, Route } from 'react-router-dom';
+import store from '../../../redux/store';
 import AppHeader from '../AppHeader';
 
 describe('<AppHeader />', () => {
   describe('Rendering', () => {
     it('renders and activates "Posts" link when the path is "/"', () => {
       render(
-        <MemoryRouter initialEntries={['/']}>
-          <AppHeader />
-        </MemoryRouter>
+        <Provider store={store}>
+          <MemoryRouter initialEntries={['/']}>
+            <AppHeader />
+          </MemoryRouter>
+        </Provider>
       );
 
       screen.getByTestId('appHeader');
       expect(screen.getByTestId('postsLink')).toHaveClass('active');
+    });
+
+    it('renders and activates "Log In" link when the path is "/login"', () => {
+      render(
+        <Provider store={store}>
+          <MemoryRouter initialEntries={['/login']}>
+            <AppHeader />
+          </MemoryRouter>
+        </Provider>
+      );
+
+      screen.getByTestId('appHeader');
+      expect(screen.getByTestId('loginLink')).toHaveClass('active');
     });
   });
 
@@ -22,16 +39,18 @@ describe('<AppHeader />', () => {
 
     beforeEach(() => {
       render(
-        <MemoryRouter initialEntries={['/invalid-path']}>
-          <AppHeader />
-          <Route
-            path="*"
-            render={({ location }) => {
-              testLocation = location;
-              return null;
-            }}
-          />
-        </MemoryRouter>
+        <Provider store={store}>
+          <MemoryRouter initialEntries={['/invalid-path']}>
+            <AppHeader />
+            <Route
+              path="*"
+              render={({ location }) => {
+                testLocation = location;
+                return null;
+              }}
+            />
+          </MemoryRouter>
+        </Provider>
       );
     });
 
@@ -39,7 +58,7 @@ describe('<AppHeader />', () => {
       expect(testLocation.pathname).toBe('/invalid-path');
 
       act(() => {
-        const brand = document.querySelector('.navbar-brand');
+        const brand = screen.getByTestId('brand');
         fireEvent.click(brand);
       });
 
@@ -55,6 +74,17 @@ describe('<AppHeader />', () => {
       });
 
       expect(testLocation.pathname).toBe('/');
+    });
+
+    it('navigates to "/login" when clicking the "Log In" link', () => {
+      expect(testLocation.pathname).toBe('/invalid-path');
+
+      act(() => {
+        const loginLink = screen.getByTestId('loginLink');
+        fireEvent.click(loginLink);
+      });
+
+      expect(testLocation.pathname).toBe('/login');
     });
   });
 });

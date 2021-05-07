@@ -25,7 +25,7 @@ export default function AppHeader() {
       data-testid="appHeader"
       onSelect={handleSelect}
     >
-      <Navbar.Brand as={NavLink} exact to="/">
+      <Navbar.Brand as={NavLink} exact to="/" data-testid="brand">
         <img
           src="/logo.svg"
           alt="Blog Logo"
