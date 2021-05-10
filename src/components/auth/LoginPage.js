@@ -25,7 +25,10 @@ export default function LoginPage() {
       .matches(/^\S+$/, 'Password cannot contain whitespace.'),
   });
 
-  async function handleFormikSubmit(values, { setFieldValue, setSubmitting }) {
+  async function handleFormikSubmit(
+    values,
+    { resetForm, setFieldValue, setSubmitting }
+  ) {
     try {
       setServerError('');
 
@@ -37,6 +40,7 @@ export default function LoginPage() {
 
       const user = await authService.login(username, password);
       dispatch(login(user));
+      resetForm();
     } catch (error) {
       if (error.response && error.response.data) {
         setServerError(error.response.data.message);

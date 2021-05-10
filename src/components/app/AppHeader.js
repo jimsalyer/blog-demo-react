@@ -35,8 +35,8 @@ export default function AppHeader() {
         Blog
       </Navbar.Brand>
       <Navbar.Toggle aria-controls="navbarContent" />
-      <Navbar.Collapse id="navbarContent">
-        <Nav className="mr-auto">
+      <Navbar.Collapse id="navbarContent" className="justify-content-between">
+        <Nav>
           <Nav.Link
             as={NavLink}
             eventKey="posts"
@@ -48,14 +48,17 @@ export default function AppHeader() {
           </Nav.Link>
         </Nav>
         {user && (
-          <NavDropdown
-            title={`${user.firstName} ${user.lastName}`}
-            data-testid="userDropdown"
-          >
-            <NavDropdown.Item eventKey="logout" data-testid="logoutLink">
-              Log Out
-            </NavDropdown.Item>
-          </NavDropdown>
+          <Nav>
+            <NavDropdown
+              alignRight
+              title={`${user.firstName} ${user.lastName}`}
+              data-testid="userDropdown"
+            >
+              <NavDropdown.Item eventKey="logout" data-testid="logoutLink">
+                Log Out
+              </NavDropdown.Item>
+            </NavDropdown>
+          </Nav>
         )}
         {!user && (
           <Nav>

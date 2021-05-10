@@ -224,7 +224,7 @@ describe('<LoginPage />', () => {
     });
 
     it('trims the leading and trailing whitespace from Username and Password', async () => {
-      loginSpy.mockResolvedValue({});
+      loginSpy.mockRejectedValue({ message: 'test error message' });
 
       render(
         <Provider store={store}>
@@ -243,6 +243,29 @@ describe('<LoginPage />', () => {
       await waitFor(() => {
         expect(usernameField).toHaveValue('test');
         expect(passwordField).toHaveValue('test');
+      });
+    });
+
+    it('resets the form after a successful login call', async () => {
+      loginSpy.mockResolvedValue({});
+
+      render(
+        <Provider store={store}>
+          <LoginPage />
+        </Provider>
+      );
+
+      const usernameField = screen.getByTestId('usernameField');
+      const passwordField = screen.getByTestId('passwordField');
+      const submitButton = screen.getByTestId('submitButton');
+
+      userEvent.type(usernameField, 'test');
+      userEvent.type(passwordField, 'test');
+      fireEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(usernameField).toHaveValue('');
+        expect(passwordField).toHaveValue('');
       });
     });
 

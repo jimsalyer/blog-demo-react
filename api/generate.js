@@ -76,7 +76,7 @@ async function generateData() {
     });
 
     console.log('Saving data to file...');
-    const data = { users, posts, comments };
+    const data = { users, posts, comments, accessTokens: [] };
     const dataString = JSON.stringify(data, null, 2);
     const dataBuffer = Buffer.from(dataString);
     fs.writeFileSync('db.json', dataBuffer);

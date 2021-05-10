@@ -22,6 +22,7 @@ In `api/.env`, set the following variables accordingly:
 - `DELAY_MAX`: Maximum delay for API requests. Default value is 0.
 - `DELAY_MIN`: Minimum delay for API requests. Default value is 0.
 - `PORT`: Port the API will run on. Make sure this is the same as the port referenced in the `REACT_APP_API_URL` variable above. Default value is 5000.
+- `USER_SESSION_TIMEOUT`: Amount of time (in milliseconds) a user session can be "dormant" before ending. Sessions are refreshed each time the verify endpoint is called.
 
 Setting the `DELAY_*` variables above will add a random delay for each API request between the minimum and maximum values.
 
