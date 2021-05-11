@@ -45,6 +45,48 @@ describe('<AppHeader />', () => {
       await screen.findByTestId('loginLink');
     });
 
+    it('renders a status message while waiting for the logout action to complete and then redirects to "/login"', async () => {
+      const expectedUser = {
+        firstName: 'Test',
+        lastName: 'User',
+      };
+
+      const logoutSpy = jest.spyOn(authService, 'logout').mockResolvedValue();
+
+      let testLocation;
+
+      render(
+        <Provider store={store}>
+          <MemoryRouter initialEntries={['/']}>
+            <AppHeader />
+            <Route
+              path="*"
+              render={({ location }) => {
+                testLocation = location;
+              }}
+            />
+          </MemoryRouter>
+        </Provider>
+      );
+
+      store.dispatch(login(expectedUser));
+
+      const userDropdown = await screen.findByTestId('userDropdown');
+      const userDropdownToggle = userDropdown.querySelector('.dropdown-toggle');
+      fireEvent.click(userDropdownToggle);
+
+      const logoutLink = await screen.findByTestId('logoutLink');
+      fireEvent.click(logoutLink);
+
+      const logoutStatus = await screen.findByTestId('logoutStatus');
+      expect(logoutStatus).toHaveTextContent('Logging Out');
+
+      await screen.findByTestId('loginLink');
+      expect(testLocation.pathname).toBe('/login');
+
+      logoutSpy.mockRestore();
+    });
+
     it('renders and activates "Posts" link when the path is "/"', () => {
       render(
         <Provider store={store}>

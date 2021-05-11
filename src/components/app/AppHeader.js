@@ -1,18 +1,23 @@
-import React from 'react';
-import { Nav, Navbar, NavDropdown } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Nav, Navbar, NavDropdown, Spinner } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useHistory } from 'react-router-dom';
 import { logout, selectUser } from '../../redux/userSlice';
 import * as authService from '../../services/authService';
 
 export default function AppHeader() {
   const dispatch = useDispatch();
+  const history = useHistory();
+  const [loggingOut, setLoggingOut] = useState(false);
   const user = useSelector(selectUser);
 
-  function handleSelect(eventKey) {
-    if (eventKey === 'logout') {
-      authService.logout(user.accessToken);
+  async function handleSelect(eventKey) {
+    if (eventKey === 'logout' && !loggingOut) {
+      setLoggingOut(true);
+      await authService.logout(user.accessToken);
       dispatch(logout());
+      setLoggingOut(false);
+      history.push('/login');
     }
   }
 
@@ -49,7 +54,13 @@ export default function AppHeader() {
             Posts
           </Nav.Link>
         </Nav>
-        {user && (
+        {user && loggingOut && (
+          <Navbar.Text data-testid="logoutStatus">
+            <Spinner animation="border" size="sm" className="mr-2" />
+            Logging Out
+          </Navbar.Text>
+        )}
+        {user && !loggingOut && (
           <Nav>
             <NavDropdown
               alignRight

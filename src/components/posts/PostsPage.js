@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, Card, Spinner } from 'react-bootstrap';
+import { Alert, Button, Card, Spinner } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
+import { selectUser } from '../../redux/userSlice';
 import {
   parseQueryString,
   stringifyQueryParams,
@@ -17,6 +19,7 @@ export default function PostsPage() {
   const [pageCount, setPageCount] = useState(1);
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState([]);
+  const user = useSelector(selectUser);
 
   const [queryParams, setQueryParams] = useState(
     parseQueryString(location.search)
@@ -77,6 +80,13 @@ export default function PostsPage() {
         onError={setError}
         onSearch={handleSearch}
       />
+      {user && (
+        <div className="mb-3">
+          <Button variant="success" data-testid="createPostButton">
+            Create New Post
+          </Button>
+        </div>
+      )}
       {loading && (
         <div data-testid="loadingMessage">
           <Spinner animation="border" role="status" size="sm" />{' '}

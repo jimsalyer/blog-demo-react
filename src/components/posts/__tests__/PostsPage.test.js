@@ -6,7 +6,10 @@ import {
   waitFor,
 } from '@testing-library/react';
 import React from 'react';
+import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom';
+import store from '../../../redux/store';
+import { login, logout } from '../../../redux/userSlice';
 import * as postService from '../../../services/postService';
 import * as userService from '../../../services/userService';
 import PostsPage from '../PostsPage';
@@ -24,6 +27,31 @@ describe('<PostsPage />', () => {
     listUsersSpy.mockRestore();
     searchPostsSpy.mockRestore();
     cleanup();
+  });
+
+  it('renders a "Create New Post" button if the user is logged in', async () => {
+    listUsersSpy.mockResolvedValue([]);
+    searchPostsSpy.mockResolvedValue({
+      pageCount: 1,
+      data: [],
+    });
+
+    render(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/']}>
+          <PostsPage />
+        </MemoryRouter>
+      </Provider>
+    );
+
+    store.dispatch(login({}));
+
+    const createPostButton = await screen.findByTestId('createPostButton');
+    expect(createPostButton).toHaveTextContent('Create New Post');
+
+    store.dispatch(logout());
+
+    expect(screen.queryByTestId('createPostButton')).not.toBeInTheDocument();
   });
 
   it('renders a list of posts', async () => {
@@ -60,9 +88,11 @@ describe('<PostsPage />', () => {
     });
 
     render(
-      <MemoryRouter initialEntries={['/?page=2']}>
-        <PostsPage />
-      </MemoryRouter>
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/?page=2']}>
+          <PostsPage />
+        </MemoryRouter>
+      </Provider>
     );
 
     screen.getByTestId('postsPage');
@@ -116,9 +146,11 @@ describe('<PostsPage />', () => {
     });
 
     render(
-      <MemoryRouter initialEntries={['/']}>
-        <PostsPage />
-      </MemoryRouter>
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/']}>
+          <PostsPage />
+        </MemoryRouter>
+      </Provider>
     );
 
     screen.getByTestId('postsPage');
@@ -172,13 +204,15 @@ describe('<PostsPage />', () => {
     });
 
     render(
-      <MemoryRouter
-        initialEntries={[
-          `/?author=${expectedAuthor}&text=${expectedText}&limit=${expectedLimit}&page=${expectedPage}`,
-        ]}
-      >
-        <PostsPage />
-      </MemoryRouter>
+      <Provider store={store}>
+        <MemoryRouter
+          initialEntries={[
+            `/?author=${expectedAuthor}&text=${expectedText}&limit=${expectedLimit}&page=${expectedPage}`,
+          ]}
+        >
+          <PostsPage />
+        </MemoryRouter>
+      </Provider>
     );
 
     await screen.findAllByTestId('post');
@@ -226,9 +260,11 @@ describe('<PostsPage />', () => {
     });
 
     render(
-      <MemoryRouter initialEntries={['/']}>
-        <PostsPage />
-      </MemoryRouter>
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/']}>
+          <PostsPage />
+        </MemoryRouter>
+      </Provider>
     );
 
     await screen.findAllByTestId('post');
@@ -287,9 +323,11 @@ describe('<PostsPage />', () => {
     });
 
     render(
-      <MemoryRouter initialEntries={[`/?page=${initialPage}`]}>
-        <PostsPage />
-      </MemoryRouter>
+      <Provider store={store}>
+        <MemoryRouter initialEntries={[`/?page=${initialPage}`]}>
+          <PostsPage />
+        </MemoryRouter>
+      </Provider>
     );
 
     await screen.findAllByTestId('post');
@@ -358,9 +396,11 @@ describe('<PostsPage />', () => {
     });
 
     render(
-      <MemoryRouter initialEntries={['/']}>
-        <PostsPage />
-      </MemoryRouter>
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/']}>
+          <PostsPage />
+        </MemoryRouter>
+      </Provider>
     );
 
     await screen.findAllByTestId('authorListItem');
@@ -396,9 +436,11 @@ describe('<PostsPage />', () => {
     searchPostsSpy.mockResolvedValue({ pageCount: 1 });
 
     render(
-      <MemoryRouter initialEntries={['/']}>
-        <PostsPage />
-      </MemoryRouter>
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/']}>
+          <PostsPage />
+        </MemoryRouter>
+      </Provider>
     );
 
     await screen.findByTestId('warningMessage');
@@ -416,9 +458,11 @@ describe('<PostsPage />', () => {
     });
 
     render(
-      <MemoryRouter initialEntries={['/']}>
-        <PostsPage />
-      </MemoryRouter>
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/']}>
+          <PostsPage />
+        </MemoryRouter>
+      </Provider>
     );
 
     await screen.findByTestId('warningMessage');
@@ -434,9 +478,11 @@ describe('<PostsPage />', () => {
     searchPostsSpy.mockRejectedValue(expectedError);
 
     render(
-      <MemoryRouter initialEntries={['/']}>
-        <PostsPage />
-      </MemoryRouter>
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/']}>
+          <PostsPage />
+        </MemoryRouter>
+      </Provider>
     );
 
     const errorMessage = await screen.findByTestId('errorMessage');
@@ -453,9 +499,11 @@ describe('<PostsPage />', () => {
     searchPostsSpy.mockResolvedValue([]);
 
     render(
-      <MemoryRouter initialEntries={['/']}>
-        <PostsPage />
-      </MemoryRouter>
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/']}>
+          <PostsPage />
+        </MemoryRouter>
+      </Provider>
     );
 
     const errorMessage = await screen.findByTestId('errorMessage');

@@ -1,20 +1,21 @@
 import { Formik } from 'formik';
+import queryString from 'query-string';
 import React, { useState } from 'react';
 import { Alert, Button, Card, Form, Spinner } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
+import { useHistory, useLocation } from 'react-router-dom';
 import loginSchema from '../../schemas/loginSchema';
 import { login } from '../../redux/userSlice';
 import * as authService from '../../services/authService';
 
 export default function LoginPage() {
   const dispatch = useDispatch();
+  const history = useHistory();
   const initialValues = { username: '', password: '', remember: false };
+  const location = useLocation();
   const [serverError, setServerError] = useState('');
 
-  async function handleFormikSubmit(
-    values,
-    { resetForm, setFieldValue, setSubmitting }
-  ) {
+  async function handleFormikSubmit(values, { setFieldValue, setSubmitting }) {
     try {
       setServerError('');
 
@@ -27,7 +28,13 @@ export default function LoginPage() {
 
       const user = await authService.login(username, password, remember);
       dispatch(login(user));
-      resetForm();
+
+      const queryValues = queryString.parse(location.search);
+      if (queryValues.returnUrl) {
+        history.push(queryValues.returnUrl);
+      } else {
+        history.push('/');
+      }
     } catch (error) {
       if (error.response && error.response.data) {
         setServerError(error.response.data.message);

@@ -1,7 +1,9 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import queryString from 'query-string';
 import React from 'react';
 import { Provider } from 'react-redux';
+import { MemoryRouter, Route } from 'react-router-dom';
 import store from '../../../redux/store';
 import * as authService from '../../../services/authService';
 import LoginPage from '../LoginPage';
@@ -21,7 +23,9 @@ describe('<LoginPage />', () => {
     it('shows appropriate styling and message when it is blank', async () => {
       render(
         <Provider store={store}>
-          <LoginPage />
+          <MemoryRouter initialEntries={['/login']}>
+            <LoginPage />
+          </MemoryRouter>
         </Provider>
       );
 
@@ -38,7 +42,9 @@ describe('<LoginPage />', () => {
     it('shows appropriate styling and message when it is all whitespace', async () => {
       render(
         <Provider store={store}>
-          <LoginPage />
+          <MemoryRouter initialEntries={['/login']}>
+            <LoginPage />
+          </MemoryRouter>
         </Provider>
       );
 
@@ -56,7 +62,9 @@ describe('<LoginPage />', () => {
     it('shows appropriate styling and message when it is too short', async () => {
       render(
         <Provider store={store}>
-          <LoginPage />
+          <MemoryRouter initialEntries={['/login']}>
+            <LoginPage />
+          </MemoryRouter>
         </Provider>
       );
 
@@ -78,7 +86,9 @@ describe('<LoginPage />', () => {
     it('shows appropriate styling and message when it is blank', async () => {
       render(
         <Provider store={store}>
-          <LoginPage />
+          <MemoryRouter initialEntries={['/login']}>
+            <LoginPage />
+          </MemoryRouter>
         </Provider>
       );
 
@@ -95,7 +105,9 @@ describe('<LoginPage />', () => {
     it('shows appropriate styling and message when it is all whitespace', async () => {
       render(
         <Provider store={store}>
-          <LoginPage />
+          <MemoryRouter initialEntries={['/login']}>
+            <LoginPage />
+          </MemoryRouter>
         </Provider>
       );
 
@@ -113,7 +125,9 @@ describe('<LoginPage />', () => {
     it('shows appropriate styling and message when it is too short', async () => {
       render(
         <Provider store={store}>
-          <LoginPage />
+          <MemoryRouter initialEntries={['/login']}>
+            <LoginPage />
+          </MemoryRouter>
         </Provider>
       );
 
@@ -133,7 +147,9 @@ describe('<LoginPage />', () => {
     it('shows appropriate styling and message when it contains whitespace', async () => {
       render(
         <Provider store={store}>
-          <LoginPage />
+          <MemoryRouter initialEntries={['/login']}>
+            <LoginPage />
+          </MemoryRouter>
         </Provider>
       );
 
@@ -163,7 +179,9 @@ describe('<LoginPage />', () => {
 
       render(
         <Provider store={store}>
-          <LoginPage />
+          <MemoryRouter initialEntries={['/login']}>
+            <LoginPage />
+          </MemoryRouter>
         </Provider>
       );
 
@@ -193,12 +211,107 @@ describe('<LoginPage />', () => {
       });
     });
 
+    it('redirects to the URL specified in the "returnUrl" query parameter after login', async () => {
+      const expectedQueryValues = {
+        returnUrl: '/test-url',
+      };
+
+      const expectedUser = {
+        username: 'testusername',
+        password: 'testpassword',
+      };
+
+      const dispatchSpy = jest.spyOn(store, 'dispatch');
+      const queryStringValue = queryString.stringify(expectedQueryValues);
+      loginSpy.mockResolvedValue(expectedUser);
+
+      let testLocation;
+
+      render(
+        <Provider store={store}>
+          <MemoryRouter initialEntries={[`/login?${queryStringValue}`]}>
+            <Route path="/login">
+              <LoginPage />
+            </Route>
+            <Route
+              path="*"
+              render={({ location }) => {
+                testLocation = location;
+              }}
+            />
+          </MemoryRouter>
+        </Provider>
+      );
+
+      const usernameField = screen.getByTestId('usernameField');
+      const passwordField = screen.getByTestId('passwordField');
+      const rememberField = screen.getByTestId('rememberField');
+      const submitButton = screen.getByTestId('submitButton');
+
+      userEvent.type(usernameField, expectedUser.username);
+      userEvent.type(passwordField, expectedUser.password);
+      fireEvent.click(rememberField);
+      fireEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(testLocation.pathname).toBe(expectedQueryValues.returnUrl);
+
+        dispatchSpy.mockRestore();
+      });
+    });
+
+    it('redirects to "/" after login if no "returnUrl" query parameter is specified', async () => {
+      const expectedUser = {
+        username: 'testusername',
+        password: 'testpassword',
+      };
+
+      const dispatchSpy = jest.spyOn(store, 'dispatch');
+      loginSpy.mockResolvedValue(expectedUser);
+
+      let testLocation;
+
+      render(
+        <Provider store={store}>
+          <MemoryRouter initialEntries={['/login']}>
+            <Route path="/login">
+              <LoginPage />
+            </Route>
+            <Route
+              path="*"
+              render={({ location }) => {
+                testLocation = location;
+              }}
+            />
+          </MemoryRouter>
+        </Provider>
+      );
+
+      const usernameField = screen.getByTestId('usernameField');
+      const passwordField = screen.getByTestId('passwordField');
+      const rememberField = screen.getByTestId('rememberField');
+      const submitButton = screen.getByTestId('submitButton');
+
+      userEvent.type(usernameField, expectedUser.username);
+      userEvent.type(passwordField, expectedUser.password);
+      fireEvent.click(rememberField);
+      fireEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(testLocation.pathname).toBe('/');
+
+        dispatchSpy.mockRestore();
+      });
+    });
+
     it('disables the submit button and shows a spinner while running', async () => {
       loginSpy.mockResolvedValue({});
 
       render(
         <Provider store={store}>
-          <LoginPage />
+          <MemoryRouter initialEntries={['/login']}>
+            <LoginPage />
+          </MemoryRouter>
         </Provider>
       );
 
@@ -231,7 +344,9 @@ describe('<LoginPage />', () => {
 
       render(
         <Provider store={store}>
-          <LoginPage />
+          <MemoryRouter initialEntries={['/login']}>
+            <LoginPage />
+          </MemoryRouter>
         </Provider>
       );
 
@@ -249,32 +364,6 @@ describe('<LoginPage />', () => {
       });
     });
 
-    it('resets the form after a successful login call', async () => {
-      loginSpy.mockResolvedValue({});
-
-      render(
-        <Provider store={store}>
-          <LoginPage />
-        </Provider>
-      );
-
-      const usernameField = screen.getByTestId('usernameField');
-      const passwordField = screen.getByTestId('passwordField');
-      const rememberField = screen.getByTestId('rememberField');
-      const submitButton = screen.getByTestId('submitButton');
-
-      userEvent.type(usernameField, 'test');
-      userEvent.type(passwordField, 'test');
-      fireEvent.click(rememberField);
-      fireEvent.click(submitButton);
-
-      await waitFor(() => {
-        expect(usernameField).toHaveValue('');
-        expect(passwordField).toHaveValue('');
-        expect(rememberField).not.toBeChecked();
-      });
-    });
-
     it('displays the error message if a server error occurs during the login call', async () => {
       const expectedErrorMessage = 'test error message';
 
@@ -288,7 +377,9 @@ describe('<LoginPage />', () => {
 
       render(
         <Provider store={store}>
-          <LoginPage />
+          <MemoryRouter initialEntries={['/login']}>
+            <LoginPage />
+          </MemoryRouter>
         </Provider>
       );
 
@@ -315,7 +406,9 @@ describe('<LoginPage />', () => {
 
       render(
         <Provider store={store}>
-          <LoginPage />
+          <MemoryRouter initialEntries={['/login']}>
+            <LoginPage />
+          </MemoryRouter>
         </Provider>
       );
 
