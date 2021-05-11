@@ -37,7 +37,7 @@ yarn init
 The following command will generate a `db.json` file in the `api` directory that will be used as the "database" for the API. If the file already exists, the command will overwrite it.
 
 ```
-yarn api:data
+yarn api:generate
 ```
 
 ## Starting
@@ -45,10 +45,8 @@ yarn api:data
 ### Start the API
 
 ```
-yarn api
+yarn api:start
 ```
-
-Each time the API starts, it will make a copy of `data.json` as `db.json`. Any updates that are done through the API will be reflected in `db.json`. `data.json` will remain unchanged unless directly updated.
 
 ### Start the React App
 
