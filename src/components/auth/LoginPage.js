@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Alert, Button, Card, Form, Spinner } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
-import loginSchema from '../../schemas/loginSchema';
+import * as yup from 'yup';
 import { login } from '../../redux/userSlice';
 import * as authService from '../../services/authService';
 
@@ -13,16 +13,21 @@ export default function LoginPage() {
   const history = useHistory();
   const initialValues = { username: '', password: '', remember: false };
   const location = useLocation();
-  const [serverError, setServerError] = useState('');
+  const [submitError, setSubmitError] = useState('');
+
+  const validationSchema = yup.object().shape({
+    username: yup.string().trim().required('Username is required.'),
+    password: yup.string().trim().required('Password is required.'),
+    remember: yup.bool(),
+  });
 
   async function handleFormikSubmit(values, { setFieldValue, setSubmitting }) {
     try {
-      setServerError('');
-
       const username = values.username.trim();
       const password = values.password.trim();
       const { remember } = values;
 
+      setSubmitError('');
       setFieldValue('username', username);
       setFieldValue('password', password);
 
@@ -37,9 +42,9 @@ export default function LoginPage() {
       }
     } catch (error) {
       if (error.response && error.response.data) {
-        setServerError(error.response.data.message);
+        setSubmitError(error.response.data.message);
       } else {
-        setServerError(error.message);
+        setSubmitError(error.message);
       }
     }
     setSubmitting(false);
@@ -49,7 +54,7 @@ export default function LoginPage() {
     <div data-testid="loginPage">
       <Formik
         initialValues={initialValues}
-        validationSchema={loginSchema}
+        validationSchema={validationSchema}
         onSubmit={handleFormikSubmit}
       >
         {({
@@ -63,14 +68,11 @@ export default function LoginPage() {
           setFieldValue,
         }) => (
           <Form onSubmit={handleSubmit}>
-            <Card
-              className="mt-2 mx-auto shadow-sm"
-              style={{ maxWidth: '32em' }}
-            >
+            <Card className="mt-2 mx-auto max-width-sm shadow-sm">
               <Card.Body>
-                {serverError && (
-                  <Alert variant="danger" data-testid="serverError">
-                    {serverError}
+                {submitError && (
+                  <Alert variant="danger" data-testid="submitError">
+                    {submitError}
                   </Alert>
                 )}
                 <Form.Group>

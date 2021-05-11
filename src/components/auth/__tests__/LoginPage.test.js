@@ -58,28 +58,6 @@ describe('<LoginPage />', () => {
       expect(usernameField).toHaveClass('is-invalid');
       expect(usernameError).toHaveTextContent('Username is required.');
     });
-
-    it('shows appropriate styling and message when it is too short', async () => {
-      render(
-        <Provider store={store}>
-          <MemoryRouter initialEntries={['/login']}>
-            <LoginPage />
-          </MemoryRouter>
-        </Provider>
-      );
-
-      const usernameField = screen.getByTestId('usernameField');
-
-      userEvent.type(usernameField, 'a');
-      fireEvent.blur(usernameField);
-
-      const usernameError = await screen.findByTestId('usernameError');
-
-      expect(usernameField).toHaveClass('is-invalid');
-      expect(usernameError).toHaveTextContent(
-        'Username must be at least 2 characters long.'
-      );
-    });
   });
 
   describe('Password Field', () => {
@@ -120,50 +98,6 @@ describe('<LoginPage />', () => {
 
       expect(passwordField).toHaveClass('is-invalid');
       expect(passwordError).toHaveTextContent('Password is required.');
-    });
-
-    it('shows appropriate styling and message when it is too short', async () => {
-      render(
-        <Provider store={store}>
-          <MemoryRouter initialEntries={['/login']}>
-            <LoginPage />
-          </MemoryRouter>
-        </Provider>
-      );
-
-      const passwordField = screen.getByTestId('passwordField');
-
-      userEvent.type(passwordField, 'a');
-      fireEvent.blur(passwordField);
-
-      const passwordError = await screen.findByTestId('passwordError');
-
-      expect(passwordField).toHaveClass('is-invalid');
-      expect(passwordError).toHaveTextContent(
-        'Password must be at least 2 characters long.'
-      );
-    });
-
-    it('shows appropriate styling and message when it contains whitespace', async () => {
-      render(
-        <Provider store={store}>
-          <MemoryRouter initialEntries={['/login']}>
-            <LoginPage />
-          </MemoryRouter>
-        </Provider>
-      );
-
-      const passwordField = screen.getByTestId('passwordField');
-
-      userEvent.type(passwordField, 'a bc');
-      fireEvent.blur(passwordField);
-
-      const passwordError = await screen.findByTestId('passwordError');
-
-      expect(passwordField).toHaveClass('is-invalid');
-      expect(passwordError).toHaveTextContent(
-        'Password cannot contain whitespace.'
-      );
     });
   });
 
@@ -391,10 +325,10 @@ describe('<LoginPage />', () => {
       userEvent.type(passwordField, 'test');
       fireEvent.click(submitButton);
 
-      const serverError = await screen.findByTestId('serverError');
+      const submitError = await screen.findByTestId('submitError');
 
       expect(loginSpy).toHaveBeenCalled();
-      expect(serverError).toHaveTextContent(expectedErrorMessage);
+      expect(submitError).toHaveTextContent(expectedErrorMessage);
     });
 
     it('displays the error message if a client error occurs during the login call', async () => {
@@ -420,10 +354,10 @@ describe('<LoginPage />', () => {
       userEvent.type(passwordField, 'test');
       fireEvent.click(submitButton);
 
-      const serverError = await screen.findByTestId('serverError');
+      const submitError = await screen.findByTestId('submitError');
 
       expect(loginSpy).toHaveBeenCalled();
-      expect(serverError).toHaveTextContent(expectedErrorMessage);
+      expect(submitError).toHaveTextContent(expectedErrorMessage);
     });
   });
 });

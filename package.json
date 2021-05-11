@@ -75,11 +75,5 @@
   },
   "browserslist": [
     "defaults"
-  ],
-  "jest": {
-    "collectCoverageFrom": [
-      "src/**/*.{js,jsx}",
-      "!src/schemas/*.{js,jsx}"
-    ]
-  }
+  ]
 }

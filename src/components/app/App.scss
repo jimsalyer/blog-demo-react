@@ -41,3 +41,19 @@ $overflows: append($overflows, visible);
 @import "~bootstrap/scss/spinners";
 @import "~bootstrap/scss/utilities";
 @import "~bootstrap/scss/print";
+
+.max-width-sm {
+  max-width: 32em;
+}
+
+.max-width-md {
+  max-width: 48em;
+}
+
+.max-width-lg {
+  max-width: 64em;
+}
+
+.max-width-xl {
+  max-width: 80em;
+}

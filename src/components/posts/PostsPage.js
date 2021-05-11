@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, Button, Card, Spinner } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { useHistory, useLocation } from 'react-router-dom';
+import { NavLink, useHistory, useLocation } from 'react-router-dom';
 import { selectUser } from '../../redux/userSlice';
 import {
   parseQueryString,
@@ -82,7 +82,12 @@ export default function PostsPage() {
       />
       {user && (
         <div className="mb-3">
-          <Button variant="success" data-testid="createPostButton">
+          <Button
+            as={NavLink}
+            to="/create"
+            variant="success"
+            data-testid="createPostButton"
+          >
             Create New Post
           </Button>
         </div>

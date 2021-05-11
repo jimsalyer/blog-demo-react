@@ -134,16 +134,18 @@ server.post('/auth/logout', (req, res) => {
 server.use((req, res, next) => {
   const date = new Date();
   const utc = date.toISOString();
+  const { accessToken } = req.body;
 
   if (
     /^(delete|patch|post|put)$/i.test(req.method) &&
-    !isAccessTokenValid(req.body.accessToken)
+    !isAccessTokenValid(accessToken)
   ) {
     return res.status(401).json({
       message: 'The user is not logged in or their session has expired.',
     });
   }
 
+  req.body.accessToken = undefined;
   if (req.method === 'POST') {
     req.body.createUtc = utc;
   } else if (/^(patch|put)$/i.test(req.method)) {
