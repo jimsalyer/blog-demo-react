@@ -5,8 +5,8 @@
   "license": "MIT",
   "main": "src/index.js",
   "scripts": {
-    "api": "cd api && node server",
-    "api:data": "cd api && node generate",
+    "api:generate": "cd api && node generate",
+    "api:start": "cd api && node server",
     "build": "react-scripts build",
     "format": "prettier -c -u --loglevel warn .",
     "format:fix": "prettier -l -u --loglevel warn --write .",
