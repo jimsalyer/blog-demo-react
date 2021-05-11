@@ -169,16 +169,19 @@ describe('<LoginPage />', () => {
 
       const usernameField = screen.getByTestId('usernameField');
       const passwordField = screen.getByTestId('passwordField');
+      const rememberField = screen.getByTestId('rememberField');
       const submitButton = screen.getByTestId('submitButton');
 
       userEvent.type(usernameField, expectedUser.username);
       userEvent.type(passwordField, expectedUser.password);
+      fireEvent.click(rememberField);
       fireEvent.click(submitButton);
 
       await waitFor(() => {
         expect(loginSpy).toHaveBeenCalledWith(
           expectedUser.username,
-          expectedUser.password
+          expectedUser.password,
+          true
         );
 
         expect(dispatchSpy).toHaveBeenCalledWith({
@@ -257,15 +260,18 @@ describe('<LoginPage />', () => {
 
       const usernameField = screen.getByTestId('usernameField');
       const passwordField = screen.getByTestId('passwordField');
+      const rememberField = screen.getByTestId('rememberField');
       const submitButton = screen.getByTestId('submitButton');
 
       userEvent.type(usernameField, 'test');
       userEvent.type(passwordField, 'test');
+      fireEvent.click(rememberField);
       fireEvent.click(submitButton);
 
       await waitFor(() => {
         expect(usernameField).toHaveValue('');
         expect(passwordField).toHaveValue('');
+        expect(rememberField).not.toBeChecked();
       });
     });
 

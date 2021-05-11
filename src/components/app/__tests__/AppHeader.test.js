@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { MemoryRouter, Route } from 'react-router-dom';
 import store from '../../../redux/store';
 import { login, logout } from '../../../redux/userSlice';
+import * as authService from '../../../services/authService';
 import AppHeader from '../AppHeader';
 
 describe('<AppHeader />', () => {
@@ -128,26 +129,33 @@ describe('<AppHeader />', () => {
       const expectedUser = {
         firstName: 'Test',
         lastName: 'User',
+        accessToken: 'testaccesstoken',
       };
 
       const dispatchSpy = jest.spyOn(store, 'dispatch');
+      const logoutSpy = jest.spyOn(authService, 'logout').mockResolvedValue({});
 
       store.dispatch(login(expectedUser));
 
       const userDropdown = await screen.findByTestId('userDropdown');
       const userDropdownToggle = userDropdown.querySelector('.dropdown-toggle');
+      const { user } = store.getState();
+
       fireEvent.click(userDropdownToggle);
 
       const logoutLink = await screen.findByTestId('logoutLink');
       fireEvent.click(logoutLink);
 
       await screen.findByTestId('loginLink');
+
+      expect(logoutSpy).toHaveBeenCalledWith(expectedUser.accessToken);
       expect(dispatchSpy).toHaveBeenLastCalledWith({
         payload: undefined,
         type: 'user/logout',
       });
 
       dispatchSpy.mockRestore();
+      logoutSpy.mockRestore();
     });
   });
 });

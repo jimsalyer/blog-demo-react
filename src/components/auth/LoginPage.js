@@ -8,7 +8,7 @@ import * as authService from '../../services/authService';
 
 export default function LoginPage() {
   const dispatch = useDispatch();
-  const initialValues = { username: '', password: '' };
+  const initialValues = { username: '', password: '', remember: false };
   const [serverError, setServerError] = useState('');
 
   async function handleFormikSubmit(
@@ -19,12 +19,13 @@ export default function LoginPage() {
       setServerError('');
 
       const username = values.username.trim();
-      setFieldValue('username', username);
-
       const password = values.password.trim();
+      const { remember } = values;
+
+      setFieldValue('username', username);
       setFieldValue('password', password);
 
-      const user = await authService.login(username, password);
+      const user = await authService.login(username, password, remember);
       dispatch(login(user));
       resetForm();
     } catch (error) {
@@ -52,6 +53,7 @@ export default function LoginPage() {
           handleBlur,
           handleSubmit,
           isSubmitting,
+          setFieldValue,
         }) => (
           <Form onSubmit={handleSubmit}>
             <Card
@@ -104,6 +106,17 @@ export default function LoginPage() {
                     </Form.Control.Feedback>
                   )}
                 </Form.Group>
+                <Form.Check
+                  checked={values.remember}
+                  custom
+                  label="Remember Me"
+                  name="remember"
+                  type="checkbox"
+                  data-testid="rememberField"
+                  onChange={(event) =>
+                    setFieldValue('remember', event.target.checked)
+                  }
+                />
               </Card.Body>
               <Card.Footer>
                 <Button

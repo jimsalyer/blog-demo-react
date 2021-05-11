@@ -17,20 +17,27 @@ if (Number.isNaN(userSessionTimeout)) {
   userSessionTimeout = 60 * 60 * 1000;
 }
 
+let userSessionTimeoutRemember = parseInt(
+  process.env.USER_SESSION_TIMEOUT_REMEMBER,
+  10
+);
+
+if (Number.isNaN(userSessionTimeoutRemember)) {
+  userSessionTimeoutRemember = 7 * 24 * 60 * 60 * 1000;
+}
+
 function isAccessTokenExpired(accessToken) {
   const currentTime = Date.UTC();
   const expireTime =
-    new Date(accessToken.refreshUtc).getTime() + userSessionTimeout;
+    new Date(accessToken.refreshUtc).getTime() +
+    (accessToken.remember ? userSessionTimeoutRemember : userSessionTimeout);
   return expireTime <= currentTime;
 }
 
-function verifyAccessToken(token) {
-  console.log('verifyAccessToken');
+function isAccessTokenValid(token) {
   if (typeof token === 'string') {
-    console.log('verifyAccessToken', 'token');
     const accessToken = router.db.get('accessTokens').find({ token }).value();
     if (accessToken && !isAccessTokenExpired(accessToken)) {
-      console.log('verifyAccessToken', 'loginToken');
       return router.db.get('users').some({ id: accessToken.userId }).value();
     }
   }
@@ -57,11 +64,12 @@ server.use((req, res, next) => {
 });
 
 server.post('/auth/login', (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, remember } = req.body;
   try {
     const user = router.db.get('users').find({ username, password }).value();
     if (user) {
       const token = uuidv4();
+      const rememberValue = Boolean(remember);
       const userId = user.id;
       const refreshDate = new Date();
       const refreshUtc = refreshDate.toISOString();
@@ -74,6 +82,7 @@ server.post('/auth/login', (req, res) => {
       const accessToken = {
         id: maxAccessToken ? maxAccessToken.id + 1 : 1,
         token,
+        remember: rememberValue,
         userId,
         refreshUtc,
       };
@@ -128,7 +137,7 @@ server.use((req, res, next) => {
 
   if (
     /^(delete|patch|post|put)$/i.test(req.method) &&
-    !verifyAccessToken(req.body.accessToken)
+    !isAccessTokenValid(req.body.accessToken)
   ) {
     return res.status(401).json({
       message: 'The user is not logged in or their session has expired.',
