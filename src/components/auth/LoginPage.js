@@ -2,7 +2,7 @@ import { Formik } from 'formik';
 import React, { useState } from 'react';
 import { Alert, Button, Card, Form, Spinner } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
-import * as yup from 'yup';
+import loginSchema from '../../schemas/loginSchema';
 import { login } from '../../redux/userSlice';
 import * as authService from '../../services/authService';
 
@@ -10,20 +10,6 @@ export default function LoginPage() {
   const dispatch = useDispatch();
   const initialValues = { username: '', password: '' };
   const [serverError, setServerError] = useState('');
-
-  const validationSchema = yup.object().shape({
-    username: yup
-      .string()
-      .trim()
-      .required('Username is required.')
-      .min(2, 'Username must be at least 2 characters long.'),
-    password: yup
-      .string()
-      .trim()
-      .required('Password is required.')
-      .min(2, 'Password must be at least 2 characters long.')
-      .matches(/^\S+$/, 'Password cannot contain whitespace.'),
-  });
 
   async function handleFormikSubmit(
     values,
@@ -55,7 +41,7 @@ export default function LoginPage() {
     <div data-testid="loginPage">
       <Formik
         initialValues={initialValues}
-        validationSchema={validationSchema}
+        validationSchema={loginSchema}
         onSubmit={handleFormikSubmit}
       >
         {({

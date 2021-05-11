@@ -14,7 +14,7 @@
     "lint:fix": "eslint --fix .",
     "start": "react-scripts start",
     "test": "react-scripts test --watchAll=false",
-    "test:cov": "react-scripts test --coverage=true --watchAll=false",
+    "test:coverage": "react-scripts test --coverage=true --watchAll=false",
     "test:watch": "react-scripts test"
   },
   "dependencies": {
@@ -75,5 +75,11 @@
   },
   "browserslist": [
     "defaults"
-  ]
+  ],
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx}",
+      "!src/schemas/*.{js,jsx}"
+    ]
+  }
 }
