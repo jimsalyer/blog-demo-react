@@ -267,11 +267,10 @@ describe('<CreatePostPage />', () => {
       userEvent.type(imageField, '  test  ');
       fireEvent.click(submitButton);
 
-      await waitFor(() => {
-        expect(titleField).toHaveValue('test');
-        expect(excerptField).toHaveValue('test');
-        expect(imageField).toHaveValue('test');
-      });
+      await screen.findByTestId('submitError');
+      expect(titleField).toHaveValue('test');
+      expect(excerptField).toHaveValue('test');
+      expect(imageField).toHaveValue('test');
     });
 
     it('displays the error message if a server error occurs during the createPost call', async () => {

@@ -63,6 +63,7 @@ export default function CreatePostPage() {
         onSubmit={handleFormikSubmit}
       >
         {({
+          values,
           errors,
           touched,
           handleChange,
@@ -83,6 +84,7 @@ export default function CreatePostPage() {
                   <Form.Control
                     isInvalid={touched.title && errors.title}
                     name="title"
+                    value={values.title}
                     data-testid="titleField"
                     onBlur={handleBlur}
                     onChange={handleChange}
@@ -102,6 +104,7 @@ export default function CreatePostPage() {
                     as="textarea"
                     isInvalid={touched.body && errors.body}
                     name="body"
+                    value={values.body}
                     data-testid="bodyField"
                     onBlur={handleBlur}
                     onChange={handleChange}
@@ -120,6 +123,7 @@ export default function CreatePostPage() {
                   <Form.Control
                     isInvalid={touched.excerpt && errors.excerpt}
                     name="excerpt"
+                    value={values.excerpt}
                     data-testid="excerptField"
                     onBlur={handleBlur}
                     onChange={handleChange}
@@ -138,6 +142,7 @@ export default function CreatePostPage() {
                   <Form.Control
                     isInvalid={touched.image && errors.image}
                     name="image"
+                    value={values.image}
                     data-testid="imageField"
                     onBlur={handleBlur}
                     onChange={handleChange}
