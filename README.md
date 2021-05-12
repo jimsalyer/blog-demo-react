@@ -22,7 +22,8 @@ In `api/.env`, set the following variables accordingly:
 - `DELAY_MAX`: Maximum delay for API requests. Default value is 0.
 - `DELAY_MIN`: Minimum delay for API requests. Default value is 0.
 - `PORT`: Port the API will run on. Make sure this is the same as the port referenced in the `REACT_APP_API_URL` variable above. Default value is 5000.
-- `USER_SESSION_TIMEOUT`: Amount of time (in milliseconds) a user session can be "dormant" before ending. Sessions are refreshed each time the verify endpoint is called.
+- `USER_SESSION_TIMEOUT`: Amount of time (in milliseconds) a user session can be "dormant" before ending. A session is refreshed each time an API call is made with its corresponding access token. Default value is 1 hour.
+- `USER_SESSION_TIMEOUT_REMEMBER`: Amount of time (in milliseconds) as user session can be "dormant" before ending. This variable controls the timeout for users that log in with "Remember Me" checked. Default value is 7 days.
 
 Setting the `DELAY_*` variables above will add a random delay for each API request between the minimum and maximum values.
 

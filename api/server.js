@@ -55,6 +55,13 @@ if (!Number.isNaN(delayMin) && !Number.isNaN(delayMax) && delayMax > delayMin) {
 }
 
 server.use((req, res, next) => {
+  const token = req.headers['x-access-token'];
+  router.db
+    .get('accessTokens')
+    .find({ token })
+    .set('refreshUtc', new Date().toISOString())
+    .write();
+
   router.db
     .get('accessTokens')
     .filter((x) => isAccessTokenExpired(x))
