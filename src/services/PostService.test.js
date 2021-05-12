@@ -98,10 +98,12 @@ describe('PostService', () => {
       };
 
       const expectedQueryParams = {
-        userId: expectedParams.author,
-        q: expectedParams.text,
         _limit: expectedParams.limit,
+        _order: service.sortParams.order,
         _page: expectedParams.page,
+        _sort: service.sortParams.sort,
+        q: expectedParams.text,
+        userId: expectedParams.author,
       };
 
       const expectedData = [
@@ -136,7 +138,9 @@ describe('PostService', () => {
     it('sets the parameters to default values if they are not provided', async () => {
       const queryParams = {
         _limit: service.defaultSearchParams.limit,
+        _order: service.sortParams.order,
         _page: service.defaultSearchParams.page,
+        _sort: service.sortParams.sort,
       };
       const query = stringifyQueryParams(queryParams);
       const expectedUrl = `/?${query}`;

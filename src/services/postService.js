@@ -9,6 +9,11 @@ export default class PostService extends BaseService {
       limit: 10,
       page: 1,
     };
+
+    this.sortParams = {
+      order: 'desc,desc,desc',
+      sort: 'modifyUtc,publishUtc,createUtc',
+    };
   }
 
   async createPost(post) {
@@ -30,7 +35,9 @@ export default class PostService extends BaseService {
 
     const queryParams = {
       _limit: searchParams.limit,
+      _order: this.sortParams.order,
       _page: searchParams.page,
+      _sort: this.sortParams.sort,
       q: searchParams.text,
       userId: searchParams.author,
     };
