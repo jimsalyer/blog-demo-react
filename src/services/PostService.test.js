@@ -1,6 +1,7 @@
 import axios from 'axios';
 import queryString from 'query-string';
 import PostService from './PostService';
+import { stringifyQueryParams } from './serviceUtils';
 
 describe('PostService', () => {
   let client;
@@ -137,7 +138,7 @@ describe('PostService', () => {
         _limit: service.defaultSearchParams.limit,
         _page: service.defaultSearchParams.page,
       };
-      const query = PostService.stringifyQueryParams(queryParams);
+      const query = stringifyQueryParams(queryParams);
       const expectedUrl = `/?${query}`;
 
       getSpy.mockResolvedValue({ data: [] });

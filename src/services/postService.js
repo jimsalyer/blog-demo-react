@@ -1,4 +1,5 @@
 import BaseService from './BaseService';
+import { parsePageCount, stringifyQueryParams } from './serviceUtils';
 
 export default class PostService extends BaseService {
   constructor() {
@@ -35,11 +36,11 @@ export default class PostService extends BaseService {
     };
 
     const response = await this.client.get(
-      `/?${BaseService.stringifyQueryParams(queryParams)}`
+      `/?${stringifyQueryParams(queryParams)}`
     );
 
     const result = {
-      pageCount: BaseService.parsePageCount(response),
+      pageCount: parsePageCount(response),
       data: response.data,
     };
     return result;
