@@ -16,14 +16,17 @@ export default function CreatePostPage() {
   const validationSchema = yup.object().shape({
     title: yup.string().trim().required('Title is required.'),
     body: yup.string().required('Body is required.'),
-    excerpt: yup.string().required('Excerpt is required.'),
-    image: yup.string(),
+    excerpt: yup.string().trim().required('Excerpt is required.'),
+    image: yup
+      .string()
+      .trim()
+      .matches(/^\S*$/, 'Image cannot contain whitespace.'),
   });
 
   async function handleFormikSubmit(values, { setFieldValue, setSubmitting }) {
     try {
       const title = values.title.trim();
-      const body = values.body.trim();
+      const { body } = values;
       const excerpt = values.excerpt.trim();
       const image = values.image.trim();
 
@@ -39,7 +42,6 @@ export default function CreatePostPage() {
         excerpt,
         image,
         userId: user.id,
-        accessToken: user.accessToken,
       });
       history.push('/');
     } catch (error) {
@@ -57,8 +59,8 @@ export default function CreatePostPage() {
       <h2>Create New Post</h2>
       <Formik
         initialValues={initialValues}
-        onSubmit={handleFormikSubmit}
         validationSchema={validationSchema}
+        onSubmit={handleFormikSubmit}
       >
         {({
           errors,
@@ -81,6 +83,7 @@ export default function CreatePostPage() {
                   <Form.Control
                     isInvalid={touched.title && errors.title}
                     name="title"
+                    data-testid="titleField"
                     onBlur={handleBlur}
                     onChange={handleChange}
                   />
@@ -99,6 +102,7 @@ export default function CreatePostPage() {
                     as="textarea"
                     isInvalid={touched.body && errors.body}
                     name="body"
+                    data-testid="bodyField"
                     onBlur={handleBlur}
                     onChange={handleChange}
                   />
@@ -116,6 +120,7 @@ export default function CreatePostPage() {
                   <Form.Control
                     isInvalid={touched.excerpt && errors.excerpt}
                     name="excerpt"
+                    data-testid="excerptField"
                     onBlur={handleBlur}
                     onChange={handleChange}
                   />
@@ -133,6 +138,7 @@ export default function CreatePostPage() {
                   <Form.Control
                     isInvalid={touched.image && errors.image}
                     name="image"
+                    data-testid="imageField"
                     onBlur={handleBlur}
                     onChange={handleChange}
                   />
