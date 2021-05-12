@@ -2,17 +2,17 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom';
-import store from '../../../redux/store';
-import { login, logout } from '../../../redux/userSlice';
-import AppContent from '../AppContent';
-import AppHeader from '../AppHeader';
+import store from '../../redux/store';
+import { login, logout } from '../../redux/userSlice';
+import AppContent from './AppContent';
+import AppHeader from './AppHeader';
 
-jest.mock('../../../services/authService', () => ({
+jest.mock('../../services/AuthService', () => ({
   login: () => Promise.resolve({}),
-  logout: () => Promise.resolve({}),
+  logout: () => Promise.resolve(),
 }));
 
-jest.mock('../../../services/postService', () => ({
+jest.mock('../../services/PostService', () => ({
   searchPosts: () => Promise.resolve({ data: [] }),
 }));
 

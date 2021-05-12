@@ -1,37 +1,41 @@
-import {
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom';
-import store from '../../../redux/store';
-import { login, logout } from '../../../redux/userSlice';
-import * as postService from '../../../services/postService';
-import * as userService from '../../../services/userService';
-import PostsPage from '../PostsPage';
+import store from '../../redux/store';
+import { login, logout } from '../../redux/userSlice';
+import PostService from '../../services/PostService';
+import UserService from '../../services/UserService';
+import PostsPage from './PostsPage';
+
+jest.mock('../../services/PostService');
+jest.mock('../../services/UserService');
 
 describe('<PostsPage />', () => {
-  let listUsersSpy;
-  let searchPostsSpy;
+  let mockListUsers;
+  let mockSearchPosts;
 
   beforeEach(() => {
-    listUsersSpy = jest.spyOn(userService, 'listUsers');
-    searchPostsSpy = jest.spyOn(postService, 'searchPosts');
+    mockListUsers = jest.fn();
+    mockSearchPosts = jest.fn();
+
+    PostService.mockImplementation(() => ({
+      searchPosts: mockSearchPosts,
+    }));
+
+    UserService.mockImplementation(() => ({
+      listUsers: mockListUsers,
+    }));
   });
 
   afterEach(() => {
-    listUsersSpy.mockRestore();
-    searchPostsSpy.mockRestore();
-    cleanup();
+    PostService.mockRestore();
+    UserService.mockRestore();
   });
 
   it('renders a "Create New Post" button if the user is logged in', async () => {
-    listUsersSpy.mockResolvedValue([]);
-    searchPostsSpy.mockResolvedValue({
+    mockListUsers.mockResolvedValue([]);
+    mockSearchPosts.mockResolvedValue({
       pageCount: 1,
       data: [],
     });
@@ -80,9 +84,9 @@ describe('<PostsPage />', () => {
       },
     ];
 
-    listUsersSpy.mockResolvedValue([]);
+    mockListUsers.mockResolvedValue([]);
 
-    searchPostsSpy.mockResolvedValue({
+    mockSearchPosts.mockResolvedValue({
       pageCount: 4,
       data: expectedData,
     });
@@ -100,7 +104,7 @@ describe('<PostsPage />', () => {
     const posts = await screen.findAllByTestId('post');
     expect(posts).toHaveLength(2);
 
-    expect(searchPostsSpy).toHaveBeenCalled();
+    expect(mockSearchPosts).toHaveBeenCalled();
 
     posts.forEach((post, index) => {
       expect(post.querySelector('.card-title').textContent).toBe(
@@ -138,9 +142,9 @@ describe('<PostsPage />', () => {
       },
     ];
 
-    listUsersSpy.mockResolvedValue([]);
+    mockListUsers.mockResolvedValue([]);
 
-    searchPostsSpy.mockResolvedValue({
+    mockSearchPosts.mockResolvedValue({
       pageCount: 10,
       data: expectedData,
     });
@@ -159,7 +163,7 @@ describe('<PostsPage />', () => {
     const posts = await screen.findAllByTestId('post');
     expect(posts).toHaveLength(2);
 
-    expect(searchPostsSpy).toHaveBeenCalled();
+    expect(mockSearchPosts).toHaveBeenCalled();
 
     const loadingMessage = screen.queryByTestId('loadingMessage');
     expect(loadingMessage).not.toBeInTheDocument();
@@ -196,9 +200,9 @@ describe('<PostsPage />', () => {
       },
     ];
 
-    listUsersSpy.mockResolvedValue([]);
+    mockListUsers.mockResolvedValue([]);
 
-    searchPostsSpy.mockResolvedValue({
+    mockSearchPosts.mockResolvedValue({
       pageCount: 10,
       data: expectedData,
     });
@@ -219,7 +223,7 @@ describe('<PostsPage />', () => {
 
     screen.getByTestId('postsPage');
 
-    expect(searchPostsSpy).toHaveBeenCalledWith({
+    expect(mockSearchPosts).toHaveBeenCalledWith({
       author: expectedAuthor,
       limit: expectedLimit,
       page: expectedPage,
@@ -253,8 +257,8 @@ describe('<PostsPage />', () => {
       },
     ];
 
-    listUsersSpy.mockResolvedValue([]);
-    searchPostsSpy.mockResolvedValue({
+    mockListUsers.mockResolvedValue([]);
+    mockSearchPosts.mockResolvedValue({
       pageCount: 10,
       data: expectedData,
     });
@@ -316,8 +320,8 @@ describe('<PostsPage />', () => {
     const newPage = 4;
     const pageCount = 10;
 
-    listUsersSpy.mockResolvedValue([]);
-    searchPostsSpy.mockResolvedValue({
+    mockListUsers.mockResolvedValue([]);
+    mockSearchPosts.mockResolvedValue({
       pageCount,
       data: expectedData,
     });
@@ -389,8 +393,8 @@ describe('<PostsPage />', () => {
     const expectedAuthor = expectedUsers[0];
     const expectedText = 'test';
 
-    listUsersSpy.mockResolvedValue(expectedUsers);
-    searchPostsSpy.mockResolvedValue({
+    mockListUsers.mockResolvedValue(expectedUsers);
+    mockSearchPosts.mockResolvedValue({
       pageCount: 10,
       data: expectedPosts,
     });
@@ -424,7 +428,7 @@ describe('<PostsPage />', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(searchPostsSpy).toHaveBeenNthCalledWith(2, {
+      expect(mockSearchPosts).toHaveBeenNthCalledWith(2, {
         author: expectedAuthor.id,
         text: expectedText,
       });
@@ -432,8 +436,8 @@ describe('<PostsPage />', () => {
   });
 
   it('displays a warning message if no data is returned from the API call', async () => {
-    listUsersSpy.mockResolvedValue([]);
-    searchPostsSpy.mockResolvedValue({ pageCount: 1 });
+    mockListUsers.mockResolvedValue([]);
+    mockSearchPosts.mockResolvedValue({ pageCount: 1 });
 
     render(
       <Provider store={store}>
@@ -450,9 +454,9 @@ describe('<PostsPage />', () => {
   });
 
   it('displays a warning message if no posts are returned from the API call', async () => {
-    listUsersSpy.mockResolvedValue([]);
+    mockListUsers.mockResolvedValue([]);
 
-    searchPostsSpy.mockResolvedValue({
+    mockSearchPosts.mockResolvedValue({
       pageCount: 1,
       data: [],
     });
@@ -474,8 +478,8 @@ describe('<PostsPage />', () => {
   it('displays an error message if the main API call fails', async () => {
     const expectedError = new Error('test error message');
 
-    listUsersSpy.mockResolvedValue([]);
-    searchPostsSpy.mockRejectedValue(expectedError);
+    mockListUsers.mockResolvedValue([]);
+    mockSearchPosts.mockRejectedValue(expectedError);
 
     render(
       <Provider store={store}>
@@ -495,8 +499,8 @@ describe('<PostsPage />', () => {
   it('displays an error message if the users API call fails', async () => {
     const expectedError = new Error('test error message');
 
-    listUsersSpy.mockRejectedValue(expectedError);
-    searchPostsSpy.mockResolvedValue([]);
+    mockListUsers.mockRejectedValue(expectedError);
+    mockSearchPosts.mockResolvedValue([]);
 
     render(
       <Provider store={store}>

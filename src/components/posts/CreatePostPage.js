@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import * as yup from 'yup';
 import { selectUser } from '../../redux/userSlice';
-import { createPost } from '../../services/postService';
+import PostService from '../../services/PostService';
 
 export default function CreatePostPage() {
   const history = useHistory();
@@ -33,7 +33,7 @@ export default function CreatePostPage() {
       setFieldValue('excerpt', excerpt);
       setFieldValue('image', image);
 
-      await createPost({
+      await new PostService().createPost({
         title,
         body,
         excerpt,

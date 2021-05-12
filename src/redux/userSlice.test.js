@@ -8,7 +8,7 @@ describe('userSlice', () => {
 
   describe('Initialization', () => {
     it('has an initial state of null when no corresponding localStorage item is found', () => {
-      const store = require('../store').default;
+      const store = require('./store').default;
       const state = store.getState();
 
       expect(state.user).toBeNull();
@@ -19,7 +19,7 @@ describe('userSlice', () => {
 
       localStorage.setItem('state.user', JSON.stringify(expectedUser));
 
-      const store = require('../store').default;
+      const store = require('./store').default;
       const state = store.getState();
 
       expect(state.user).toStrictEqual(expectedUser);
@@ -30,8 +30,8 @@ describe('userSlice', () => {
     it('sets the state to the given user and stores the state in localStorage', () => {
       const expectedUser = { id: 1 };
 
-      const store = require('../store').default;
-      const { login } = require('../userSlice');
+      const store = require('./store').default;
+      const { login } = require('./userSlice');
 
       store.dispatch(login(expectedUser));
 
@@ -48,8 +48,8 @@ describe('userSlice', () => {
     it('clears the state and the localStorage item', () => {
       const expectedUser = { id: 1 };
 
-      const store = require('../store').default;
-      const { login, logout } = require('../userSlice');
+      const store = require('./store').default;
+      const { login, logout } = require('./userSlice');
 
       store.dispatch(login(expectedUser));
 
@@ -75,8 +75,8 @@ describe('userSlice', () => {
     it('returns the user from the state', () => {
       const expectedUser = { id: 1 };
 
-      const store = require('../store').default;
-      const { selectUser, login } = require('../userSlice');
+      const store = require('./store').default;
+      const { selectUser, login } = require('./userSlice');
 
       store.dispatch(login(expectedUser));
 

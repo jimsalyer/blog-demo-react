@@ -3,9 +3,9 @@ import queryString from 'query-string';
 import React from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter, Route } from 'react-router-dom';
-import ProtectedRoute from '../ProtectedRoute';
-import store from '../../../redux/store';
-import * as userSliceExports from '../../../redux/userSlice';
+import ProtectedRoute from './ProtectedRoute';
+import store from '../../redux/store';
+import * as userSliceExports from '../../redux/userSlice';
 
 describe('<ProtectedRoute />', () => {
   it('loads the given component if the user is authenticated', async () => {

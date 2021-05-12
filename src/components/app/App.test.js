@@ -2,10 +2,10 @@ import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom';
-import store from '../../../redux/store';
-import App from '../App';
+import store from '../../redux/store';
+import App from './App';
 
-jest.mock('../../../services/postService', () => ({
+jest.mock('../../services/PostService', () => ({
   searchPosts: () => Promise.resolve({ data: [] }),
 }));
 

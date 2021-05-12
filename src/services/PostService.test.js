@@ -1,8 +1,28 @@
+import axios from 'axios';
 import queryString from 'query-string';
-import * as postService from '../postService';
-import { stringifyQueryParams } from '../serviceUtils';
+import PostService from './PostService';
 
-describe('postService', () => {
+describe('PostService', () => {
+  let client;
+  let createSpy;
+  let service;
+
+  beforeEach(() => {
+    client = axios.create();
+    createSpy = jest.spyOn(axios, 'create').mockImplementation((config) => {
+      client.defaults = {
+        ...client.defaults,
+        config,
+      };
+      return client;
+    });
+    service = new PostService();
+  });
+
+  afterEach(() => {
+    createSpy.mockRestore();
+  });
+
   describe('createPost()', () => {
     it('makes a POST request with the given data and returns the result', async () => {
       const expectedPost = {
@@ -10,11 +30,11 @@ describe('postService', () => {
         body: 'test body',
       };
 
-      const postSpy = jest.spyOn(postService.client, 'post').mockResolvedValue({
+      const postSpy = jest.spyOn(client, 'post').mockResolvedValue({
         data: expectedPost,
       });
 
-      const actualPost = await postService.createPost(expectedPost);
+      const actualPost = await service.createPost(expectedPost);
 
       expect(postSpy).toHaveBeenCalledWith('/', expectedPost);
       expect(actualPost).toStrictEqual(expectedPost);
@@ -26,11 +46,9 @@ describe('postService', () => {
   describe('deletePost()', () => {
     it('makes a DELETE request with the given ID', async () => {
       const expectedId = 1;
-      const deleteSpy = jest
-        .spyOn(postService.client, 'delete')
-        .mockResolvedValue(null);
+      const deleteSpy = jest.spyOn(client, 'delete').mockResolvedValue(null);
 
-      await postService.deletePost(expectedId);
+      await service.deletePost(expectedId);
 
       expect(deleteSpy).toHaveBeenCalledWith(`/${expectedId}`);
 
@@ -46,11 +64,11 @@ describe('postService', () => {
         body: 'test body',
       };
 
-      const getSpy = jest.spyOn(postService.client, 'get').mockResolvedValue({
+      const getSpy = jest.spyOn(client, 'get').mockResolvedValue({
         data: expectedPost,
       });
 
-      const actualPost = await postService.getPost(expectedPost.id);
+      const actualPost = await service.getPost(expectedPost.id);
 
       expect(getSpy).toHaveBeenCalledWith(`/${expectedPost.id}`);
       expect(actualPost).toStrictEqual(expectedPost);
@@ -63,7 +81,7 @@ describe('postService', () => {
     let getSpy;
 
     beforeEach(() => {
-      getSpy = jest.spyOn(postService.client, 'get');
+      getSpy = jest.spyOn(client, 'get');
     });
 
     afterEach(() => {
@@ -106,7 +124,7 @@ describe('postService', () => {
 
       getSpy.mockResolvedValue(mockResponse);
 
-      const actualResult = await postService.searchPosts(expectedParams);
+      const actualResult = await service.searchPosts(expectedParams);
 
       expect(getSpy).toHaveBeenCalledWith(
         `/?${queryString.stringify(expectedQueryParams)}`
@@ -116,15 +134,15 @@ describe('postService', () => {
 
     it('sets the parameters to default values if they are not provided', async () => {
       const queryParams = {
-        _limit: postService.defaultSearchParams.limit,
-        _page: postService.defaultSearchParams.page,
+        _limit: service.defaultSearchParams.limit,
+        _page: service.defaultSearchParams.page,
       };
-      const query = stringifyQueryParams(queryParams);
+      const query = PostService.stringifyQueryParams(queryParams);
       const expectedUrl = `/?${query}`;
 
       getSpy.mockResolvedValue({ data: [] });
 
-      await postService.searchPosts();
+      await service.searchPosts();
 
       expect(getSpy).toHaveBeenCalledWith(expectedUrl);
     });
@@ -138,11 +156,11 @@ describe('postService', () => {
         body: 'test body',
       };
 
-      const putSpy = jest.spyOn(postService.client, 'put').mockResolvedValue({
+      const putSpy = jest.spyOn(client, 'put').mockResolvedValue({
         data: expectedPost,
       });
 
-      const actualPost = await postService.updatePost(
+      const actualPost = await service.updatePost(
         expectedPost.id,
         expectedPost
       );

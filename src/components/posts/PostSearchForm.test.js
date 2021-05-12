@@ -1,47 +1,40 @@
-import {
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import * as userService from '../../../services/userService';
-import PostSearchForm from '../PostSearchForm';
+import UserService from '../../services/UserService';
+import PostSearchForm from './PostSearchForm';
+
+jest.mock('../../services/UserService');
 
 describe('<PostSearchForm />', () => {
-  let listUsersSpy;
-  let onErrorMock;
-  let onSearchMock;
+  let mockListUsers;
+  let mockOnError;
+  let mockOnSearch;
 
   beforeAll(() => {
-    onErrorMock = jest.fn();
-    onSearchMock = jest.fn();
+    mockOnError = jest.fn();
+    mockOnSearch = jest.fn();
   });
 
   beforeEach(() => {
-    listUsersSpy = jest.spyOn(userService, 'listUsers');
-  });
-
-  afterAll(() => {
-    onErrorMock.mockRestore();
-    onSearchMock.mockRestore();
+    mockListUsers = jest.fn();
+    UserService.mockImplementation(() => ({
+      listUsers: mockListUsers,
+    }));
   });
 
   afterEach(() => {
-    listUsersSpy.mockRestore();
-    cleanup();
+    UserService.mockRestore();
   });
 
   describe('Form', () => {
     it('is collapsed by default', async () => {
-      listUsersSpy.mockResolvedValue([]);
+      mockListUsers.mockResolvedValue([]);
 
       render(
         <PostSearchForm
           values={{}}
-          onError={onErrorMock}
-          onSearch={onSearchMock}
+          onError={mockOnError}
+          onSearch={mockOnSearch}
         />
       );
 
@@ -52,13 +45,13 @@ describe('<PostSearchForm />', () => {
     });
 
     it('expands when clicking the header', async () => {
-      listUsersSpy.mockResolvedValue([]);
+      mockListUsers.mockResolvedValue([]);
 
       render(
         <PostSearchForm
           values={{}}
-          onError={onErrorMock}
-          onSearch={onSearchMock}
+          onError={mockOnError}
+          onSearch={mockOnSearch}
         />
       );
 
@@ -90,13 +83,13 @@ describe('<PostSearchForm />', () => {
       const expectedAuthor = expectedUsers[1];
       const expectedText = 'test text';
 
-      listUsersSpy.mockResolvedValue(expectedUsers);
+      mockListUsers.mockResolvedValue(expectedUsers);
 
       render(
         <PostSearchForm
           values={{ author: expectedAuthor.id, text: expectedText }}
-          onError={onErrorMock}
-          onSearch={onSearchMock}
+          onError={mockOnError}
+          onSearch={mockOnSearch}
         />
       );
 
@@ -118,19 +111,19 @@ describe('<PostSearchForm />', () => {
       expect(container).not.toHaveClass('border-primary');
       expect(list).toHaveValue('0');
       expect(fullTextSearch).toHaveValue('');
-      expect(onSearchMock).toHaveBeenCalledWith({});
+      expect(mockOnSearch).toHaveBeenCalledWith({});
     });
   });
 
   describe('Author Filter', () => {
     it('displays a loading message until the list of users loads', async () => {
-      listUsersSpy.mockResolvedValue([]);
+      mockListUsers.mockResolvedValue([]);
 
       render(
         <PostSearchForm
           values={{}}
-          onError={onErrorMock}
-          onSearch={onSearchMock}
+          onError={mockOnError}
+          onSearch={mockOnSearch}
         />
       );
 
@@ -158,13 +151,13 @@ describe('<PostSearchForm />', () => {
         },
       ];
 
-      listUsersSpy.mockResolvedValue(expectedUsers);
+      mockListUsers.mockResolvedValue(expectedUsers);
 
       render(
         <PostSearchForm
           values={{}}
-          onError={onErrorMock}
-          onSearch={onSearchMock}
+          onError={mockOnError}
+          onSearch={mockOnSearch}
         />
       );
 
@@ -197,13 +190,13 @@ describe('<PostSearchForm />', () => {
       ];
       const expectedAuthor = expectedUsers[1];
 
-      listUsersSpy.mockResolvedValue(expectedUsers);
+      mockListUsers.mockResolvedValue(expectedUsers);
 
       render(
         <PostSearchForm
           values={{ author: expectedAuthor.id }}
-          onError={onErrorMock}
-          onSearch={onSearchMock}
+          onError={mockOnError}
+          onSearch={mockOnSearch}
         />
       );
 
@@ -229,13 +222,13 @@ describe('<PostSearchForm />', () => {
       ];
       const expectedAuthor = expectedUsers[1];
 
-      listUsersSpy.mockResolvedValue(expectedUsers);
+      mockListUsers.mockResolvedValue(expectedUsers);
 
       render(
         <PostSearchForm
           values={{}}
-          onError={onErrorMock}
-          onSearch={onSearchMock}
+          onError={mockOnError}
+          onSearch={mockOnSearch}
         />
       );
 
@@ -269,13 +262,13 @@ describe('<PostSearchForm />', () => {
       ];
       const expectedAuthor = expectedUsers[0];
 
-      listUsersSpy.mockResolvedValue(expectedUsers);
+      mockListUsers.mockResolvedValue(expectedUsers);
 
       render(
         <PostSearchForm
           values={{}}
-          onError={onErrorMock}
-          onSearch={onSearchMock}
+          onError={mockOnError}
+          onSearch={mockOnSearch}
         />
       );
 
@@ -291,20 +284,20 @@ describe('<PostSearchForm />', () => {
       const submitButton = screen.getByText('Search');
       fireEvent.click(submitButton);
 
-      expect(onSearchMock).toHaveBeenCalledWith({
+      expect(mockOnSearch).toHaveBeenCalledWith({
         author: expectedAuthor.id,
         text: '',
       });
     });
 
     it('displays an appropriate message when no users are found', async () => {
-      listUsersSpy.mockResolvedValue([]);
+      mockListUsers.mockResolvedValue([]);
 
       render(
         <PostSearchForm
           values={{}}
-          onError={onErrorMock}
-          onSearch={onSearchMock}
+          onError={mockOnError}
+          onSearch={mockOnSearch}
         />
       );
 
@@ -321,13 +314,13 @@ describe('<PostSearchForm />', () => {
     it('defaults to the text provided (if applicable)', async () => {
       const expectedText = 'test text';
 
-      listUsersSpy.mockResolvedValue([]);
+      mockListUsers.mockResolvedValue([]);
 
       render(
         <PostSearchForm
           values={{ text: expectedText }}
-          onError={onErrorMock}
-          onSearch={onSearchMock}
+          onError={mockOnError}
+          onSearch={mockOnSearch}
         />
       );
 
@@ -338,13 +331,13 @@ describe('<PostSearchForm />', () => {
     it('changes the visual state of the form when the value changes', async () => {
       const expectedText = 'test text';
 
-      listUsersSpy.mockResolvedValue([]);
+      mockListUsers.mockResolvedValue([]);
 
       render(
         <PostSearchForm
           values={{}}
-          onError={onErrorMock}
-          onSearch={onSearchMock}
+          onError={mockOnError}
+          onSearch={mockOnSearch}
         />
       );
 
@@ -367,13 +360,13 @@ describe('<PostSearchForm />', () => {
     it('passes the entered text to the onSearch handler', async () => {
       const expectedText = 'test text';
 
-      listUsersSpy.mockResolvedValue([]);
+      mockListUsers.mockResolvedValue([]);
 
       render(
         <PostSearchForm
           values={{}}
-          onError={onErrorMock}
-          onSearch={onSearchMock}
+          onError={mockOnError}
+          onSearch={mockOnSearch}
         />
       );
 
@@ -389,7 +382,7 @@ describe('<PostSearchForm />', () => {
       const submitButton = screen.getByText('Search');
       fireEvent.click(submitButton);
 
-      expect(onSearchMock).toHaveBeenCalledWith({
+      expect(mockOnSearch).toHaveBeenCalledWith({
         author: 0,
         text: expectedText,
       });

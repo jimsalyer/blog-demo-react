@@ -2,12 +2,27 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter, Route } from 'react-router-dom';
-import store from '../../../redux/store';
-import { login, logout } from '../../../redux/userSlice';
-import * as authService from '../../../services/authService';
-import AppHeader from '../AppHeader';
+import store from '../../redux/store';
+import { login, logout } from '../../redux/userSlice';
+import AuthService from '../../services/AuthService';
+import AppHeader from './AppHeader';
+
+jest.mock('../../services/AuthService');
 
 describe('<AppHeader />', () => {
+  let mockLogout;
+
+  beforeEach(() => {
+    mockLogout = jest.fn();
+    AuthService.mockImplementation(() => ({
+      logout: mockLogout,
+    }));
+  });
+
+  afterEach(() => {
+    AuthService.mockRestore();
+  });
+
   describe('Rendering', () => {
     it('renders user dropdown with a "Log Out" link if the user is logged in', async () => {
       const expectedUser = {
@@ -51,7 +66,7 @@ describe('<AppHeader />', () => {
         lastName: 'User',
       };
 
-      const logoutSpy = jest.spyOn(authService, 'logout').mockResolvedValue();
+      mockLogout.mockResolvedValue();
 
       let testLocation;
 
@@ -83,8 +98,6 @@ describe('<AppHeader />', () => {
 
       await screen.findByTestId('loginLink');
       expect(testLocation.pathname).toBe('/login');
-
-      logoutSpy.mockRestore();
     });
 
     it('renders and activates "Posts" link when the path is "/"', () => {
@@ -168,20 +181,18 @@ describe('<AppHeader />', () => {
     });
 
     it('logs the user out when clicking the "Log Out" link', async () => {
-      const expectedUser = {
+      const user = {
         firstName: 'Test',
         lastName: 'User',
-        accessToken: 'testaccesstoken',
       };
 
       const dispatchSpy = jest.spyOn(store, 'dispatch');
-      const logoutSpy = jest.spyOn(authService, 'logout').mockResolvedValue({});
+      mockLogout.mockResolvedValue();
 
-      store.dispatch(login(expectedUser));
+      store.dispatch(login(user));
 
       const userDropdown = await screen.findByTestId('userDropdown');
       const userDropdownToggle = userDropdown.querySelector('.dropdown-toggle');
-      const { user } = store.getState();
 
       fireEvent.click(userDropdownToggle);
 
@@ -190,14 +201,13 @@ describe('<AppHeader />', () => {
 
       await screen.findByTestId('loginLink');
 
-      expect(logoutSpy).toHaveBeenCalledWith(expectedUser.accessToken);
+      expect(mockLogout).toHaveBeenCalled();
       expect(dispatchSpy).toHaveBeenLastCalledWith({
         payload: undefined,
         type: 'user/logout',
       });
 
       dispatchSpy.mockRestore();
-      logoutSpy.mockRestore();
     });
   });
 });

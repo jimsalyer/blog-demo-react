@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
 import * as yup from 'yup';
 import { login } from '../../redux/userSlice';
-import * as authService from '../../services/authService';
+import AuthService from '../../services/AuthService';
 
 export default function LoginPage() {
   const dispatch = useDispatch();
@@ -31,7 +31,7 @@ export default function LoginPage() {
       setFieldValue('username', username);
       setFieldValue('password', password);
 
-      const user = await authService.login(username, password, remember);
+      const user = await new AuthService().login(username, password, remember);
       dispatch(login(user));
 
       const queryValues = queryString.parse(location.search);

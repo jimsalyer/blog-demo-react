@@ -1,27 +1,31 @@
-import createClient from './createClient';
+import BaseService from './BaseService';
 
-export const client = createClient('/users');
+export default class UserService extends BaseService {
+  constructor() {
+    super('/users');
+  }
 
-export async function createUser(user) {
-  const response = await client.post('/', user);
-  return response.data;
-}
+  async createUser(user) {
+    const response = await this.client.post('/', user);
+    return response.data;
+  }
 
-export async function deleteUser(id) {
-  await client.delete(`/${id}`);
-}
+  async deleteUser(id) {
+    await this.client.delete(`/${id}`);
+  }
 
-export async function getUser(id) {
-  const response = await client.get(`/${id}`);
-  return response.data;
-}
+  async getUser(id) {
+    const response = await this.client.get(`/${id}`);
+    return response.data;
+  }
 
-export async function listUsers() {
-  const response = await client.get('/');
-  return response.data;
-}
+  async listUsers() {
+    const response = await this.client.get('/');
+    return response.data;
+  }
 
-export async function updateUser(id, user) {
-  const response = await client.put(`/${id}`, user);
-  return response.data;
+  async updateUser(id, user) {
+    const response = await this.client.put(`/${id}`, user);
+    return response.data;
+  }
 }

@@ -3,11 +3,8 @@ import { Alert, Button, Card, Spinner } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { NavLink, useHistory, useLocation } from 'react-router-dom';
 import { selectUser } from '../../redux/userSlice';
-import {
-  parseQueryString,
-  stringifyQueryParams,
-} from '../../services/serviceUtils';
-import { searchPosts } from '../../services/postService';
+import BaseService from '../../services/BaseService';
+import PostService from '../../services/PostService';
 import ErrorMessage from '../common/ErrorMessage';
 import Pager from '../common/Pager';
 import PostSearchForm from './PostSearchForm';
@@ -22,7 +19,7 @@ export default function PostsPage() {
   const user = useSelector(selectUser);
 
   const [queryParams, setQueryParams] = useState(
-    parseQueryString(location.search)
+    BaseService.parseQueryString(location.search)
   );
 
   function handleLimitChange(value) {
@@ -52,14 +49,14 @@ export default function PostsPage() {
     async function loadPosts() {
       const currentQueryString =
         location.search && location.search.substring(1);
-      const queryParamString = stringifyQueryParams(queryParams);
+      const queryParamString = BaseService.stringifyQueryParams(queryParams);
 
       if (queryParamString !== currentQueryString) {
         history.push({ search: queryParamString });
       } else {
         setLoading(true);
         try {
-          const result = await searchPosts(queryParams);
+          const result = await new PostService().searchPosts(queryParams);
           setPageCount(result.pageCount);
           setPosts(result.data);
         } catch (loadPostsError) {

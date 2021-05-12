@@ -1,14 +1,28 @@
-import * as authService from '../authService';
+import axios from 'axios';
+import AuthService from './AuthService';
 
-describe('authService', () => {
+describe('AuthService', () => {
+  let createSpy;
   let postSpy;
+  let service;
 
   beforeEach(() => {
-    postSpy = jest.spyOn(authService.client, 'post');
+    const client = axios.create();
+    postSpy = jest.spyOn(client, 'post');
+
+    createSpy = jest.spyOn(axios, 'create').mockImplementation((config) => {
+      client.defaults = {
+        ...client.defaults,
+        config,
+      };
+      return client;
+    });
+    service = new AuthService();
   });
 
   afterEach(() => {
     postSpy.mockRestore();
+    createSpy.mockRestore();
   });
 
   describe('login()', () => {
@@ -29,7 +43,7 @@ describe('authService', () => {
         data: expectedUser,
       });
 
-      const actualUser = await authService.login(
+      const actualUser = await service.login(
         expectedUser.username,
         expectedUser.password,
         expectedBody.remember
@@ -41,16 +55,12 @@ describe('authService', () => {
   });
 
   describe('logout()', () => {
-    it('makes a POST request to the logout endpoint with the given access token', async () => {
-      const expectedBody = {
-        accessToken: 'testaccesstoken',
-      };
-
+    it('makes a POST request to the logout endpoint', async () => {
       postSpy.mockResolvedValue({});
 
-      await authService.logout(expectedBody.accessToken);
+      await service.logout();
 
-      expect(postSpy).toHaveBeenCalledWith('/logout', expectedBody);
+      expect(postSpy).toHaveBeenCalledWith('/logout');
     });
   });
 });

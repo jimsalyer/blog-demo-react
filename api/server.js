@@ -109,7 +109,7 @@ server.post('/auth/login', (req, res) => {
 });
 
 server.post('/auth/logout', (req, res) => {
-  const { accessToken } = req.body;
+  const accessToken = req.headers['x-access-token'];
   try {
     const currentAccessToken = router.db
       .get('accessTokens')
@@ -127,14 +127,14 @@ server.post('/auth/logout', (req, res) => {
   }
 
   return res.status(400).json({
-    message: 'Could not find login token.',
+    message: 'Could not find access token.',
   });
 });
 
 server.use((req, res, next) => {
   const date = new Date();
   const utc = date.toISOString();
-  const { accessToken } = req.body;
+  const accessToken = req.headers['x-access-token'];
 
   if (
     /^(delete|patch|post|put)$/i.test(req.method) &&
@@ -145,7 +145,6 @@ server.use((req, res, next) => {
     });
   }
 
-  req.body.accessToken = undefined;
   if (req.method === 'POST') {
     req.body.createUtc = utc;
   } else if (/^(patch|put)$/i.test(req.method)) {

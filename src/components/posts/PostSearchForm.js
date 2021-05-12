@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { useEffect, useRef, useState } from 'react';
 import { Accordion, Button, Card, Col, Form, Row } from 'react-bootstrap';
-import { listUsers } from '../../services/userService';
+import UserService from '../../services/UserService';
 
 export default function PostSearchForm({ values, onError, onSearch }) {
   const [active, setActive] = useState(false);
@@ -39,7 +39,7 @@ export default function PostSearchForm({ values, onError, onSearch }) {
     async function loadUsers() {
       setLoadingUsers(true);
       try {
-        const result = await listUsers();
+        const result = await new UserService().listUsers();
         setUsers(result);
       } catch (error) {
         onError(error);

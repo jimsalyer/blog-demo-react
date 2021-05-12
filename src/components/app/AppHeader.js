@@ -3,7 +3,7 @@ import { Nav, Navbar, NavDropdown, Spinner } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useHistory } from 'react-router-dom';
 import { logout, selectUser } from '../../redux/userSlice';
-import * as authService from '../../services/authService';
+import AuthService from '../../services/AuthService';
 
 export default function AppHeader() {
   const dispatch = useDispatch();
@@ -14,7 +14,7 @@ export default function AppHeader() {
   async function handleSelect(eventKey) {
     if (eventKey === 'logout' && !loggingOut) {
       setLoggingOut(true);
-      await authService.logout(user.accessToken);
+      await new AuthService().logout(user.accessToken);
       dispatch(logout());
       setLoggingOut(false);
       history.push('/login');
