@@ -34,7 +34,7 @@ export const logout = createAsyncThunk(
   }
 );
 
-export const userSlice = createSlice({
+export default createSlice({
   name: 'user',
   initialState: {
     ...JSON.parse(localStorage.getItem(userStorageKey)),
@@ -75,5 +75,3 @@ export const userSlice = createSlice({
 });
 
 export const userSelector = (state) => state.user;
-
-export default userSlice.reducer;
