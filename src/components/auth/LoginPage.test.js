@@ -5,23 +5,14 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter, Route } from 'react-router-dom';
 import store from '../../redux/store';
-import AuthService from '../../services/AuthService';
+import authService from '../../services/AuthService';
 import LoginPage from './LoginPage';
 
-jest.mock('../../services/AuthService');
-
 describe('<LoginPage />', () => {
-  let mockLogin;
+  let loginSpy;
 
   beforeEach(() => {
-    mockLogin = jest.fn();
-    AuthService.mockImplementation(() => ({
-      login: mockLogin,
-    }));
-  });
-
-  afterEach(() => {
-    AuthService.mockRestore();
+    loginSpy = jest.spyOn(authService, 'login');
   });
 
   describe('Username Field', () => {
@@ -107,14 +98,14 @@ describe('<LoginPage />', () => {
   });
 
   describe('Submission Handling', () => {
-    it('calls the login method of the authentication service and updates state with the result', async () => {
+    it('logs the user in', async () => {
       const expectedUser = {
+        id: 1,
         username: 'testusername',
         password: 'testpassword',
       };
 
-      const dispatchSpy = jest.spyOn(store, 'dispatch');
-      mockLogin.mockResolvedValue(expectedUser);
+      loginSpy.mockResolvedValue(expectedUser);
 
       render(
         <Provider store={store}>
@@ -135,34 +126,28 @@ describe('<LoginPage />', () => {
       fireEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(mockLogin).toHaveBeenCalledWith(
+        expect(loginSpy).toHaveBeenCalledWith(
           expectedUser.username,
           expectedUser.password,
           true
         );
-
-        expect(dispatchSpy).toHaveBeenCalledWith({
-          payload: expectedUser,
-          type: 'user/login',
-        });
-
-        dispatchSpy.mockRestore();
       });
     });
 
     it('redirects to the URL specified in the "returnUrl" query parameter after login', async () => {
-      const expectedQueryValues = {
-        returnUrl: '/test-url',
-      };
+      const expectedReturnUrl = '/test-url';
 
       const expectedUser = {
+        id: 1,
         username: 'testusername',
         password: 'testpassword',
       };
 
-      const dispatchSpy = jest.spyOn(store, 'dispatch');
-      const queryStringValue = queryString.stringify(expectedQueryValues);
-      mockLogin.mockResolvedValue(expectedUser);
+      const queryStringValue = queryString.stringify({
+        returnUrl: expectedReturnUrl,
+      });
+
+      loginSpy.mockResolvedValue(expectedUser);
 
       let testLocation;
 
@@ -193,20 +178,18 @@ describe('<LoginPage />', () => {
       fireEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(testLocation.pathname).toBe(expectedQueryValues.returnUrl);
-
-        dispatchSpy.mockRestore();
+        expect(testLocation.pathname).toBe(expectedReturnUrl);
       });
     });
 
     it('redirects to "/" after login if no "returnUrl" query parameter is specified', async () => {
       const expectedUser = {
+        id: 1,
         username: 'testusername',
         password: 'testpassword',
       };
 
-      const dispatchSpy = jest.spyOn(store, 'dispatch');
-      mockLogin.mockResolvedValue(expectedUser);
+      loginSpy.mockResolvedValue(expectedUser);
 
       let testLocation;
 
@@ -238,13 +221,13 @@ describe('<LoginPage />', () => {
 
       await waitFor(() => {
         expect(testLocation.pathname).toBe('/');
-
-        dispatchSpy.mockRestore();
       });
     });
 
     it('disables the submit button and shows a spinner while running', async () => {
-      mockLogin.mockResolvedValue({});
+      loginSpy.mockRejectedValue({
+        message: 'test error message',
+      });
 
       render(
         <Provider store={store}>
@@ -279,7 +262,7 @@ describe('<LoginPage />', () => {
     });
 
     it('trims the leading and trailing whitespace from Username and Password', async () => {
-      mockLogin.mockRejectedValue({ message: 'test error message' });
+      loginSpy.mockRejectedValue({ message: 'test error message' });
 
       render(
         <Provider store={store}>
@@ -306,7 +289,7 @@ describe('<LoginPage />', () => {
     it('displays the error message if a server error occurs during the login call', async () => {
       const expectedErrorMessage = 'test error message';
 
-      mockLogin.mockRejectedValue({
+      loginSpy.mockRejectedValue({
         response: {
           data: {
             message: expectedErrorMessage,
@@ -332,15 +315,15 @@ describe('<LoginPage />', () => {
 
       const submitError = await screen.findByTestId('submitError');
 
-      expect(mockLogin).toHaveBeenCalled();
+      expect(loginSpy).toHaveBeenCalled();
       expect(submitError).toHaveTextContent(expectedErrorMessage);
     });
 
     it('displays the error message if a client error occurs during the login call', async () => {
       const expectedErrorMessage = 'test error message';
 
-      mockLogin.mockImplementation(() => {
-        throw new Error(expectedErrorMessage);
+      loginSpy.mockRejectedValue({
+        message: expectedErrorMessage,
       });
 
       render(
@@ -361,7 +344,7 @@ describe('<LoginPage />', () => {
 
       const submitError = await screen.findByTestId('submitError');
 
-      expect(mockLogin).toHaveBeenCalled();
+      expect(loginSpy).toHaveBeenCalled();
       expect(submitError).toHaveTextContent(expectedErrorMessage);
     });
   });

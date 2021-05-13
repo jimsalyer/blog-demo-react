@@ -3,7 +3,7 @@ import { Alert, Button, Card, Spinner } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { NavLink, useHistory, useLocation } from 'react-router-dom';
 import { selectUser } from '../../redux/userSlice';
-import PostService from '../../services/PostService';
+import postService from '../../services/PostService';
 import {
   parseQueryString,
   stringifyQueryParams,
@@ -59,7 +59,7 @@ export default function PostsPage() {
       } else {
         setLoading(true);
         try {
-          const result = await new PostService().searchPosts(queryParams);
+          const result = await postService.searchPosts(queryParams);
           setPageCount(result.pageCount);
           setPosts(result.data);
         } catch (loadPostsError) {
@@ -80,7 +80,7 @@ export default function PostsPage() {
         onError={setError}
         onSearch={handleSearch}
       />
-      {user && (
+      {user.id && (
         <div className="mb-3">
           <Button
             as={NavLink}

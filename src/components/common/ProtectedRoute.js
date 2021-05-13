@@ -13,7 +13,7 @@ export default function ProtectedRoute({ children, ...props }) {
     <Route
       {...props}
       render={() => {
-        if (user || location.pathname === '/login') {
+        if (user.id || location.pathname === '/login') {
           return children;
         }
 

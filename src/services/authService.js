@@ -1,6 +1,6 @@
 import BaseService from './BaseService';
 
-export default class AuthService extends BaseService {
+export class AuthService extends BaseService {
   constructor() {
     super('/auth');
   }
@@ -18,3 +18,5 @@ export default class AuthService extends BaseService {
     await this.client.post('/logout');
   }
 }
+
+export default new AuthService();

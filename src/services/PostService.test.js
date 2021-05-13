@@ -1,29 +1,8 @@
-import axios from 'axios';
 import queryString from 'query-string';
-import PostService from './PostService';
+import postService from './PostService';
 import { stringifyQueryParams } from './serviceUtils';
 
 describe('PostService', () => {
-  let client;
-  let createSpy;
-  let service;
-
-  beforeEach(() => {
-    client = axios.create();
-    createSpy = jest.spyOn(axios, 'create').mockImplementation((config) => {
-      client.defaults = {
-        ...client.defaults,
-        config,
-      };
-      return client;
-    });
-    service = new PostService();
-  });
-
-  afterEach(() => {
-    createSpy.mockRestore();
-  });
-
   describe('createPost()', () => {
     it('makes a POST request with the given data and returns the result', async () => {
       const expectedPost = {
@@ -31,29 +10,28 @@ describe('PostService', () => {
         body: 'test body',
       };
 
-      const postSpy = jest.spyOn(client, 'post').mockResolvedValue({
+      const postSpy = jest.spyOn(postService.client, 'post').mockResolvedValue({
         data: expectedPost,
       });
 
-      const actualPost = await service.createPost(expectedPost);
+      const actualPost = await postService.createPost(expectedPost);
 
       expect(postSpy).toHaveBeenCalledWith('/', expectedPost);
       expect(actualPost).toStrictEqual(expectedPost);
-
-      postSpy.mockRestore();
     });
   });
 
   describe('deletePost()', () => {
     it('makes a DELETE request with the given ID', async () => {
       const expectedId = 1;
-      const deleteSpy = jest.spyOn(client, 'delete').mockResolvedValue(null);
 
-      await service.deletePost(expectedId);
+      const deleteSpy = jest
+        .spyOn(postService.client, 'delete')
+        .mockResolvedValue(null);
+
+      await postService.deletePost(expectedId);
 
       expect(deleteSpy).toHaveBeenCalledWith(`/${expectedId}`);
-
-      deleteSpy.mockRestore();
     });
   });
 
@@ -65,16 +43,14 @@ describe('PostService', () => {
         body: 'test body',
       };
 
-      const getSpy = jest.spyOn(client, 'get').mockResolvedValue({
+      const getSpy = jest.spyOn(postService.client, 'get').mockResolvedValue({
         data: expectedPost,
       });
 
-      const actualPost = await service.getPost(expectedPost.id);
+      const actualPost = await postService.getPost(expectedPost.id);
 
       expect(getSpy).toHaveBeenCalledWith(`/${expectedPost.id}`);
       expect(actualPost).toStrictEqual(expectedPost);
-
-      getSpy.mockRestore();
     });
   });
 
@@ -82,11 +58,7 @@ describe('PostService', () => {
     let getSpy;
 
     beforeEach(() => {
-      getSpy = jest.spyOn(client, 'get');
-    });
-
-    afterEach(() => {
-      getSpy.mockRestore();
+      getSpy = jest.spyOn(postService.client, 'get');
     });
 
     it('makes a GET request with the given parameters and returns the resulting data and pagination values', async () => {
@@ -99,9 +71,9 @@ describe('PostService', () => {
 
       const expectedQueryParams = {
         _limit: expectedParams.limit,
-        _order: service.sortParams.order,
+        _order: postService.sortParams.order,
         _page: expectedParams.page,
-        _sort: service.sortParams.sort,
+        _sort: postService.sortParams.sort,
         q: expectedParams.text,
         userId: expectedParams.author,
       };
@@ -127,7 +99,7 @@ describe('PostService', () => {
 
       getSpy.mockResolvedValue(mockResponse);
 
-      const actualResult = await service.searchPosts(expectedParams);
+      const actualResult = await postService.searchPosts(expectedParams);
 
       expect(getSpy).toHaveBeenCalledWith(
         `/?${queryString.stringify(expectedQueryParams)}`
@@ -137,17 +109,17 @@ describe('PostService', () => {
 
     it('sets the parameters to default values if they are not provided', async () => {
       const queryParams = {
-        _limit: service.defaultSearchParams.limit,
-        _order: service.sortParams.order,
-        _page: service.defaultSearchParams.page,
-        _sort: service.sortParams.sort,
+        _limit: postService.defaultSearchParams.limit,
+        _order: postService.sortParams.order,
+        _page: postService.defaultSearchParams.page,
+        _sort: postService.sortParams.sort,
       };
       const query = stringifyQueryParams(queryParams);
       const expectedUrl = `/?${query}`;
 
       getSpy.mockResolvedValue({ data: [] });
 
-      await service.searchPosts();
+      await postService.searchPosts();
 
       expect(getSpy).toHaveBeenCalledWith(expectedUrl);
     });
@@ -161,19 +133,17 @@ describe('PostService', () => {
         body: 'test body',
       };
 
-      const putSpy = jest.spyOn(client, 'put').mockResolvedValue({
+      const putSpy = jest.spyOn(postService.client, 'put').mockResolvedValue({
         data: expectedPost,
       });
 
-      const actualPost = await service.updatePost(
+      const actualPost = await postService.updatePost(
         expectedPost.id,
         expectedPost
       );
 
       expect(putSpy).toHaveBeenCalledWith(`/${expectedPost.id}`, expectedPost);
       expect(actualPost).toStrictEqual(expectedPost);
-
-      putSpy.mockRestore();
     });
   });
 });

@@ -1,89 +1,234 @@
 /* eslint-disable global-require */
+import { userStorageKey } from '../constants';
+import authService from '../services/AuthService';
+import { login, logout, selectUser } from './userSlice';
 
 describe('userSlice', () => {
+  const expectedUserId = 1;
+  const expectedUsername = 'tuser';
+
+  const expectedAccessToken = {
+    userId: expectedUserId,
+    token: 'testaccesstoken',
+  };
+
+  const expectedLogin = {
+    username: expectedUsername,
+    password: 'testpassword',
+    remember: true,
+  };
+
+  const expectedUser = {
+    id: expectedUserId,
+    username: expectedUsername,
+  };
+
+  let loginSpy;
+  let logoutSpy;
+
   beforeEach(() => {
-    jest.resetModules();
     localStorage.clear();
+    jest.resetModules();
+
+    loginSpy = jest.spyOn(authService, 'login').mockResolvedValue(expectedUser);
+    logoutSpy = jest
+      .spyOn(authService, 'logout')
+      .mockResolvedValue(expectedAccessToken);
   });
 
   describe('Initialization', () => {
-    it('has an initial state of null when no corresponding localStorage item is found', () => {
-      const store = require('./store').default;
-      const state = store.getState();
+    it('has a default initial state when no localStorage item is found', () => {
+      const expectedState = {
+        errorMessage: '',
+        isProcessing: false,
+      };
 
-      expect(state.user).toBeNull();
+      const store = require('./store').default;
+      const actualState = store.getState().user;
+
+      expect(actualState).toStrictEqual(expectedState);
     });
 
     it('gets its initial state from localStorage, if provided', () => {
-      const expectedUser = { id: 1 };
+      const expectedState = {
+        ...expectedUser,
+        errorMessage: '',
+        isProcessing: false,
+      };
 
-      localStorage.setItem('state.user', JSON.stringify(expectedUser));
+      localStorage.setItem(userStorageKey, JSON.stringify(expectedUser));
 
       const store = require('./store').default;
-      const state = store.getState();
+      const actualState = store.getState().user;
 
-      expect(state.user).toStrictEqual(expectedUser);
+      expect(actualState).toStrictEqual(expectedState);
+
+      localStorage.removeItem(userStorageKey);
     });
   });
 
   describe('login()', () => {
-    it('sets the state to the given user and stores the state in localStorage', () => {
-      const expectedUser = { id: 1 };
+    it('logs the user in, stores the result in localStorage, and returns that result', async () => {
+      const expectedState = {
+        ...expectedUser,
+        errorMessage: '',
+        isProcessing: false,
+      };
 
       const store = require('./store').default;
-      const { login } = require('./userSlice');
 
-      store.dispatch(login(expectedUser));
+      const resultAction = await store.dispatch(login(expectedLogin));
+      const actualState = store.getState().user;
+      const actualUser = JSON.parse(localStorage.getItem(userStorageKey));
 
-      const state = store.getState();
-      const stateUser = state.user;
-      const localStorageUser = JSON.parse(localStorage.getItem('state.user'));
+      expect(login.fulfilled.match(resultAction)).toBeTruthy();
+      expect(actualState).toStrictEqual(expectedState);
+      expect(actualUser).toStrictEqual(expectedUser);
+    });
 
-      expect(stateUser).toStrictEqual(expectedUser);
-      expect(localStorageUser).toStrictEqual(expectedUser);
+    it('sets the errorMessage state property if a server error occurs', async () => {
+      const expectedErrorMessage = 'test error message';
+      const expectedState = {
+        errorMessage: expectedErrorMessage,
+        isProcessing: false,
+      };
+
+      loginSpy.mockReset();
+      loginSpy.mockRejectedValue({
+        response: {
+          data: {
+            message: expectedErrorMessage,
+          },
+        },
+      });
+
+      const store = require('./store').default;
+
+      await store.dispatch(login(expectedLogin));
+
+      const actualState = store.getState().user;
+
+      expect(actualState).toStrictEqual(expectedState);
+    });
+
+    it('sets the errorMessage state property if a client error occurs', async () => {
+      const expectedErrorMessage = 'test error message';
+      const expectedState = {
+        errorMessage: expectedErrorMessage,
+        isProcessing: false,
+      };
+
+      loginSpy.mockReset();
+      loginSpy.mockRejectedValue({
+        message: expectedErrorMessage,
+      });
+
+      const store = require('./store').default;
+
+      await store.dispatch(login(expectedLogin));
+
+      const actualState = store.getState().user;
+
+      expect(actualState).toStrictEqual(expectedState);
     });
   });
 
   describe('logout()', () => {
-    it('clears the state and the localStorage item', () => {
-      const expectedUser = { id: 1 };
+    it('clears the state and the localStorage item', async () => {
+      let expectedState = {
+        ...expectedUser,
+        errorMessage: '',
+        isProcessing: false,
+      };
 
       const store = require('./store').default;
-      const { login, logout } = require('./userSlice');
 
-      store.dispatch(login(expectedUser));
+      await store.dispatch(login(expectedLogin));
 
-      let state = store.getState();
-      let stateUser = state.user;
-      let localStorageUser = JSON.parse(localStorage.getItem('state.user'));
+      let actualState = store.getState().user;
+      let actualUser = JSON.parse(localStorage.getItem(userStorageKey));
 
-      expect(stateUser).toStrictEqual(expectedUser);
-      expect(localStorageUser).toStrictEqual(expectedUser);
+      expect(actualState).toStrictEqual(expectedState);
+      expect(actualUser).toStrictEqual(expectedUser);
 
-      store.dispatch(logout());
+      expectedState = {
+        ...expectedAccessToken,
+        errorMessage: '',
+        isProcessing: false,
+      };
 
-      state = store.getState();
-      stateUser = state.user;
-      localStorageUser = JSON.parse(localStorage.getItem('state.user'));
+      await store.dispatch(logout());
 
-      expect(stateUser).toBeNull();
-      expect(localStorageUser).toBeNull();
+      actualState = store.getState().user;
+      actualUser = JSON.parse(localStorage.getItem(userStorageKey));
+
+      expect(actualState).toStrictEqual(expectedState);
+      expect(actualUser).toBeNull();
+    });
+
+    it('sets the errorMessage state property if a server error occurs', async () => {
+      const expectedErrorMessage = 'test error message';
+      const expectedState = {
+        errorMessage: expectedErrorMessage,
+        isProcessing: false,
+      };
+
+      logoutSpy.mockReset();
+      logoutSpy.mockRejectedValue({
+        response: {
+          data: {
+            message: expectedErrorMessage,
+          },
+        },
+      });
+
+      const store = require('./store').default;
+
+      await store.dispatch(logout());
+
+      const actualState = store.getState().user;
+
+      expect(actualState).toStrictEqual(expectedState);
+    });
+
+    it('sets the errorMessage state property if a client error occurs', async () => {
+      const expectedErrorMessage = 'test error message';
+      const expectedState = {
+        errorMessage: expectedErrorMessage,
+        isProcessing: false,
+      };
+
+      logoutSpy.mockReset();
+      logoutSpy.mockRejectedValue({
+        message: expectedErrorMessage,
+      });
+
+      const store = require('./store').default;
+
+      await store.dispatch(logout());
+
+      const actualState = store.getState().user;
+
+      expect(actualState).toStrictEqual(expectedState);
     });
   });
 
   describe('selectUser()', () => {
-    it('returns the user from the state', () => {
-      const expectedUser = { id: 1 };
+    it('returns the user from the state', async () => {
+      const expectedState = {
+        ...expectedUser,
+        errorMessage: '',
+        isProcessing: false,
+      };
 
       const store = require('./store').default;
-      const { selectUser, login } = require('./userSlice');
 
-      store.dispatch(login(expectedUser));
+      await store.dispatch(login(expectedLogin));
 
       const state = store.getState();
-      const user = selectUser(state);
+      const actualState = selectUser(state);
 
-      expect(user).toStrictEqual(expectedUser);
+      expect(actualState).toStrictEqual(expectedState);
     });
   });
 });

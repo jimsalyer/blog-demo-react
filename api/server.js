@@ -125,7 +125,7 @@ server.post('/auth/logout', (req, res) => {
 
     if (currentAccessToken) {
       router.db.get('accessTokens').pull(currentAccessToken).write();
-      return res.json({});
+      return res.json(currentAccessToken);
     }
   } catch (error) {
     return res.status(500).json({

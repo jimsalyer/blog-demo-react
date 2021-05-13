@@ -11,15 +11,6 @@ describe('<Pager />', () => {
     onPageChangeMock = jest.fn();
   });
 
-  afterAll(() => {
-    onLimitChangeMock.mockRestore();
-    onPageChangeMock.mockRestore();
-  });
-
-  afterEach(() => {
-    cleanup();
-  });
-
   describe('Limiting', () => {
     it('displays a dropdown with the choices that correspond to the paging limits set on the component', async () => {
       render(

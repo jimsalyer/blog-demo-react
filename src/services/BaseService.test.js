@@ -1,4 +1,6 @@
+import MockAdapter from 'axios-mock-adapter';
 import mockedEnv from 'mocked-env';
+import { userStorageKey } from '../constants';
 import BaseService from './BaseService';
 
 describe('BaseService', () => {
@@ -52,22 +54,32 @@ describe('BaseService', () => {
     expect(service.client.defaults.baseURL).toStrictEqual(`${apiUrl}/test`);
   });
 
-  it("adds the current user's access token to the headers of the request", () => {
+  it("adds the current user's access token to the headers of the request", async () => {
     const expectedAccessToken = 'testaccesstoken';
 
     const user = {
       accessToken: expectedAccessToken,
     };
 
-    localStorage.setItem('state.user', JSON.stringify(user));
+    localStorage.setItem(userStorageKey, JSON.stringify(user));
 
     const service = new BaseService('/test');
 
-    expect(service.client.defaults.headers).toHaveProperty(
+    const clientMock = new MockAdapter(service.client);
+    let testConfig;
+
+    clientMock.onGet('/').reply((config) => {
+      testConfig = config;
+      return [200, {}];
+    });
+
+    await service.client.get('/');
+
+    expect(testConfig.headers).toHaveProperty(
       'X-Access-Token',
       expectedAccessToken
     );
 
-    localStorage.removeItem('state.user');
+    localStorage.removeItem(userStorageKey);
   });
 });

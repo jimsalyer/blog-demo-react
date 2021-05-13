@@ -1,24 +1,78 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { userStorageKey } from '../constants';
+import authService from '../services/AuthService';
 
-const initialState = JSON.parse(localStorage.getItem('state.user'));
+export const login = createAsyncThunk(
+  'user/login',
+  async ({ username, password, remember }, { rejectWithValue }) => {
+    try {
+      const user = await authService.login(username, password, remember);
+      localStorage.setItem(userStorageKey, JSON.stringify(user));
+      return user;
+    } catch (error) {
+      if (error.response && error.response.data) {
+        return rejectWithValue(error.response.data);
+      }
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const logout = createAsyncThunk(
+  'user/logout',
+  async (_, { rejectWithValue }) => {
+    try {
+      const accessToken = await authService.logout();
+      localStorage.removeItem(userStorageKey);
+      return accessToken;
+    } catch (error) {
+      if (error.response && error.response.data) {
+        return rejectWithValue(error.response.data);
+      }
+      return rejectWithValue(error);
+    }
+  }
+);
 
 export const userSlice = createSlice({
   name: 'user',
-  initialState,
-  reducers: {
-    login: (state, action) => {
-      const user = action.payload;
-      localStorage.setItem('state.user', JSON.stringify(user));
-      return user;
-    },
-    logout: (state) => {
-      localStorage.removeItem('state.user');
-      return null;
-    },
+  initialState: {
+    ...JSON.parse(localStorage.getItem(userStorageKey)),
+    errorMessage: '',
+    isProcessing: false,
+  },
+  reducers: {},
+  extraReducers: {
+    [login.fulfilled]: (state, { payload }) => ({
+      ...payload,
+      errorMessage: '',
+      isProcessing: false,
+    }),
+    [login.pending]: (state) => ({
+      ...state,
+      isProcessing: true,
+    }),
+    [login.rejected]: (state, { payload }) => ({
+      ...state,
+      errorMessage: payload.message,
+      isProcessing: false,
+    }),
+    [logout.fulfilled]: (state, { payload }) => ({
+      ...payload,
+      errorMessage: '',
+      isProcessing: false,
+    }),
+    [logout.pending]: (state) => ({
+      ...state,
+      isProcessing: true,
+    }),
+    [logout.rejected]: (state, { payload }) => ({
+      ...state,
+      errorMessage: payload.message,
+      isProcessing: false,
+    }),
   },
 });
-
-export const { login, logout } = userSlice.actions;
 
 export const selectUser = (state) => state.user;
 

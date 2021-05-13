@@ -4,24 +4,14 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter, Route } from 'react-router-dom';
 import store from '../../redux/store';
-import { login, logout } from '../../redux/userSlice';
-import PostService from '../../services/PostService';
+import postService from '../../services/PostService';
 import CreatePostPage from './CreatePostPage';
 
-jest.mock('../../services/PostService');
-
 describe('<CreatePostPage />', () => {
-  let mockCreatePost;
+  let createPostSpy;
 
   beforeEach(() => {
-    mockCreatePost = jest.fn();
-    PostService.mockImplementation(() => ({
-      createPost: mockCreatePost,
-    }));
-  });
-
-  afterEach(() => {
-    PostService.mockRestore();
+    createPostSpy = jest.spyOn(postService, 'createPost');
   });
 
   describe('Title Field', () => {
@@ -150,28 +140,17 @@ describe('<CreatePostPage />', () => {
   });
 
   describe('Submission Handling', () => {
-    const user = { id: 1, accessToken: 'testaccesstoken' };
-
-    beforeAll(() => {
-      store.dispatch(login(user));
-    });
-
-    afterAll(() => {
-      store.dispatch(logout());
-    });
-
     it('calls the createPost method of the post service and redirects to the posts page', async () => {
       const expectedPost = {
         title: 'Test Title',
         body: 'Test Body',
         excerpt: 'Test Excerpt',
         image: 'http://www.example.com/test-image.png',
-        userId: user.id,
       };
 
       let testLocation;
 
-      mockCreatePost.mockResolvedValue(expectedPost);
+      createPostSpy.mockResolvedValue(expectedPost);
 
       render(
         <Provider store={store}>
@@ -200,13 +179,13 @@ describe('<CreatePostPage />', () => {
       fireEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(mockCreatePost).toHaveBeenCalledWith(expectedPost);
+        expect(createPostSpy).toHaveBeenCalledWith(expectedPost);
         expect(testLocation.pathname).toBe('/');
       });
     });
 
     it('disables the submit button and shows a spinner while running', async () => {
-      mockCreatePost.mockResolvedValue({});
+      createPostSpy.mockResolvedValue({});
 
       render(
         <Provider store={store}>
@@ -245,7 +224,7 @@ describe('<CreatePostPage />', () => {
     });
 
     it('trims the leading and trailing whitespace from Title, Excerpt, and Image', async () => {
-      mockCreatePost.mockRejectedValue({ message: 'test error message' });
+      createPostSpy.mockRejectedValue({ message: 'test error message' });
 
       render(
         <Provider store={store}>
@@ -276,7 +255,7 @@ describe('<CreatePostPage />', () => {
     it('displays the error message if a server error occurs during the createPost call', async () => {
       const expectedErrorMessage = 'test error message';
 
-      mockCreatePost.mockRejectedValue({
+      createPostSpy.mockRejectedValue({
         response: {
           data: {
             message: expectedErrorMessage,
@@ -306,14 +285,14 @@ describe('<CreatePostPage />', () => {
 
       const submitError = await screen.findByTestId('submitError');
 
-      expect(mockCreatePost).toHaveBeenCalled();
+      expect(createPostSpy).toHaveBeenCalled();
       expect(submitError).toHaveTextContent(expectedErrorMessage);
     });
 
-    it('displays the error message if a client error occurs during the login call', async () => {
+    it('displays the error message if a client error occurs during the createPost call', async () => {
       const expectedErrorMessage = 'test error message';
 
-      mockCreatePost.mockImplementation(() => {
+      createPostSpy.mockImplementation(() => {
         throw new Error(expectedErrorMessage);
       });
 
@@ -339,7 +318,7 @@ describe('<CreatePostPage />', () => {
 
       const submitError = await screen.findByTestId('submitError');
 
-      expect(mockCreatePost).toHaveBeenCalled();
+      expect(createPostSpy).toHaveBeenCalled();
       expect(submitError).toHaveTextContent(expectedErrorMessage);
     });
   });

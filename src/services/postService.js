@@ -1,7 +1,7 @@
 import BaseService from './BaseService';
 import { parsePageCount, stringifyQueryParams } from './serviceUtils';
 
-export default class PostService extends BaseService {
+export class PostService extends BaseService {
   constructor() {
     super('/posts');
 
@@ -58,3 +58,5 @@ export default class PostService extends BaseService {
     return response.data;
   }
 }
+
+export default new PostService();

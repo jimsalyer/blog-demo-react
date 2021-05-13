@@ -1,27 +1,6 @@
-import axios from 'axios';
-import UserService from './UserService';
+import userService from './UserService';
 
 describe('UserService', () => {
-  let client;
-  let createSpy;
-  let service;
-
-  beforeEach(() => {
-    client = axios.create();
-    createSpy = jest.spyOn(axios, 'create').mockImplementation((config) => {
-      client.defaults = {
-        ...client.defaults,
-        config,
-      };
-      return client;
-    });
-    service = new UserService();
-  });
-
-  afterEach(() => {
-    createSpy.mockRestore();
-  });
-
   describe('createUser()', () => {
     it('makes a POST request with the given data and returns the result', async () => {
       const expectedUser = {
@@ -29,29 +8,28 @@ describe('UserService', () => {
         password: 'p@ssw0rd',
       };
 
-      const postSpy = jest.spyOn(client, 'post').mockResolvedValue({
+      const postSpy = jest.spyOn(userService.client, 'post').mockResolvedValue({
         data: expectedUser,
       });
 
-      const actualUser = await service.createUser(expectedUser);
+      const actualUser = await userService.createUser(expectedUser);
 
       expect(postSpy).toHaveBeenCalledWith('/', expectedUser);
       expect(actualUser).toStrictEqual(expectedUser);
-
-      postSpy.mockRestore();
     });
   });
 
   describe('deleteUser()', () => {
     it('makes a DELETE request with the given ID', async () => {
       const expectedId = 1;
-      const deleteSpy = jest.spyOn(client, 'delete').mockResolvedValue(null);
 
-      await service.deleteUser(expectedId);
+      const deleteSpy = jest
+        .spyOn(userService.client, 'delete')
+        .mockResolvedValue(null);
+
+      await userService.deleteUser(expectedId);
 
       expect(deleteSpy).toHaveBeenCalledWith(`/${expectedId}`);
-
-      deleteSpy.mockRestore();
     });
   });
 
@@ -63,16 +41,14 @@ describe('UserService', () => {
         password: 'p@ssw0rd',
       };
 
-      const getSpy = jest.spyOn(client, 'get').mockResolvedValue({
+      const getSpy = jest.spyOn(userService.client, 'get').mockResolvedValue({
         data: expectedUser,
       });
 
-      const actualUser = await service.getUser(expectedUser.id);
+      const actualUser = await userService.getUser(expectedUser.id);
 
       expect(getSpy).toHaveBeenCalledWith(`/${expectedUser.id}`);
       expect(actualUser).toStrictEqual(expectedUser);
-
-      getSpy.mockRestore();
     });
   });
 
@@ -95,9 +71,11 @@ describe('UserService', () => {
         data: expectedData,
       };
 
-      const getSpy = jest.spyOn(client, 'get').mockResolvedValue(mockResponse);
+      const getSpy = jest
+        .spyOn(userService.client, 'get')
+        .mockResolvedValue(mockResponse);
 
-      const actualData = await service.listUsers();
+      const actualData = await userService.listUsers();
 
       expect(getSpy).toHaveBeenCalledWith('/');
       expect(actualData).toStrictEqual(expectedData);
@@ -112,19 +90,17 @@ describe('UserService', () => {
         password: 'p@ssw0rd',
       };
 
-      const putSpy = jest.spyOn(client, 'put').mockResolvedValue({
+      const putSpy = jest.spyOn(userService.client, 'put').mockResolvedValue({
         data: expectedUser,
       });
 
-      const actualUser = await service.updateUser(
+      const actualUser = await userService.updateUser(
         expectedUser.id,
         expectedUser
       );
 
       expect(putSpy).toHaveBeenCalledWith(`/${expectedUser.id}`, expectedUser);
       expect(actualUser).toStrictEqual(expectedUser);
-
-      putSpy.mockRestore();
     });
   });
 });

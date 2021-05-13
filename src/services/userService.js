@@ -1,6 +1,6 @@
 import BaseService from './BaseService';
 
-export default class UserService extends BaseService {
+export class UserService extends BaseService {
   constructor() {
     super('/users');
   }
@@ -29,3 +29,5 @@ export default class UserService extends BaseService {
     return response.data;
   }
 }
+
+export default new UserService();

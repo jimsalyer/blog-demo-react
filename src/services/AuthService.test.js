@@ -1,28 +1,10 @@
-import axios from 'axios';
-import AuthService from './AuthService';
+import authService from './AuthService';
 
 describe('AuthService', () => {
-  let createSpy;
   let postSpy;
-  let service;
 
   beforeEach(() => {
-    const client = axios.create();
-    postSpy = jest.spyOn(client, 'post');
-
-    createSpy = jest.spyOn(axios, 'create').mockImplementation((config) => {
-      client.defaults = {
-        ...client.defaults,
-        config,
-      };
-      return client;
-    });
-    service = new AuthService();
-  });
-
-  afterEach(() => {
-    postSpy.mockRestore();
-    createSpy.mockRestore();
+    postSpy = jest.spyOn(authService.client, 'post');
   });
 
   describe('login()', () => {
@@ -43,7 +25,7 @@ describe('AuthService', () => {
         data: expectedUser,
       });
 
-      const actualUser = await service.login(
+      const actualUser = await authService.login(
         expectedUser.username,
         expectedUser.password,
         expectedBody.remember
@@ -58,7 +40,7 @@ describe('AuthService', () => {
     it('makes a POST request to the logout endpoint', async () => {
       postSpy.mockResolvedValue({});
 
-      await service.logout();
+      await authService.logout();
 
       expect(postSpy).toHaveBeenCalledWith('/logout');
     });

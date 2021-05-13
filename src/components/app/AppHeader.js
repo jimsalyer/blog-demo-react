@@ -1,23 +1,22 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Nav, Navbar, NavDropdown, Spinner } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useHistory } from 'react-router-dom';
 import { logout, selectUser } from '../../redux/userSlice';
-import AuthService from '../../services/AuthService';
 
 export default function AppHeader() {
   const dispatch = useDispatch();
   const history = useHistory();
-  const [loggingOut, setLoggingOut] = useState(false);
   const user = useSelector(selectUser);
 
   async function handleSelect(eventKey) {
-    if (eventKey === 'logout' && !loggingOut) {
-      setLoggingOut(true);
-      await new AuthService().logout(user.accessToken);
-      dispatch(logout());
-      setLoggingOut(false);
-      history.push('/login');
+    if (eventKey === 'logout' && !user.isProcessing) {
+      try {
+        await dispatch(logout());
+        history.push('/login');
+      } catch {
+        // Do nothing
+      }
     }
   }
 
@@ -54,13 +53,13 @@ export default function AppHeader() {
             Posts
           </Nav.Link>
         </Nav>
-        {user && loggingOut && (
+        {user.id && user.isProcessing && (
           <Navbar.Text data-testid="logoutStatus">
             <Spinner animation="border" size="sm" className="mr-2" />
             Logging Out
           </Navbar.Text>
         )}
-        {user && !loggingOut && (
+        {user.id && !user.isProcessing && (
           <Nav>
             <NavDropdown
               alignRight
@@ -73,7 +72,7 @@ export default function AppHeader() {
             </NavDropdown>
           </Nav>
         )}
-        {!user && (
+        {!user.id && (
           <Nav>
             <Nav.Link
               as={NavLink}

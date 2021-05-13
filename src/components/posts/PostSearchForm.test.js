@@ -1,12 +1,10 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import UserService from '../../services/UserService';
+import userService from '../../services/UserService';
 import PostSearchForm from './PostSearchForm';
 
-jest.mock('../../services/UserService');
-
 describe('<PostSearchForm />', () => {
-  let mockListUsers;
+  let listUsersSpy;
   let mockOnError;
   let mockOnSearch;
 
@@ -16,19 +14,12 @@ describe('<PostSearchForm />', () => {
   });
 
   beforeEach(() => {
-    mockListUsers = jest.fn();
-    UserService.mockImplementation(() => ({
-      listUsers: mockListUsers,
-    }));
-  });
-
-  afterEach(() => {
-    UserService.mockRestore();
+    listUsersSpy = jest.spyOn(userService, 'listUsers');
   });
 
   describe('Form', () => {
     it('is collapsed by default', async () => {
-      mockListUsers.mockResolvedValue([]);
+      listUsersSpy.mockResolvedValue([]);
 
       render(
         <PostSearchForm
@@ -45,7 +36,7 @@ describe('<PostSearchForm />', () => {
     });
 
     it('expands when clicking the header', async () => {
-      mockListUsers.mockResolvedValue([]);
+      listUsersSpy.mockResolvedValue([]);
 
       render(
         <PostSearchForm
@@ -83,7 +74,7 @@ describe('<PostSearchForm />', () => {
       const expectedAuthor = expectedUsers[1];
       const expectedText = 'test text';
 
-      mockListUsers.mockResolvedValue(expectedUsers);
+      listUsersSpy.mockResolvedValue(expectedUsers);
 
       render(
         <PostSearchForm
@@ -117,7 +108,7 @@ describe('<PostSearchForm />', () => {
 
   describe('Author Filter', () => {
     it('displays a loading message until the list of users loads', async () => {
-      mockListUsers.mockResolvedValue([]);
+      listUsersSpy.mockResolvedValue([]);
 
       render(
         <PostSearchForm
@@ -151,7 +142,7 @@ describe('<PostSearchForm />', () => {
         },
       ];
 
-      mockListUsers.mockResolvedValue(expectedUsers);
+      listUsersSpy.mockResolvedValue(expectedUsers);
 
       render(
         <PostSearchForm
@@ -190,7 +181,7 @@ describe('<PostSearchForm />', () => {
       ];
       const expectedAuthor = expectedUsers[1];
 
-      mockListUsers.mockResolvedValue(expectedUsers);
+      listUsersSpy.mockResolvedValue(expectedUsers);
 
       render(
         <PostSearchForm
@@ -222,7 +213,7 @@ describe('<PostSearchForm />', () => {
       ];
       const expectedAuthor = expectedUsers[1];
 
-      mockListUsers.mockResolvedValue(expectedUsers);
+      listUsersSpy.mockResolvedValue(expectedUsers);
 
       render(
         <PostSearchForm
@@ -262,7 +253,7 @@ describe('<PostSearchForm />', () => {
       ];
       const expectedAuthor = expectedUsers[0];
 
-      mockListUsers.mockResolvedValue(expectedUsers);
+      listUsersSpy.mockResolvedValue(expectedUsers);
 
       render(
         <PostSearchForm
@@ -291,7 +282,7 @@ describe('<PostSearchForm />', () => {
     });
 
     it('displays an appropriate message when no users are found', async () => {
-      mockListUsers.mockResolvedValue([]);
+      listUsersSpy.mockResolvedValue([]);
 
       render(
         <PostSearchForm
@@ -314,7 +305,7 @@ describe('<PostSearchForm />', () => {
     it('defaults to the text provided (if applicable)', async () => {
       const expectedText = 'test text';
 
-      mockListUsers.mockResolvedValue([]);
+      listUsersSpy.mockResolvedValue([]);
 
       render(
         <PostSearchForm
@@ -331,7 +322,7 @@ describe('<PostSearchForm />', () => {
     it('changes the visual state of the form when the value changes', async () => {
       const expectedText = 'test text';
 
-      mockListUsers.mockResolvedValue([]);
+      listUsersSpy.mockResolvedValue([]);
 
       render(
         <PostSearchForm
@@ -360,7 +351,7 @@ describe('<PostSearchForm />', () => {
     it('passes the entered text to the onSearch handler', async () => {
       const expectedText = 'test text';
 
-      mockListUsers.mockResolvedValue([]);
+      listUsersSpy.mockResolvedValue([]);
 
       render(
         <PostSearchForm

@@ -1,35 +1,43 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter, Route } from 'react-router-dom';
 import store from '../../redux/store';
-import { login, logout } from '../../redux/userSlice';
-import AuthService from '../../services/AuthService';
+import { login } from '../../redux/userSlice';
+import authService from '../../services/AuthService';
 import AppHeader from './AppHeader';
 
-jest.mock('../../services/AuthService');
-
 describe('<AppHeader />', () => {
-  let mockLogout;
+  const expectedToken = 'testaccesstoken';
+  const expectedUserId = 1;
+  const expectedUsername = 'tuser';
+
+  const expectedAccessToken = {
+    userId: expectedUserId,
+    token: expectedToken,
+  };
+
+  const expectedLogin = {
+    username: expectedUsername,
+    password: 'testpassword',
+    remember: true,
+  };
+
+  const expectedUser = {
+    id: expectedUserId,
+    firstName: 'Test',
+    lastName: 'User',
+    username: expectedUsername,
+    accessToken: expectedToken,
+  };
 
   beforeEach(() => {
-    mockLogout = jest.fn();
-    AuthService.mockImplementation(() => ({
-      logout: mockLogout,
-    }));
-  });
-
-  afterEach(() => {
-    AuthService.mockRestore();
+    jest.spyOn(authService, 'login').mockResolvedValue(expectedUser);
+    jest.spyOn(authService, 'logout').mockResolvedValue(expectedAccessToken);
   });
 
   describe('Rendering', () => {
     it('renders user dropdown with a "Log Out" link if the user is logged in', async () => {
-      const expectedUser = {
-        firstName: 'Test',
-        lastName: 'User',
-      };
-
       render(
         <Provider store={store}>
           <MemoryRouter initialEntries={['/']}>
@@ -41,33 +49,24 @@ describe('<AppHeader />', () => {
       screen.getByTestId('loginLink');
       expect(screen.queryByTestId('logoutLink')).not.toBeInTheDocument();
 
-      store.dispatch(login(expectedUser));
+      await store.dispatch(login(expectedLogin));
 
       const userDropdown = await screen.findByTestId('userDropdown');
       const userDropdownToggle = userDropdown.querySelector('.dropdown-toggle');
+      fireEvent.click(userDropdownToggle);
 
       expect(screen.queryByTestId('loginLink')).not.toBeInTheDocument();
       expect(userDropdownToggle).toHaveTextContent(
         `${expectedUser.firstName} ${expectedUser.lastName}`
       );
 
-      fireEvent.click(userDropdownToggle);
-
-      await screen.findByTestId('logoutLink');
-
-      store.dispatch(logout());
+      const logoutLink = await screen.findByTestId('logoutLink');
+      fireEvent.click(logoutLink);
 
       await screen.findByTestId('loginLink');
     });
 
     it('renders a status message while waiting for the logout action to complete and then redirects to "/login"', async () => {
-      const expectedUser = {
-        firstName: 'Test',
-        lastName: 'User',
-      };
-
-      mockLogout.mockResolvedValue();
-
       let testLocation;
 
       render(
@@ -78,13 +77,14 @@ describe('<AppHeader />', () => {
               path="*"
               render={({ location }) => {
                 testLocation = location;
+                return null;
               }}
             />
           </MemoryRouter>
         </Provider>
       );
 
-      store.dispatch(login(expectedUser));
+      await store.dispatch(login(expectedLogin));
 
       const userDropdown = await screen.findByTestId('userDropdown');
       const userDropdownToggle = userDropdown.querySelector('.dropdown-toggle');
@@ -147,49 +147,43 @@ describe('<AppHeader />', () => {
       );
     });
 
-    it('navigates to "/" when clicking <Navbar.Brand />', () => {
+    it('navigates to "/" when clicking <Navbar.Brand />', async () => {
       expect(testLocation.pathname).toBe('/invalid-path');
 
-      act(() => {
-        const brand = screen.getByTestId('brand');
-        fireEvent.click(brand);
-      });
+      const brand = screen.getByTestId('brand');
+      fireEvent.click(brand);
 
-      expect(testLocation.pathname).toBe('/');
+      await waitFor(() => {
+        expect(testLocation.pathname).toBe('/');
+      });
     });
 
-    it('navigates to "/" when clicking the "Posts" link', () => {
+    it('navigates to "/" when clicking the "Posts" link', async () => {
       expect(testLocation.pathname).toBe('/invalid-path');
 
-      act(() => {
-        const postsLink = screen.getByTestId('postsLink');
-        fireEvent.click(postsLink);
-      });
+      const postsLink = screen.getByTestId('postsLink');
+      fireEvent.click(postsLink);
 
-      expect(testLocation.pathname).toBe('/');
+      await waitFor(() => {
+        expect(testLocation.pathname).toBe('/');
+      });
     });
 
-    it('navigates to "/login" when clicking the "Log In" link', () => {
+    it('navigates to "/login" when clicking the "Log In" link', async () => {
       expect(testLocation.pathname).toBe('/invalid-path');
 
-      act(() => {
-        const loginLink = screen.getByTestId('loginLink');
-        fireEvent.click(loginLink);
-      });
+      const loginLink = screen.getByTestId('loginLink');
+      fireEvent.click(loginLink);
 
-      expect(testLocation.pathname).toBe('/login');
+      await waitFor(() => {
+        expect(testLocation.pathname).toBe('/login');
+      });
     });
 
-    it('logs the user out when clicking the "Log Out" link', async () => {
-      const user = {
-        firstName: 'Test',
-        lastName: 'User',
-      };
+    it('logs the user out and navigates to "/login" when clicking the "Log Out" link', async () => {
+      expect(testLocation.pathname).toBe('/invalid-path');
 
-      const dispatchSpy = jest.spyOn(store, 'dispatch');
-      mockLogout.mockResolvedValue();
-
-      store.dispatch(login(user));
+      await store.dispatch(login(expectedLogin));
 
       const userDropdown = await screen.findByTestId('userDropdown');
       const userDropdownToggle = userDropdown.querySelector('.dropdown-toggle');
@@ -201,13 +195,9 @@ describe('<AppHeader />', () => {
 
       await screen.findByTestId('loginLink');
 
-      expect(mockLogout).toHaveBeenCalled();
-      expect(dispatchSpy).toHaveBeenLastCalledWith({
-        payload: undefined,
-        type: 'user/logout',
+      await waitFor(() => {
+        expect(testLocation.pathname).toBe('/login');
       });
-
-      dispatchSpy.mockRestore();
     });
   });
 });

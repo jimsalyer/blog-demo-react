@@ -1,19 +1,18 @@
 import { Formik } from 'formik';
 import queryString from 'query-string';
-import React, { useState } from 'react';
+import React from 'react';
 import { Alert, Button, Card, Form, Spinner } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
 import * as yup from 'yup';
-import { login } from '../../redux/userSlice';
-import AuthService from '../../services/AuthService';
+import { login, selectUser } from '../../redux/userSlice';
 
 export default function LoginPage() {
   const dispatch = useDispatch();
   const history = useHistory();
   const initialValues = { username: '', password: '', remember: false };
   const location = useLocation();
-  const [submitError, setSubmitError] = useState('');
+  const user = useSelector(selectUser);
 
   const validationSchema = yup.object().shape({
     username: yup.string().trim().required('Username is required.'),
@@ -22,17 +21,15 @@ export default function LoginPage() {
   });
 
   async function handleFormikSubmit(values, { setFieldValue, setSubmitting }) {
+    const username = values.username.trim();
+    const password = values.password.trim();
+    const { remember } = values;
+
+    setFieldValue('username', username);
+    setFieldValue('password', password);
+
     try {
-      const username = values.username.trim();
-      const password = values.password.trim();
-      const { remember } = values;
-
-      setSubmitError('');
-      setFieldValue('username', username);
-      setFieldValue('password', password);
-
-      const user = await new AuthService().login(username, password, remember);
-      dispatch(login(user));
+      await dispatch(login({ username, password, remember }));
 
       const queryValues = queryString.parse(location.search);
       if (queryValues.returnUrl) {
@@ -40,12 +37,8 @@ export default function LoginPage() {
       } else {
         history.push('/');
       }
-    } catch (error) {
-      if (error.response && error.response.data) {
-        setSubmitError(error.response.data.message);
-      } else {
-        setSubmitError(error.message);
-      }
+    } catch {
+      // Do nothing
     }
     setSubmitting(false);
   }
@@ -70,9 +63,9 @@ export default function LoginPage() {
           <Form onSubmit={handleSubmit}>
             <Card className="mt-2 mx-auto max-width-sm shadow-sm">
               <Card.Body>
-                {submitError && (
+                {user.errorMessage && (
                   <Alert variant="danger" data-testid="submitError">
-                    {submitError}
+                    {user.errorMessage}
                   </Alert>
                 )}
                 <Form.Group>
@@ -130,11 +123,11 @@ export default function LoginPage() {
               <Card.Footer>
                 <Button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || user.isProcessing}
                   className="btn-block"
                   data-testid="submitButton"
                 >
-                  {isSubmitting && (
+                  {(isSubmitting || user.isProcessing) && (
                     <Spinner
                       animation="border"
                       size="sm"

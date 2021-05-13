@@ -8,8 +8,8 @@ import AppContent from './AppContent';
 import AppHeader from './AppHeader';
 
 jest.mock('../../services/AuthService', () => ({
-  login: () => Promise.resolve({}),
-  logout: () => Promise.resolve(),
+  login: () => Promise.resolve({ id: 1 }),
+  logout: () => Promise.resolve({ userId: 1 }),
 }));
 
 jest.mock('../../services/PostService', () => ({
@@ -43,12 +43,9 @@ describe('<AppContent />', () => {
   });
 
   it('renders <CreatePostPage /> if the path is "/create" and the user is logged in', async () => {
-    const user = {
-      firstName: 'Test',
-      lastName: 'User',
-    };
-
-    store.dispatch(login(user));
+    await store.dispatch(
+      login({ username: 'tuser', password: 'testpassword', remember: true })
+    );
 
     render(
       <Provider store={store}>
@@ -61,7 +58,7 @@ describe('<AppContent />', () => {
 
     await screen.findByTestId('createPostPage');
 
-    store.dispatch(logout());
+    await store.dispatch(logout());
   });
 
   it('renders <LoginPage /> if the path is "/login"', async () => {
