@@ -1,7 +1,7 @@
 /* eslint-disable global-require */
 import { userStorageKey } from '../constants';
 import authService from '../services/AuthService';
-import { login, logout, selectUser } from './userSlice';
+import { login, logout, userSelector } from './userSlice';
 
 describe('userSlice', () => {
   const expectedUserId = 1;
@@ -213,7 +213,7 @@ describe('userSlice', () => {
     });
   });
 
-  describe('selectUser()', () => {
+  describe('userSelector()', () => {
     it('returns the user from the state', async () => {
       const expectedState = {
         ...expectedUser,
@@ -226,7 +226,7 @@ describe('userSlice', () => {
       await store.dispatch(login(expectedLogin));
 
       const state = store.getState();
-      const actualState = selectUser(state);
+      const actualState = userSelector(state);
 
       expect(actualState).toStrictEqual(expectedState);
     });

@@ -9,7 +9,7 @@ import * as userSliceExports from '../../redux/userSlice';
 
 describe('<ProtectedRoute />', () => {
   it('loads the given component if the user is authenticated', async () => {
-    jest.spyOn(userSliceExports, 'selectUser').mockReturnValue({ id: 1 });
+    jest.spyOn(userSliceExports, 'userSelector').mockReturnValue({ id: 1 });
 
     render(
       <Provider store={store}>
@@ -30,7 +30,7 @@ describe('<ProtectedRoute />', () => {
   it('redirects to the "/login" route with the current URL as a parameter if the user is not authenticated', async () => {
     let testLocation;
 
-    jest.spyOn(userSliceExports, 'selectUser').mockReturnValue({});
+    jest.spyOn(userSliceExports, 'userSelector').mockReturnValue({});
 
     render(
       <Provider store={store}>

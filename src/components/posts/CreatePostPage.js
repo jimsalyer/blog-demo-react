@@ -4,14 +4,14 @@ import { Alert, Button, Card, Form, Spinner } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import * as yup from 'yup';
-import { selectUser } from '../../redux/userSlice';
+import { userSelector } from '../../redux/userSlice';
 import postService from '../../services/PostService';
 
 export default function CreatePostPage() {
   const history = useHistory();
   const initialValues = { title: '', body: '', excerpt: '', image: '' };
   const [submitError, setSubmitError] = useState('');
-  const user = useSelector(selectUser);
+  const user = useSelector(userSelector);
 
   const validationSchema = yup.object().shape({
     title: yup.string().trim().required('Title is required.'),

@@ -5,14 +5,14 @@ import { Alert, Button, Card, Form, Spinner } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
 import * as yup from 'yup';
-import { login, selectUser } from '../../redux/userSlice';
+import { login, userSelector } from '../../redux/userSlice';
 
 export default function LoginPage() {
   const dispatch = useDispatch();
   const history = useHistory();
   const initialValues = { username: '', password: '', remember: false };
   const location = useLocation();
-  const user = useSelector(selectUser);
+  const user = useSelector(userSelector);
 
   const validationSchema = yup.object().shape({
     username: yup.string().trim().required('Username is required.'),

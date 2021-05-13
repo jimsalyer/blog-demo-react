@@ -11,13 +11,13 @@ import PostsPage from './PostsPage';
 describe('<PostsPage />', () => {
   let listUsersSpy;
   let searchPostsSpy;
-  let selectUserSpy;
+  let userSelectorSpy;
 
   beforeEach(() => {
     listUsersSpy = jest.spyOn(userService, 'listUsers').mockResolvedValue([]);
     searchPostsSpy = jest.spyOn(postService, 'searchPosts');
-    selectUserSpy = jest
-      .spyOn(userSliceExports, 'selectUser')
+    userSelectorSpy = jest
+      .spyOn(userSliceExports, 'userSelector')
       .mockReturnValue({});
   });
 
@@ -26,7 +26,7 @@ describe('<PostsPage />', () => {
       pageCount: 1,
       data: [],
     });
-    selectUserSpy.mockReset().mockReturnValue({ id: 1 });
+    userSelectorSpy.mockReset().mockReturnValue({ id: 1 });
 
     render(
       <Provider store={store}>

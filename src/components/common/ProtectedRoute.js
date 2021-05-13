@@ -3,11 +3,11 @@ import queryString from 'query-string';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Redirect, Route, useLocation } from 'react-router-dom';
-import { selectUser } from '../../redux/userSlice';
+import { userSelector } from '../../redux/userSlice';
 
 export default function ProtectedRoute({ children, ...props }) {
   const location = useLocation();
-  const user = useSelector(selectUser);
+  const user = useSelector(userSelector);
 
   return (
     <Route

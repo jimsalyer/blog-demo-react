@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Alert, Button, Card, Spinner } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { NavLink, useHistory, useLocation } from 'react-router-dom';
-import { selectUser } from '../../redux/userSlice';
+import { userSelector } from '../../redux/userSlice';
 import postService from '../../services/PostService';
 import {
   parseQueryString,
@@ -19,7 +19,7 @@ export default function PostsPage() {
   const [pageCount, setPageCount] = useState(1);
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState([]);
-  const user = useSelector(selectUser);
+  const user = useSelector(userSelector);
 
   const [queryParams, setQueryParams] = useState(
     parseQueryString(location.search)

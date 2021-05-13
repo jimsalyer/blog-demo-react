@@ -2,12 +2,12 @@ import React from 'react';
 import { Nav, Navbar, NavDropdown, Spinner } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useHistory } from 'react-router-dom';
-import { logout, selectUser } from '../../redux/userSlice';
+import { logout, userSelector } from '../../redux/userSlice';
 
 export default function AppHeader() {
   const dispatch = useDispatch();
   const history = useHistory();
-  const user = useSelector(selectUser);
+  const user = useSelector(userSelector);
 
   async function handleSelect(eventKey) {
     if (eventKey === 'logout' && !user.isProcessing) {
