@@ -34,6 +34,7 @@ export class PostService extends BaseService {
     const searchParams = { ...this.defaultSearchParams, ...params };
 
     const queryParams = {
+      _expand: 'user',
       _limit: searchParams.limit,
       _order: this.sortParams.order,
       _page: searchParams.page,

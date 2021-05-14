@@ -100,7 +100,7 @@ describe('<PostSearchForm />', () => {
       fireEvent.click(resetButton);
 
       expect(container).not.toHaveClass('border-primary');
-      expect(list).toHaveValue('0');
+      expect(list).toHaveValue('');
       expect(fullTextSearch).toHaveValue('');
       expect(mockOnSearch).toHaveBeenCalledWith({});
     });
@@ -381,6 +381,7 @@ describe('<PostSearchForm />', () => {
 
       await waitFor(() => {
         expect(mockOnSearch).toHaveBeenCalledWith({
+          author: '',
           text: expectedText,
         });
       });

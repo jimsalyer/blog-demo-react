@@ -44,14 +44,14 @@ export default function PostsPage() {
     setQueryParams({
       ...queryParams,
       author,
+      page: 1,
       text,
     });
   }
 
   useEffect(() => {
     async function loadPosts() {
-      const currentQueryString =
-        location.search && location.search.substring(1);
+      const currentQueryString = location.search?.substring(1);
       const queryParamString = stringifyQueryParams(queryParams);
 
       if (queryParamString !== currentQueryString) {
@@ -98,12 +98,12 @@ export default function PostsPage() {
         </div>
       )}
       {!loading && error && <ErrorMessage error={error} />}
-      {!loading && !error && (!posts || posts.length === 0) && (
+      {!loading && !error && !posts?.length && (
         <Alert variant="warning" data-testid="warningMessage">
           No posts were found.
         </Alert>
       )}
-      {!loading && !error && posts && posts.length > 0 && (
+      {!loading && !error && posts?.length > 0 && (
         <>
           <Pager
             currentLimit={queryParams.limit}
@@ -117,6 +117,9 @@ export default function PostsPage() {
               <Card.Body>
                 <Card.Title>{post.title}</Card.Title>
                 <Card.Text>{post.excerpt}</Card.Text>
+                <Card.Text>
+                  By {post.user?.firstName} {post.user?.lastName}
+                </Card.Text>
               </Card.Body>
             </Card>
           ))}

@@ -10,7 +10,7 @@ export const login = createAsyncThunk(
       localStorage.setItem(userStorageKey, JSON.stringify(user));
       return user;
     } catch (error) {
-      if (error.response && error.response.data) {
+      if (error.response?.data) {
         return rejectWithValue(error.response.data);
       }
       return rejectWithValue(error);
@@ -26,7 +26,7 @@ export const logout = createAsyncThunk(
       localStorage.removeItem(userStorageKey);
       return accessToken;
     } catch (error) {
-      if (error.response && error.response.data) {
+      if (error.response?.data) {
         return rejectWithValue(error.response.data);
       }
       return rejectWithValue(error);

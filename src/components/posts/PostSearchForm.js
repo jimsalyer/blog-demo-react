@@ -10,23 +10,20 @@ export default function PostSearchForm({ queryValues, onError, onSearch }) {
   const [users, setUsers] = useState([]);
 
   const initialValues = {
-    author: queryValues.author || 0,
-    text: queryValues.text || '',
+    author: queryValues.author ?? '',
+    text: queryValues.text ?? '',
   };
 
   function handleFormikReset() {
     searchFormToggle.current.click();
-    initialValues.author = 0;
+    initialValues.author = '';
     initialValues.text = '';
     onSearch({});
   }
 
   function handleFormikSubmit(values, { setSubmitting }) {
     searchFormToggle.current.click();
-    onSearch({
-      author: values.author || undefined,
-      text: values.text,
-    });
+    onSearch(values);
     setSubmitting(false);
   }
 
@@ -57,107 +54,101 @@ export default function PostSearchForm({ queryValues, onError, onSearch }) {
         handleChange,
         handleReset,
         handleSubmit,
-      }) => (
-        <Accordion>
-          <Card
-            border={values.author || values.text ? 'primary' : null}
-            className="mb-3"
-            data-testid="searchFormContainer"
-          >
-            <Accordion.Toggle
-              as={Card.Header}
-              eventKey="searchForm"
-              ref={searchFormToggle}
-              className={
-                values.author || values.text ? 'bg-primary text-white' : null
-              }
-              data-testid="searchFormToggle"
+      }) => {
+        const active = values.author || values.text;
+        return (
+          <Accordion>
+            <Card
+              border={active ? 'primary' : null}
+              className="mb-3"
+              data-testid="searchFormContainer"
             >
-              <h5 className="m-0">Search Posts</h5>
-              {(values.author || values.text) && (
-                <span className="sr-only">Active</span>
-              )}
-            </Accordion.Toggle>
-            <Accordion.Collapse
-              eventKey="searchForm"
-              data-testid="searchFormCollapse"
-            >
-              <Card.Body>
-                <Form
-                  onReset={handleReset}
-                  onSubmit={handleSubmit}
-                  data-testid="searchForm"
-                >
-                  <Form.Row as={Row} xs={1} md={2} lg={3} xl={4}>
-                    <Form.Group as={Col} controlId="author">
-                      <Form.Label>Search by Author</Form.Label>
-                      <Form.Control
-                        as="select"
-                        custom
-                        name="author"
-                        value={values.author}
-                        onChange={handleChange}
-                        data-testid="authorList"
-                      >
-                        <option value={0}>Select user</option>
-                        {loadingUsers && (
-                          <option value={-1} data-testid="authorLoadingMessage">
-                            Loading users...
-                          </option>
-                        )}
-                        {!loadingUsers && (!users || users.length === 0) && (
-                          <option
-                            value={-1}
-                            data-testid="authorNotFoundMessage"
-                          >
-                            No users were found.
-                          </option>
-                        )}
-                        {!loadingUsers &&
-                          users &&
-                          users.length > 0 &&
-                          users.map((user) => (
-                            <option
-                              key={user.id}
-                              value={user.id}
-                              data-testid="authorListItem"
-                            >
-                              {user.firstName} {user.lastName}
+              <Accordion.Toggle
+                as={Card.Header}
+                eventKey="searchForm"
+                ref={searchFormToggle}
+                className={active ? 'bg-primary text-white' : null}
+                data-testid="searchFormToggle"
+              >
+                <h5 className="m-0">Search Posts</h5>
+                {active && <span className="sr-only">Active</span>}
+              </Accordion.Toggle>
+              <Accordion.Collapse
+                eventKey="searchForm"
+                data-testid="searchFormCollapse"
+              >
+                <Card.Body>
+                  <Form
+                    onReset={handleReset}
+                    onSubmit={handleSubmit}
+                    data-testid="searchForm"
+                  >
+                    <Form.Row as={Row} xs={1} md={2} lg={3} xl={4}>
+                      <Form.Group as={Col} controlId="author">
+                        <Form.Label>Search by Author</Form.Label>
+                        <Form.Control
+                          as="select"
+                          custom
+                          name="author"
+                          value={values.author}
+                          onChange={handleChange}
+                          data-testid="authorList"
+                        >
+                          <option value="">Select user</option>
+                          {loadingUsers && (
+                            <option data-testid="authorLoadingMessage">
+                              Loading users...
                             </option>
-                          ))}
-                      </Form.Control>
-                    </Form.Group>
-                    <Form.Group as={Col} controlId="text">
-                      <Form.Label>Full Text Search</Form.Label>
-                      <Form.Control
-                        value={values.text}
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        data-testid="fullTextSearch"
-                      />
-                    </Form.Group>
-                  </Form.Row>
-                  <Button
-                    disabled={isSubmitting}
-                    type="submit"
-                    data-testid="searchButton"
-                  >
-                    Search
-                  </Button>{' '}
-                  <Button
-                    disabled={isSubmitting}
-                    type="reset"
-                    variant="secondary"
-                    data-testid="resetButton"
-                  >
-                    Reset
-                  </Button>
-                </Form>
-              </Card.Body>
-            </Accordion.Collapse>
-          </Card>
-        </Accordion>
-      )}
+                          )}
+                          {!loadingUsers && !users?.length && (
+                            <option data-testid="authorNotFoundMessage">
+                              No users were found.
+                            </option>
+                          )}
+                          {!loadingUsers &&
+                            users?.map((user) => (
+                              <option
+                                key={user.id}
+                                value={user.id}
+                                data-testid="authorListItem"
+                              >
+                                {user.firstName} {user.lastName}
+                              </option>
+                            ))}
+                        </Form.Control>
+                      </Form.Group>
+                      <Form.Group as={Col} controlId="text">
+                        <Form.Label>Full Text Search</Form.Label>
+                        <Form.Control
+                          value={values.text}
+                          onBlur={handleBlur}
+                          onChange={handleChange}
+                          data-testid="fullTextSearch"
+                        />
+                      </Form.Group>
+                    </Form.Row>
+                    <Button
+                      disabled={isSubmitting}
+                      type="submit"
+                      data-testid="searchButton"
+                    >
+                      Search
+                    </Button>{' '}
+                    <Button
+                      disabled={isSubmitting}
+                      type="reset"
+                      variant="secondary"
+                      data-testid="resetButton"
+                    >
+                      Reset
+                    </Button>
+                  </Form>
+                </Card.Body>
+              </Accordion.Collapse>
+            </Card>
+          </Accordion>
+        );
+      }}
     </Formik>
   );
 }

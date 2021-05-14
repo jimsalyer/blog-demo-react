@@ -1,11 +1,7 @@
 import queryString from 'query-string';
 
 export function parsePageCount(response) {
-  if (
-    response &&
-    response.headers &&
-    typeof response.headers.link === 'string'
-  ) {
+  if (typeof response?.headers?.link === 'string') {
     const links = response.headers.link.split(',');
     const lastLink = links.find((link) => link.includes('rel="last"'));
 

@@ -1,4 +1,5 @@
 import userService from './UserService';
+import { stringifyQueryParams } from './serviceUtils';
 
 describe('UserService', () => {
   describe('createUser()', () => {
@@ -67,6 +68,10 @@ describe('UserService', () => {
         },
       ];
 
+      const expectedQueryParams = {
+        _sort: 'firstName,lastName,username',
+      };
+
       const mockResponse = {
         data: expectedData,
       };
@@ -77,7 +82,9 @@ describe('UserService', () => {
 
       const actualData = await userService.listUsers();
 
-      expect(getSpy).toHaveBeenCalledWith('/');
+      expect(getSpy).toHaveBeenCalledWith(
+        `/?${stringifyQueryParams(expectedQueryParams)}`
+      );
       expect(actualData).toStrictEqual(expectedData);
     });
   });

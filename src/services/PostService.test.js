@@ -70,6 +70,7 @@ describe('PostService', () => {
       };
 
       const expectedQueryParams = {
+        _expand: 'user',
         _limit: expectedParams.limit,
         _order: postService.sortParams.order,
         _page: expectedParams.page,
@@ -109,6 +110,7 @@ describe('PostService', () => {
 
     it('sets the parameters to default values if they are not provided', async () => {
       const queryParams = {
+        _expand: 'user',
         _limit: postService.defaultSearchParams.limit,
         _order: postService.sortParams.order,
         _page: postService.defaultSearchParams.page,

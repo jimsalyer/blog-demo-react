@@ -1,4 +1,5 @@
 import BaseService from './BaseService';
+import { stringifyQueryParams } from './serviceUtils';
 
 export class UserService extends BaseService {
   constructor() {
@@ -20,7 +21,13 @@ export class UserService extends BaseService {
   }
 
   async listUsers() {
-    const response = await this.client.get('/');
+    const queryParams = {
+      _sort: 'firstName,lastName,username',
+    };
+
+    const response = await this.client.get(
+      `/?${stringifyQueryParams(queryParams)}`
+    );
     return response.data;
   }
 

@@ -45,7 +45,7 @@ export default function CreatePostPage() {
       });
       history.push('/');
     } catch (error) {
-      if (error.response && error.response.data) {
+      if (error.response?.data) {
         setSubmitError(error.response.data.message);
       } else {
         setSubmitError(error.message);

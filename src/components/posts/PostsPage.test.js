@@ -423,6 +423,7 @@ describe('<PostsPage />', () => {
     await waitFor(() => {
       expect(searchPostsSpy).toHaveBeenNthCalledWith(2, {
         author: expectedAuthor.id.toString(),
+        page: 1,
         text: expectedText,
       });
     });
