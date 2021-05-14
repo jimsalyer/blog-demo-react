@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, Button, Card, Spinner } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useHistory, useLocation } from 'react-router-dom';
+import { clearPostSearch, savePostSearch } from '../../redux/postSearchSlice';
 import { userSelector } from '../../redux/userSlice';
 import postService from '../../services/PostService';
 import {
@@ -13,6 +14,7 @@ import Pager from '../common/Pager';
 import PostSearchForm from './PostSearchForm';
 
 export default function PostsPage() {
+  const dispatch = useDispatch();
   const [error, setError] = useState(null);
   const history = useHistory();
   const location = useLocation();
@@ -62,6 +64,12 @@ export default function PostsPage() {
           const result = await postService.searchPosts(queryParams);
           setPageCount(result.pageCount);
           setPosts(result.data);
+
+          if (currentQueryString) {
+            dispatch(savePostSearch(currentQueryString));
+          } else {
+            dispatch(clearPostSearch());
+          }
         } catch (loadPostsError) {
           setError(loadPostsError);
         }
@@ -69,7 +77,7 @@ export default function PostsPage() {
       }
     }
     loadPosts();
-  }, [history, location.search, queryParams]);
+  }, [dispatch, history, location, queryParams]);
 
   return (
     <div data-testid="postsPage">

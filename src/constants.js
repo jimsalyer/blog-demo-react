@@ -1,1 +1,2 @@
-export const userStorageKey = 'state.user';
+export const postSearchStorageKey = 'postSearch';
+export const userStorageKey = 'user';

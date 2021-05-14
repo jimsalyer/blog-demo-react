@@ -6,6 +6,7 @@ import { useHistory } from 'react-router-dom';
 import * as yup from 'yup';
 import { userSelector } from '../../redux/userSlice';
 import postService from '../../services/PostService';
+import PostSearchLink from './PostSearchLink';
 
 export default function CreatePostPage() {
   const history = useHistory();
@@ -56,6 +57,9 @@ export default function CreatePostPage() {
 
   return (
     <div data-testid="createPostPage">
+      <p>
+        <PostSearchLink />
+      </p>
       <h2>Create New Post</h2>
       <Formik
         initialValues={initialValues}
