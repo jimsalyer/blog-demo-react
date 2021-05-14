@@ -83,7 +83,7 @@ export default function PostSearchForm({ queryValues, onError, onSearch }) {
                     onSubmit={handleSubmit}
                     data-testid="searchForm"
                   >
-                    <Form.Row as={Row} xs={1} md={2} lg={3} xl={4}>
+                    <Form.Row as={Row} xs={1} md={2} lg={3}>
                       <Form.Group as={Col} controlId="author">
                         <Form.Label>Search by Author</Form.Label>
                         <Form.Control

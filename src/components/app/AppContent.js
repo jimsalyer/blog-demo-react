@@ -9,7 +9,7 @@ import PostsPage from '../posts/PostsPage';
 
 export default function AppContent() {
   return (
-    <Container fluid className="my-5 pt-3 pb-1">
+    <Container className="my-5 pt-3 pb-1">
       <Switch>
         <Route exact path="/">
           <PostsPage />

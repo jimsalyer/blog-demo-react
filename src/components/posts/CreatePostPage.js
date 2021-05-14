@@ -72,7 +72,7 @@ export default function CreatePostPage() {
           isSubmitting,
         }) => (
           <Form onSubmit={handleSubmit}>
-            <Card className="max-width-md">
+            <Card>
               <Card.Body>
                 {submitError && (
                   <Alert variant="danger" data-testid="submitError">
