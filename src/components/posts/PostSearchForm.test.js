@@ -23,7 +23,7 @@ describe('<PostSearchForm />', () => {
 
       render(
         <PostSearchForm
-          values={{}}
+          queryValues={{}}
           onError={mockOnError}
           onSearch={mockOnSearch}
         />
@@ -40,7 +40,7 @@ describe('<PostSearchForm />', () => {
 
       render(
         <PostSearchForm
-          values={{}}
+          queryValues={{}}
           onError={mockOnError}
           onSearch={mockOnSearch}
         />
@@ -78,7 +78,7 @@ describe('<PostSearchForm />', () => {
 
       render(
         <PostSearchForm
-          values={{ author: expectedAuthor.id, text: expectedText }}
+          queryValues={{ author: expectedAuthor.id, text: expectedText }}
           onError={mockOnError}
           onSearch={mockOnSearch}
         />
@@ -112,7 +112,7 @@ describe('<PostSearchForm />', () => {
 
       render(
         <PostSearchForm
-          values={{}}
+          queryValues={{}}
           onError={mockOnError}
           onSearch={mockOnSearch}
         />
@@ -146,7 +146,7 @@ describe('<PostSearchForm />', () => {
 
       render(
         <PostSearchForm
-          values={{}}
+          queryValues={{}}
           onError={mockOnError}
           onSearch={mockOnSearch}
         />
@@ -185,7 +185,7 @@ describe('<PostSearchForm />', () => {
 
       render(
         <PostSearchForm
-          values={{ author: expectedAuthor.id }}
+          queryValues={{ author: expectedAuthor.id }}
           onError={mockOnError}
           onSearch={mockOnSearch}
         />
@@ -217,7 +217,7 @@ describe('<PostSearchForm />', () => {
 
       render(
         <PostSearchForm
-          values={{}}
+          queryValues={{}}
           onError={mockOnError}
           onSearch={mockOnSearch}
         />
@@ -235,7 +235,9 @@ describe('<PostSearchForm />', () => {
         },
       });
 
-      expect(container).toHaveClass('border-primary');
+      await waitFor(() => {
+        expect(container).toHaveClass('border-primary');
+      });
     });
 
     it('passes the selected user to the onSearch handler', async () => {
@@ -257,7 +259,7 @@ describe('<PostSearchForm />', () => {
 
       render(
         <PostSearchForm
-          values={{}}
+          queryValues={{}}
           onError={mockOnError}
           onSearch={mockOnSearch}
         />
@@ -275,9 +277,11 @@ describe('<PostSearchForm />', () => {
       const submitButton = screen.getByText('Search');
       fireEvent.click(submitButton);
 
-      expect(mockOnSearch).toHaveBeenCalledWith({
-        author: expectedAuthor.id,
-        text: '',
+      await waitFor(() => {
+        expect(mockOnSearch).toHaveBeenCalledWith({
+          author: expectedAuthor.id.toString(),
+          text: '',
+        });
       });
     });
 
@@ -286,7 +290,7 @@ describe('<PostSearchForm />', () => {
 
       render(
         <PostSearchForm
-          values={{}}
+          queryValues={{}}
           onError={mockOnError}
           onSearch={mockOnSearch}
         />
@@ -309,7 +313,7 @@ describe('<PostSearchForm />', () => {
 
       render(
         <PostSearchForm
-          values={{ text: expectedText }}
+          queryValues={{ text: expectedText }}
           onError={mockOnError}
           onSearch={mockOnSearch}
         />
@@ -326,7 +330,7 @@ describe('<PostSearchForm />', () => {
 
       render(
         <PostSearchForm
-          values={{}}
+          queryValues={{}}
           onError={mockOnError}
           onSearch={mockOnSearch}
         />
@@ -345,7 +349,9 @@ describe('<PostSearchForm />', () => {
         },
       });
 
-      expect(container).toHaveClass('border-primary');
+      await waitFor(() => {
+        expect(container).toHaveClass('border-primary');
+      });
     });
 
     it('passes the entered text to the onSearch handler', async () => {
@@ -355,7 +361,7 @@ describe('<PostSearchForm />', () => {
 
       render(
         <PostSearchForm
-          values={{}}
+          queryValues={{}}
           onError={mockOnError}
           onSearch={mockOnSearch}
         />
@@ -370,12 +376,13 @@ describe('<PostSearchForm />', () => {
         },
       });
 
-      const submitButton = screen.getByText('Search');
+      const submitButton = screen.getByTestId('searchButton');
       fireEvent.click(submitButton);
 
-      expect(mockOnSearch).toHaveBeenCalledWith({
-        author: 0,
-        text: expectedText,
+      await waitFor(() => {
+        expect(mockOnSearch).toHaveBeenCalledWith({
+          text: expectedText,
+        });
       });
     });
   });

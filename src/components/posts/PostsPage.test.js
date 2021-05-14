@@ -417,12 +417,12 @@ describe('<PostsPage />', () => {
       },
     });
 
-    const submitButton = await screen.findByText('Search');
-    fireEvent.click(submitButton);
+    const searchButton = await screen.findByTestId('searchButton');
+    fireEvent.click(searchButton);
 
     await waitFor(() => {
       expect(searchPostsSpy).toHaveBeenNthCalledWith(2, {
-        author: expectedAuthor.id,
+        author: expectedAuthor.id.toString(),
         text: expectedText,
       });
     });

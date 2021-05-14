@@ -68,7 +68,6 @@ export default function PostsPage() {
         setLoading(false);
       }
     }
-
     loadPosts();
   }, [history, location.search, queryParams]);
 
@@ -76,7 +75,7 @@ export default function PostsPage() {
     <div data-testid="postsPage">
       <h2>Posts</h2>
       <PostSearchForm
-        values={queryParams}
+        queryValues={queryParams}
         onError={setError}
         onSearch={handleSearch}
       />
