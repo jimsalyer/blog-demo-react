@@ -6,9 +6,9 @@ import store from '../../redux/store';
 import * as userSliceExports from '../../redux/userSlice';
 import postService from '../../services/PostService';
 import userService from '../../services/UserService';
-import PostsPage from './PostsPage';
+import PostSearchPage from './PostSearchPage';
 
-describe('<PostsPage />', () => {
+describe('<PostSearchPage />', () => {
   let listUsersSpy;
   let searchPostsSpy;
   let userSelectorSpy;
@@ -31,7 +31,7 @@ describe('<PostsPage />', () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/']}>
-          <PostsPage />
+          <PostSearchPage />
         </MemoryRouter>
       </Provider>
     );
@@ -49,7 +49,7 @@ describe('<PostsPage />', () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/']}>
-          <PostsPage />
+          <PostSearchPage />
         </MemoryRouter>
       </Provider>
     );
@@ -93,12 +93,12 @@ describe('<PostsPage />', () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/?page=2']}>
-          <PostsPage />
+          <PostSearchPage />
         </MemoryRouter>
       </Provider>
     );
 
-    screen.getByTestId('postsPage');
+    screen.getByTestId('postSearchPage');
 
     const posts = await screen.findAllByTestId('post');
     expect(posts).toHaveLength(2);
@@ -149,12 +149,12 @@ describe('<PostsPage />', () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/']}>
-          <PostsPage />
+          <PostSearchPage />
         </MemoryRouter>
       </Provider>
     );
 
-    screen.getByTestId('postsPage');
+    screen.getByTestId('postSearchPage');
     screen.getByTestId('loadingMessage');
 
     const posts = await screen.findAllByTestId('post');
@@ -209,14 +209,14 @@ describe('<PostsPage />', () => {
             `/?author=${expectedAuthor}&text=${expectedText}&limit=${expectedLimit}&page=${expectedPage}`,
           ]}
         >
-          <PostsPage />
+          <PostSearchPage />
         </MemoryRouter>
       </Provider>
     );
 
     await screen.findAllByTestId('post');
 
-    screen.getByTestId('postsPage');
+    screen.getByTestId('postSearchPage');
 
     expect(searchPostsSpy).toHaveBeenCalledWith({
       author: expectedAuthor,
@@ -260,7 +260,7 @@ describe('<PostsPage />', () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/']}>
-          <PostsPage />
+          <PostSearchPage />
         </MemoryRouter>
       </Provider>
     );
@@ -322,7 +322,7 @@ describe('<PostsPage />', () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={[`/?page=${initialPage}`]}>
-          <PostsPage />
+          <PostSearchPage />
         </MemoryRouter>
       </Provider>
     );
@@ -395,7 +395,7 @@ describe('<PostsPage />', () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/']}>
-          <PostsPage />
+          <PostSearchPage />
         </MemoryRouter>
       </Provider>
     );
@@ -435,7 +435,7 @@ describe('<PostsPage />', () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/']}>
-          <PostsPage />
+          <PostSearchPage />
         </MemoryRouter>
       </Provider>
     );
@@ -455,7 +455,7 @@ describe('<PostsPage />', () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/']}>
-          <PostsPage />
+          <PostSearchPage />
         </MemoryRouter>
       </Provider>
     );
@@ -476,7 +476,7 @@ describe('<PostsPage />', () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/']}>
-          <PostsPage />
+          <PostSearchPage />
         </MemoryRouter>
       </Provider>
     );
@@ -503,7 +503,7 @@ describe('<PostsPage />', () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/']}>
-          <PostsPage />
+          <PostSearchPage />
         </MemoryRouter>
       </Provider>
     );

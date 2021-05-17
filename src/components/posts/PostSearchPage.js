@@ -13,7 +13,7 @@ import ErrorMessage from '../common/ErrorMessage';
 import Pager from '../common/Pager';
 import PostSearchForm from './PostSearchForm';
 
-export default function PostsPage() {
+export default function PostSearchPage() {
   const dispatch = useDispatch();
   const [error, setError] = useState(null);
   const history = useHistory();
@@ -80,7 +80,7 @@ export default function PostsPage() {
   }, [dispatch, history, location, queryParams]);
 
   return (
-    <div data-testid="postsPage">
+    <div data-testid="postSearchPage">
       <h2>Posts</h2>
       <PostSearchForm
         queryValues={queryParams}

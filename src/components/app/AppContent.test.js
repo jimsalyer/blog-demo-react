@@ -17,7 +17,7 @@ jest.mock('../../services/PostService', () => ({
 }));
 
 describe('<AppContent />', () => {
-  it('renders <PostsPage /> if the path is exactly "/"', async () => {
+  it('renders <PostSearchPage /> if the path is exactly "/"', async () => {
     render(
       <Provider store={store}>
         <MemoryRouter initialEntries={['/']}>
@@ -26,7 +26,7 @@ describe('<AppContent />', () => {
       </Provider>
     );
 
-    await screen.findByTestId('postsPage');
+    await screen.findByTestId('postSearchPage');
   });
 
   it('renders <LoginPage /> if the path is "/create" and the user is not logged in', async () => {

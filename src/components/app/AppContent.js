@@ -5,14 +5,14 @@ import LoginPage from '../auth/LoginPage';
 import ProtectedRoute from '../common/ProtectedRoute';
 import NotFoundPage from '../not-found/NotFoundPage';
 import CreatePostPage from '../posts/CreatePostPage';
-import PostsPage from '../posts/PostsPage';
+import PostSearchPage from '../posts/PostSearchPage';
 
 export default function AppContent() {
   return (
     <Container className="my-5 pt-3 pb-1">
       <Switch>
         <Route exact path="/">
-          <PostsPage />
+          <PostSearchPage />
         </Route>
         <ProtectedRoute path="/create">
           <CreatePostPage />

@@ -21,7 +21,7 @@ describe('<App />', () => {
 
     await waitFor(() => {
       screen.getByTestId('appHeader');
-      screen.getByTestId('postsPage');
+      screen.getByTestId('postSearchPage');
       screen.getByTestId('appFooter');
     });
   });
