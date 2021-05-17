@@ -6,6 +6,7 @@ import ProtectedRoute from '../common/ProtectedRoute';
 import NotFoundPage from '../not-found/NotFoundPage';
 import PostCreatePage from '../posts/PostCreatePage';
 import PostSearchPage from '../posts/PostSearchPage';
+import PostUpdatePage from '../posts/PostUpdatePage';
 
 export default function AppContent() {
   return (
@@ -16,6 +17,9 @@ export default function AppContent() {
         </Route>
         <ProtectedRoute path="/create">
           <PostCreatePage />
+        </ProtectedRoute>
+        <ProtectedRoute path="/update/:id">
+          <PostUpdatePage />
         </ProtectedRoute>
         <Route path="/login">
           <LoginPage />
