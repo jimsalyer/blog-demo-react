@@ -5,9 +5,9 @@ import { Provider } from 'react-redux';
 import { MemoryRouter, Route } from 'react-router-dom';
 import store from '../../redux/store';
 import postService from '../../services/PostService';
-import CreatePostPage from './CreatePostPage';
+import PostCreatePage from './PostCreatePage';
 
-describe('<CreatePostPage />', () => {
+describe('<PostCreatePage />', () => {
   let createPostSpy;
 
   beforeEach(() => {
@@ -19,7 +19,7 @@ describe('<CreatePostPage />', () => {
       render(
         <Provider store={store}>
           <MemoryRouter>
-            <CreatePostPage />
+            <PostCreatePage />
           </MemoryRouter>
         </Provider>
       );
@@ -38,7 +38,7 @@ describe('<CreatePostPage />', () => {
       render(
         <Provider store={store}>
           <MemoryRouter>
-            <CreatePostPage />
+            <PostCreatePage />
           </MemoryRouter>
         </Provider>
       );
@@ -60,7 +60,7 @@ describe('<CreatePostPage />', () => {
       render(
         <Provider store={store}>
           <MemoryRouter>
-            <CreatePostPage />
+            <PostCreatePage />
           </MemoryRouter>
         </Provider>
       );
@@ -81,7 +81,7 @@ describe('<CreatePostPage />', () => {
       render(
         <Provider store={store}>
           <MemoryRouter>
-            <CreatePostPage />
+            <PostCreatePage />
           </MemoryRouter>
         </Provider>
       );
@@ -100,7 +100,7 @@ describe('<CreatePostPage />', () => {
       render(
         <Provider store={store}>
           <MemoryRouter>
-            <CreatePostPage />
+            <PostCreatePage />
           </MemoryRouter>
         </Provider>
       );
@@ -122,7 +122,7 @@ describe('<CreatePostPage />', () => {
       render(
         <Provider store={store}>
           <MemoryRouter>
-            <CreatePostPage />
+            <PostCreatePage />
           </MemoryRouter>
         </Provider>
       );
@@ -155,7 +155,7 @@ describe('<CreatePostPage />', () => {
       render(
         <Provider store={store}>
           <MemoryRouter>
-            <CreatePostPage />
+            <PostCreatePage />
             <Route
               path="*"
               render={({ location }) => {
@@ -190,7 +190,7 @@ describe('<CreatePostPage />', () => {
       render(
         <Provider store={store}>
           <MemoryRouter>
-            <CreatePostPage />
+            <PostCreatePage />
           </MemoryRouter>
         </Provider>
       );
@@ -229,7 +229,7 @@ describe('<CreatePostPage />', () => {
       render(
         <Provider store={store}>
           <MemoryRouter>
-            <CreatePostPage />
+            <PostCreatePage />
           </MemoryRouter>
         </Provider>
       );
@@ -266,7 +266,7 @@ describe('<CreatePostPage />', () => {
       render(
         <Provider store={store}>
           <MemoryRouter>
-            <CreatePostPage />
+            <PostCreatePage />
           </MemoryRouter>
         </Provider>
       );
@@ -299,7 +299,7 @@ describe('<CreatePostPage />', () => {
       render(
         <Provider store={store}>
           <MemoryRouter>
-            <CreatePostPage />
+            <PostCreatePage />
           </MemoryRouter>
         </Provider>
       );

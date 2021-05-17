@@ -4,7 +4,7 @@ import { Route, Switch } from 'react-router-dom';
 import LoginPage from '../auth/LoginPage';
 import ProtectedRoute from '../common/ProtectedRoute';
 import NotFoundPage from '../not-found/NotFoundPage';
-import CreatePostPage from '../posts/CreatePostPage';
+import PostCreatePage from '../posts/PostCreatePage';
 import PostSearchPage from '../posts/PostSearchPage';
 
 export default function AppContent() {
@@ -15,7 +15,7 @@ export default function AppContent() {
           <PostSearchPage />
         </Route>
         <ProtectedRoute path="/create">
-          <CreatePostPage />
+          <PostCreatePage />
         </ProtectedRoute>
         <Route path="/login">
           <LoginPage />

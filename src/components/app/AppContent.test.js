@@ -42,7 +42,7 @@ describe('<AppContent />', () => {
     await screen.findByTestId('loginPage');
   });
 
-  it('renders <CreatePostPage /> if the path is "/create" and the user is logged in', async () => {
+  it('renders <PostCreatePage /> if the path is "/create" and the user is logged in', async () => {
     await store.dispatch(
       login({ username: 'tuser', password: 'testpassword', remember: true })
     );
@@ -56,7 +56,7 @@ describe('<AppContent />', () => {
       </Provider>
     );
 
-    await screen.findByTestId('createPostPage');
+    await screen.findByTestId('postCreatePage');
 
     await store.dispatch(logout());
   });

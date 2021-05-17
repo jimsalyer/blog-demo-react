@@ -8,7 +8,7 @@ import { userSelector } from '../../redux/userSlice';
 import postService from '../../services/PostService';
 import PostSearchLink from './PostSearchLink';
 
-export default function CreatePostPage() {
+export default function PostCreatePage() {
   const history = useHistory();
   const initialValues = { title: '', body: '', excerpt: '', image: '' };
   const [submitError, setSubmitError] = useState('');
@@ -56,7 +56,7 @@ export default function CreatePostPage() {
   }
 
   return (
-    <div data-testid="createPostPage">
+    <div data-testid="postCreatePage">
       <p>
         <PostSearchLink />
       </p>
