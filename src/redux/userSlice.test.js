@@ -93,8 +93,7 @@ describe('userSlice', () => {
         isProcessing: false,
       };
 
-      loginSpy.mockReset();
-      loginSpy.mockRejectedValue({
+      loginSpy.mockReset().mockRejectedValue({
         response: {
           data: {
             message: expectedErrorMessage,
@@ -118,8 +117,7 @@ describe('userSlice', () => {
         isProcessing: false,
       };
 
-      loginSpy.mockReset();
-      loginSpy.mockRejectedValue({
+      loginSpy.mockReset().mockRejectedValue({
         message: expectedErrorMessage,
       });
 
@@ -134,7 +132,7 @@ describe('userSlice', () => {
   });
 
   describe('logout()', () => {
-    it('clears the state and the localStorage item', async () => {
+    it('clears the state and localStorage item', async () => {
       let expectedState = {
         ...expectedUser,
         errorMessage: '',
@@ -166,6 +164,28 @@ describe('userSlice', () => {
       expect(actualUser).toBeNull();
     });
 
+    it('clears the state and localStorage item even if an error occurs', async () => {
+      const expectedErrorMessage = 'test error message';
+      const expectedState = {
+        errorMessage: expectedErrorMessage,
+        isProcessing: false,
+      };
+
+      const store = require('./store').default;
+
+      await store.dispatch(login(expectedLogin));
+
+      logoutSpy.mockReset().mockRejectedValue({
+        message: expectedErrorMessage,
+      });
+
+      await store.dispatch(logout());
+
+      const actualState = store.getState().user;
+      expect(actualState).toStrictEqual(expectedState);
+      expect(localStorage.getItem(userStorageKey)).toBeNull();
+    });
+
     it('sets the errorMessage state property if a server error occurs', async () => {
       const expectedErrorMessage = 'test error message';
       const expectedState = {
@@ -173,8 +193,7 @@ describe('userSlice', () => {
         isProcessing: false,
       };
 
-      logoutSpy.mockReset();
-      logoutSpy.mockRejectedValue({
+      logoutSpy.mockReset().mockRejectedValue({
         response: {
           data: {
             message: expectedErrorMessage,
@@ -198,8 +217,7 @@ describe('userSlice', () => {
         isProcessing: false,
       };
 
-      logoutSpy.mockReset();
-      logoutSpy.mockRejectedValue({
+      logoutSpy.mockReset().mockRejectedValue({
         message: expectedErrorMessage,
       });
 
