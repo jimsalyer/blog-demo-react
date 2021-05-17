@@ -12,7 +12,7 @@ export default function PostSearchLink({ children, ...props }) {
       data-testid="postSearchLink"
       {...props}
     >
-      {children || 'Back to Search'}
+      {children ?? 'Back to Search'}
     </Link>
   );
 }
