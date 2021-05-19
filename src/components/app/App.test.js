@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom';
@@ -19,10 +19,8 @@ describe('<App />', () => {
       </Provider>
     );
 
-    await waitFor(() => {
-      screen.getByTestId('appHeader');
-      screen.getByTestId('postSearchPage');
-      screen.getByTestId('appFooter');
-    });
+    screen.getByTestId('appHeader');
+    await screen.findByTestId('postSearchPage');
+    screen.getByTestId('appFooter');
   });
 });

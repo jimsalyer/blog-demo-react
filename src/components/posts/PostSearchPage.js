@@ -17,9 +17,9 @@ export default function PostSearchPage() {
   const dispatch = useDispatch();
   const [error, setError] = useState(null);
   const history = useHistory();
+  const [isLoading, setLoading] = useState(true);
   const location = useLocation();
   const [pageCount, setPageCount] = useState(1);
-  const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState([]);
   const user = useSelector(userSelector);
 
@@ -99,19 +99,19 @@ export default function PostSearchPage() {
           </Button>
         </div>
       )}
-      {loading && (
+      {isLoading && (
         <div data-testid="loadingMessage">
           <Spinner animation="border" role="status" size="sm" />{' '}
           <strong>Loading results...</strong>
         </div>
       )}
-      {!loading && error && <ErrorMessage error={error} />}
-      {!loading && !error && !posts?.length && (
+      {!isLoading && error && <ErrorMessage error={error} />}
+      {!isLoading && !error && !posts?.length && (
         <Alert variant="warning" data-testid="warningMessage">
           No posts were found.
         </Alert>
       )}
-      {!loading && !error && posts?.length > 0 && (
+      {!isLoading && !error && posts?.length > 0 && (
         <>
           <Pager
             currentLimit={queryParams.limit}

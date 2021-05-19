@@ -14,16 +14,22 @@ export default function PostSearchForm({ queryValues, onError, onSearch }) {
     text: queryValues.text ?? '',
   };
 
-  function handleFormikReset() {
+  function handleFormikReset(resetForm) {
     searchFormToggle.current.click();
-    initialValues.author = '';
-    initialValues.text = '';
+    resetForm({
+      values: {
+        author: '',
+        text: '',
+      },
+    });
     onSearch({});
   }
 
-  function handleFormikSubmit(values, { setSubmitting }) {
+  function handleFormikSubmit(values, { resetForm, setSubmitting }) {
     searchFormToggle.current.click();
     onSearch(values);
+
+    resetForm({ values });
     setSubmitting(false);
   }
 
@@ -42,18 +48,15 @@ export default function PostSearchForm({ queryValues, onError, onSearch }) {
   }, [onError]);
 
   return (
-    <Formik
-      initialValues={initialValues}
-      onReset={handleFormikReset}
-      onSubmit={handleFormikSubmit}
-    >
+    <Formik initialValues={initialValues} onSubmit={handleFormikSubmit}>
       {({
-        isSubmitting,
-        values,
+        dirty,
         handleBlur,
         handleChange,
-        handleReset,
         handleSubmit,
+        isSubmitting,
+        resetForm,
+        values,
       }) => {
         const active = values.author || values.text;
         return (
@@ -78,11 +81,7 @@ export default function PostSearchForm({ queryValues, onError, onSearch }) {
                 data-testid="searchFormCollapse"
               >
                 <Card.Body>
-                  <Form
-                    onReset={handleReset}
-                    onSubmit={handleSubmit}
-                    data-testid="searchForm"
-                  >
+                  <Form onSubmit={handleSubmit} data-testid="searchForm">
                     <Form.Row as={Row} xs={1} md={2} lg={3}>
                       <Form.Group as={Col} controlId="author">
                         <Form.Label>Search by Author</Form.Label>
@@ -128,7 +127,7 @@ export default function PostSearchForm({ queryValues, onError, onSearch }) {
                       </Form.Group>
                     </Form.Row>
                     <Button
-                      disabled={isSubmitting}
+                      disabled={!dirty || isSubmitting}
                       type="submit"
                       data-testid="searchButton"
                     >
@@ -136,9 +135,9 @@ export default function PostSearchForm({ queryValues, onError, onSearch }) {
                     </Button>{' '}
                     <Button
                       disabled={isSubmitting}
-                      type="reset"
                       variant="secondary"
                       data-testid="resetButton"
+                      onClick={() => handleFormikReset(resetForm)}
                     >
                       Reset
                     </Button>

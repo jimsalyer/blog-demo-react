@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { Provider } from 'react-redux';
@@ -26,7 +26,8 @@ describe('<PostCreatePage />', () => {
 
       const titleField = screen.getByTestId('titleField');
 
-      fireEvent.blur(titleField);
+      userEvent.click(titleField);
+      userEvent.tab();
 
       const titleError = await screen.findByTestId('titleError');
 
@@ -46,7 +47,7 @@ describe('<PostCreatePage />', () => {
       const titleField = screen.getByTestId('titleField');
 
       userEvent.type(titleField, '    ');
-      fireEvent.blur(titleField);
+      userEvent.tab();
 
       const titleError = await screen.findByTestId('titleError');
 
@@ -67,7 +68,8 @@ describe('<PostCreatePage />', () => {
 
       const bodyField = screen.getByTestId('bodyField');
 
-      fireEvent.blur(bodyField);
+      userEvent.click(bodyField);
+      userEvent.tab();
 
       const bodyError = await screen.findByTestId('bodyError');
 
@@ -88,7 +90,8 @@ describe('<PostCreatePage />', () => {
 
       const excerptField = screen.getByTestId('excerptField');
 
-      fireEvent.blur(excerptField);
+      userEvent.click(excerptField);
+      userEvent.tab();
 
       const excerptError = await screen.findByTestId('excerptError');
 
@@ -108,7 +111,7 @@ describe('<PostCreatePage />', () => {
       const excerptField = screen.getByTestId('excerptField');
 
       userEvent.type(excerptField, '    ');
-      fireEvent.blur(excerptField);
+      userEvent.tab();
 
       const excerptError = await screen.findByTestId('excerptError');
 
@@ -130,7 +133,7 @@ describe('<PostCreatePage />', () => {
       const imageField = screen.getByTestId('imageField');
 
       userEvent.type(imageField, 'test image');
-      fireEvent.blur(imageField);
+      userEvent.tab();
 
       const imageError = await screen.findByTestId('imageError');
 
@@ -176,12 +179,12 @@ describe('<PostCreatePage />', () => {
       userEvent.type(bodyField, expectedPost.body);
       userEvent.type(excerptField, expectedPost.excerpt);
       userEvent.type(imageField, expectedPost.image);
-      fireEvent.click(submitButton);
+      userEvent.click(submitButton);
 
-      await waitFor(() => {
-        expect(createPostSpy).toHaveBeenCalledWith(expectedPost);
-        expect(testLocation.pathname).toBe('/');
-      });
+      await waitFor(() =>
+        expect(createPostSpy).toHaveBeenCalledWith(expectedPost)
+      );
+      expect(testLocation.pathname).toBe('/');
     });
 
     it('disables the submit button and shows a spinner while running', async () => {
@@ -201,7 +204,7 @@ describe('<PostCreatePage />', () => {
       const imageField = screen.getByTestId('imageField');
       const submitButton = screen.getByTestId('submitButton');
 
-      expect(submitButton).not.toBeDisabled();
+      expect(submitButton).toBeDisabled();
       expect(
         screen.queryByTestId('submitButtonSpinner')
       ).not.toBeInTheDocument();
@@ -210,7 +213,10 @@ describe('<PostCreatePage />', () => {
       userEvent.type(bodyField, 'test');
       userEvent.type(excerptField, 'test');
       userEvent.type(imageField, 'test');
-      fireEvent.click(submitButton);
+
+      expect(submitButton).not.toBeDisabled();
+
+      userEvent.click(submitButton);
 
       expect(submitButton).toBeDisabled();
       expect(screen.queryByTestId('submitButtonSpinner')).toBeInTheDocument();
@@ -244,9 +250,9 @@ describe('<PostCreatePage />', () => {
       userEvent.type(bodyField, 'test');
       userEvent.type(excerptField, '  test  ');
       userEvent.type(imageField, '  test  ');
-      fireEvent.click(submitButton);
+      userEvent.click(submitButton);
 
-      await screen.findByTestId('submitError');
+      await screen.findByTestId('createError');
       expect(titleField).toHaveValue('test');
       expect(excerptField).toHaveValue('test');
       expect(imageField).toHaveValue('test');
@@ -281,12 +287,12 @@ describe('<PostCreatePage />', () => {
       userEvent.type(bodyField, 'test');
       userEvent.type(excerptField, 'test');
       userEvent.type(imageField, 'test');
-      fireEvent.click(submitButton);
+      userEvent.click(submitButton);
 
-      const submitError = await screen.findByTestId('submitError');
+      const createError = await screen.findByTestId('createError');
 
       expect(createPostSpy).toHaveBeenCalled();
-      expect(submitError).toHaveTextContent(expectedErrorMessage);
+      expect(createError).toHaveTextContent(expectedErrorMessage);
     });
 
     it('displays the error message if a client error occurs during the createPost call', async () => {
@@ -314,12 +320,12 @@ describe('<PostCreatePage />', () => {
       userEvent.type(bodyField, 'test');
       userEvent.type(excerptField, 'test');
       userEvent.type(imageField, 'test');
-      fireEvent.click(submitButton);
+      userEvent.click(submitButton);
 
-      const submitError = await screen.findByTestId('submitError');
+      const createError = await screen.findByTestId('createError');
 
       expect(createPostSpy).toHaveBeenCalled();
-      expect(submitError).toHaveTextContent(expectedErrorMessage);
+      expect(createError).toHaveTextContent(expectedErrorMessage);
     });
   });
 });

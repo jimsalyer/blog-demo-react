@@ -1,4 +1,5 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 import Pager from './Pager';
 
@@ -25,7 +26,7 @@ describe('<Pager />', () => {
 
       const limitToggle = screen.getByTestId('limitToggle');
 
-      fireEvent.click(limitToggle);
+      userEvent.click(limitToggle);
 
       const limitItems = await screen.findAllByTestId('limitItem');
 
@@ -61,11 +62,11 @@ describe('<Pager />', () => {
 
       const limitToggle = screen.getByTestId('limitToggle');
 
-      fireEvent.click(limitToggle);
+      userEvent.click(limitToggle);
 
       const limitItems = screen.getAllByTestId('limitItem');
 
-      fireEvent.click(limitItems[1]);
+      userEvent.click(limitItems[1]);
 
       expect(onLimitChangeMock).toHaveBeenCalledWith(15);
     });
@@ -122,7 +123,7 @@ describe('<Pager />', () => {
 
       const pageLink = screen.getByTestId('firstPageLink');
 
-      fireEvent.click(pageLink);
+      userEvent.click(pageLink);
 
       expect(onPageChangeMock).toHaveBeenCalledWith(1);
     });
@@ -140,7 +141,7 @@ describe('<Pager />', () => {
 
       const pageLink = screen.getByTestId('ellipsisBackPageLink');
 
-      fireEvent.click(pageLink);
+      userEvent.click(pageLink);
 
       expect(onPageChangeMock).toHaveBeenCalledWith(3);
     });
@@ -157,7 +158,7 @@ describe('<Pager />', () => {
 
       const pageLink = screen.getByTestId('prevPageLink');
 
-      fireEvent.click(pageLink);
+      userEvent.click(pageLink);
 
       expect(onPageChangeMock).toHaveBeenCalledWith(2);
     });
@@ -177,7 +178,7 @@ describe('<Pager />', () => {
         (pageNumberLink) => pageNumberLink.textContent === '5'
       );
 
-      fireEvent.click(targetPageNumberLink);
+      userEvent.click(targetPageNumberLink);
 
       expect(onPageChangeMock).toHaveBeenCalledWith(5);
     });
@@ -194,7 +195,7 @@ describe('<Pager />', () => {
 
       const pageLink = screen.getByTestId('nextPageLink');
 
-      fireEvent.click(pageLink);
+      userEvent.click(pageLink);
 
       expect(onPageChangeMock).toHaveBeenCalledWith(3);
     });
@@ -212,7 +213,7 @@ describe('<Pager />', () => {
 
       const pageLink = screen.getByTestId('ellipsisForwardPageLink');
 
-      fireEvent.click(pageLink);
+      userEvent.click(pageLink);
 
       expect(onPageChangeMock).toHaveBeenCalledWith(5);
     });
@@ -229,7 +230,7 @@ describe('<Pager />', () => {
 
       const pageLink = screen.getByTestId('lastPageLink');
 
-      fireEvent.click(pageLink);
+      userEvent.click(pageLink);
 
       expect(onPageChangeMock).toHaveBeenCalledWith(10);
     });

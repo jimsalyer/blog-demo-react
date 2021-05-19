@@ -20,7 +20,7 @@ export default function LoginPage() {
     remember: yup.bool(),
   });
 
-  async function handleFormikSubmit(values, { setFieldValue, setSubmitting }) {
+  async function handleFormikSubmit(values, { setFieldValue }) {
     const username = values.username.trim();
     const password = values.password.trim();
     const { remember } = values;
@@ -40,7 +40,6 @@ export default function LoginPage() {
     } catch {
       // Do nothing
     }
-    setSubmitting(false);
   }
 
   return (
@@ -51,20 +50,21 @@ export default function LoginPage() {
         onSubmit={handleFormikSubmit}
       >
         {({
-          values,
+          dirty,
           errors,
-          touched,
-          handleChange,
           handleBlur,
+          handleChange,
           handleSubmit,
           isSubmitting,
           setFieldValue,
+          touched,
+          values,
         }) => (
           <Form onSubmit={handleSubmit}>
             <Card className="mt-2 mx-auto max-width-sm shadow-sm">
               <Card.Body>
                 {user.errorMessage && (
-                  <Alert variant="danger" data-testid="submitError">
+                  <Alert variant="danger" data-testid="loginError">
                     {user.errorMessage}
                   </Alert>
                 )}
@@ -123,7 +123,7 @@ export default function LoginPage() {
               <Card.Footer>
                 <Button
                   type="submit"
-                  disabled={isSubmitting || user.isProcessing}
+                  disabled={!dirty || isSubmitting || user.isProcessing}
                   className="btn-block"
                   data-testid="submitButton"
                 >

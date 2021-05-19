@@ -1,4 +1,5 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom';
@@ -161,9 +162,7 @@ describe('<PostSearchPage />', () => {
     expect(posts).toHaveLength(2);
 
     expect(searchPostsSpy).toHaveBeenCalled();
-
-    const loadingMessage = screen.queryByTestId('loadingMessage');
-    expect(loadingMessage).not.toBeInTheDocument();
+    expect(screen.queryByTestId('loadingMessage')).not.toBeInTheDocument();
   });
 
   it('gets paging and search parameters from the current query string when the page loads', async () => {
@@ -269,14 +268,16 @@ describe('<PostSearchPage />', () => {
 
     const currentLimitToggle = screen.getAllByTestId('limitToggle')[0];
     const currentLimit = parseInt(currentLimitToggle.textContent, 10);
-    fireEvent.click(currentLimitToggle);
+
+    userEvent.click(currentLimitToggle);
 
     const limitItems = await screen.findAllByTestId('limitItem');
     const newLimitItem = limitItems.find(
       (limitItem) => parseInt(limitItem.textContent, 10) !== currentLimit
     );
     const newLimit = parseInt(newLimitItem.textContent, 10);
-    fireEvent.click(newLimitItem);
+
+    userEvent.click(newLimitItem);
 
     await screen.findAllByTestId('post');
 
@@ -338,7 +339,8 @@ describe('<PostSearchPage />', () => {
     const newPageNumberLink = pageNumberLinks.find(
       (pageNumberLink) => pageNumberLink.textContent === newPage.toString()
     );
-    fireEvent.click(newPageNumberLink);
+
+    userEvent.click(newPageNumberLink);
 
     pageStatus = await screen.findAllByTestId('pageStatus');
     expect(pageStatus[0]).toHaveTextContent(`Page ${newPage} of ${pageCount}`);
@@ -404,29 +406,24 @@ describe('<PostSearchPage />', () => {
     await screen.findAllByTestId('post');
 
     const list = screen.getByTestId('authorList');
-    fireEvent.change(list, {
-      target: {
-        value: expectedAuthor.id,
-      },
-    });
+
+    userEvent.selectOptions(list, expectedAuthor.id.toString());
 
     const fullTextSearch = screen.getByTestId('fullTextSearch');
-    fireEvent.change(fullTextSearch, {
-      target: {
-        value: expectedText,
-      },
-    });
+
+    userEvent.type(fullTextSearch, expectedText);
 
     const searchButton = await screen.findByTestId('searchButton');
-    fireEvent.click(searchButton);
 
-    await waitFor(() => {
+    userEvent.click(searchButton);
+
+    await waitFor(() =>
       expect(searchPostsSpy).toHaveBeenNthCalledWith(2, {
         author: expectedAuthor.id.toString(),
         page: 1,
         text: expectedText,
-      });
-    });
+      })
+    );
   });
 
   it('displays a warning message if no data is returned from the API call', async () => {

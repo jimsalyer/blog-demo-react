@@ -11,7 +11,7 @@ import PostSearchLink from './PostSearchLink';
 export default function PostCreatePage() {
   const history = useHistory();
   const initialValues = { title: '', body: '', excerpt: '', image: '' };
-  const [submitError, setSubmitError] = useState('');
+  const [createError, setCreateError] = useState('');
   const user = useSelector(userSelector);
 
   const validationSchema = yup.object().shape({
@@ -31,7 +31,7 @@ export default function PostCreatePage() {
       const excerpt = values.excerpt.trim();
       const image = values.image.trim();
 
-      setSubmitError('');
+      setCreateError('');
       setFieldValue('title', title);
       setFieldValue('body', body);
       setFieldValue('excerpt', excerpt);
@@ -47,12 +47,11 @@ export default function PostCreatePage() {
       history.push('/');
     } catch (error) {
       if (error.response?.data) {
-        setSubmitError(error.response.data.message);
+        setCreateError(error.response.data.message);
       } else {
-        setSubmitError(error.message);
+        setCreateError(error.message);
       }
     }
-    setSubmitting(false);
   }
 
   return (
@@ -67,20 +66,21 @@ export default function PostCreatePage() {
         onSubmit={handleFormikSubmit}
       >
         {({
-          values,
+          dirty,
           errors,
-          touched,
-          handleChange,
           handleBlur,
+          handleChange,
           handleSubmit,
           isSubmitting,
+          touched,
+          values,
         }) => (
           <Form onSubmit={handleSubmit}>
             <Card>
               <Card.Body>
-                {submitError && (
-                  <Alert variant="danger" data-testid="submitError">
-                    {submitError}
+                {createError && (
+                  <Alert variant="danger" data-testid="createError">
+                    {createError}
                   </Alert>
                 )}
                 <Form.Group controlId="title">
@@ -163,7 +163,7 @@ export default function PostCreatePage() {
               </Card.Body>
               <Card.Footer>
                 <Button
-                  disabled={isSubmitting}
+                  disabled={!dirty || isSubmitting}
                   type="submit"
                   data-testid="submitButton"
                 >

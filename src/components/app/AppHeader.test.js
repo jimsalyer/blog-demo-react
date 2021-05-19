@@ -1,4 +1,5 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter, Route } from 'react-router-dom';
@@ -53,7 +54,7 @@ describe('<AppHeader />', () => {
 
       const userDropdown = await screen.findByTestId('userDropdown');
       const userDropdownToggle = userDropdown.querySelector('.dropdown-toggle');
-      fireEvent.click(userDropdownToggle);
+      userEvent.click(userDropdownToggle);
 
       expect(screen.queryByTestId('loginLink')).not.toBeInTheDocument();
       expect(userDropdownToggle).toHaveTextContent(
@@ -61,7 +62,7 @@ describe('<AppHeader />', () => {
       );
 
       const logoutLink = await screen.findByTestId('logoutLink');
-      fireEvent.click(logoutLink);
+      userEvent.click(logoutLink);
 
       await screen.findByTestId('loginLink');
     });
@@ -88,10 +89,10 @@ describe('<AppHeader />', () => {
 
       const userDropdown = await screen.findByTestId('userDropdown');
       const userDropdownToggle = userDropdown.querySelector('.dropdown-toggle');
-      fireEvent.click(userDropdownToggle);
+      userEvent.click(userDropdownToggle);
 
       const logoutLink = await screen.findByTestId('logoutLink');
-      fireEvent.click(logoutLink);
+      userEvent.click(logoutLink);
 
       const logoutStatus = await screen.findByTestId('logoutStatus');
       expect(logoutStatus).toHaveTextContent('Logging Out');
@@ -151,33 +152,27 @@ describe('<AppHeader />', () => {
       expect(testLocation.pathname).toBe('/invalid-path');
 
       const brand = screen.getByTestId('brand');
-      fireEvent.click(brand);
+      userEvent.click(brand);
 
-      await waitFor(() => {
-        expect(testLocation.pathname).toBe('/');
-      });
+      await waitFor(() => expect(testLocation.pathname).toBe('/'));
     });
 
     it('navigates to "/" when clicking the "Posts" link', async () => {
       expect(testLocation.pathname).toBe('/invalid-path');
 
       const postsLink = screen.getByTestId('postsLink');
-      fireEvent.click(postsLink);
+      userEvent.click(postsLink);
 
-      await waitFor(() => {
-        expect(testLocation.pathname).toBe('/');
-      });
+      await waitFor(() => expect(testLocation.pathname).toBe('/'));
     });
 
     it('navigates to "/login" when clicking the "Log In" link', async () => {
       expect(testLocation.pathname).toBe('/invalid-path');
 
       const loginLink = screen.getByTestId('loginLink');
-      fireEvent.click(loginLink);
+      userEvent.click(loginLink);
 
-      await waitFor(() => {
-        expect(testLocation.pathname).toBe('/login');
-      });
+      await waitFor(() => expect(testLocation.pathname).toBe('/login'));
     });
 
     it('logs the user out and navigates to "/login" when clicking the "Log Out" link', async () => {
@@ -188,16 +183,14 @@ describe('<AppHeader />', () => {
       const userDropdown = await screen.findByTestId('userDropdown');
       const userDropdownToggle = userDropdown.querySelector('.dropdown-toggle');
 
-      fireEvent.click(userDropdownToggle);
+      userEvent.click(userDropdownToggle);
 
       const logoutLink = await screen.findByTestId('logoutLink');
-      fireEvent.click(logoutLink);
+      userEvent.click(logoutLink);
 
       await screen.findByTestId('loginLink');
 
-      await waitFor(() => {
-        expect(testLocation.pathname).toBe('/login');
-      });
+      await waitFor(() => expect(testLocation.pathname).toBe('/login'));
     });
   });
 });

@@ -1,4 +1,5 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 import userService from '../../services/UserService';
 import PostSearchForm from './PostSearchForm';
@@ -51,11 +52,9 @@ describe('<PostSearchForm />', () => {
 
       expect(searchFormCollapse).not.toHaveClass('show');
 
-      fireEvent.click(searchFormToggle);
+      userEvent.click(searchFormToggle);
 
-      await waitFor(() => {
-        expect(searchFormCollapse).toHaveClass('show');
-      });
+      await waitFor(() => expect(searchFormCollapse).toHaveClass('show'));
     });
 
     it('resets the filter fields, collapses, and triggers the onSearch handler with no values when the reset button is clicked', async () => {
@@ -97,7 +96,7 @@ describe('<PostSearchForm />', () => {
 
       const resetButton = screen.getByText('Reset');
 
-      fireEvent.click(resetButton);
+      userEvent.click(resetButton);
 
       expect(container).not.toHaveClass('border-primary');
       expect(list).toHaveValue('');
@@ -123,9 +122,7 @@ describe('<PostSearchForm />', () => {
       const loadingMessage = screen.getByTestId('authorLoadingMessage');
       expect(loadingMessage).toHaveTextContent('Loading users...');
 
-      await waitFor(() => {
-        expect(loadingMessage).not.toBeInTheDocument();
-      });
+      await waitFor(() => expect(loadingMessage).not.toBeInTheDocument());
     });
 
     it('displays a list of users by name', async () => {
@@ -193,9 +190,9 @@ describe('<PostSearchForm />', () => {
 
       const list = screen.getByTestId('authorList');
 
-      await waitFor(() => {
-        expect(list).toHaveValue(expectedAuthor.id.toString());
-      });
+      await waitFor(() =>
+        expect(list).toHaveValue(expectedAuthor.id.toString())
+      );
     });
 
     it('changes the visual state of the form when a user is selected', async () => {
@@ -229,15 +226,9 @@ describe('<PostSearchForm />', () => {
       const container = screen.getByTestId('searchFormContainer');
       expect(container).not.toHaveClass('border-primary');
 
-      fireEvent.change(list, {
-        target: {
-          value: expectedAuthor.id,
-        },
-      });
+      userEvent.selectOptions(list, expectedAuthor.id.toString());
 
-      await waitFor(() => {
-        expect(container).toHaveClass('border-primary');
-      });
+      await waitFor(() => expect(container).toHaveClass('border-primary'));
     });
 
     it('passes the selected user to the onSearch handler', async () => {
@@ -268,21 +259,17 @@ describe('<PostSearchForm />', () => {
       await screen.findAllByTestId('authorListItem');
       const list = screen.getByTestId('authorList');
 
-      fireEvent.change(list, {
-        target: {
-          value: expectedAuthor.id,
-        },
-      });
+      userEvent.selectOptions(list, expectedAuthor.id.toString());
 
       const submitButton = screen.getByText('Search');
-      fireEvent.click(submitButton);
+      userEvent.click(submitButton);
 
-      await waitFor(() => {
+      await waitFor(() =>
         expect(mockOnSearch).toHaveBeenCalledWith({
           author: expectedAuthor.id.toString(),
           text: '',
-        });
-      });
+        })
+      );
     });
 
     it('displays an appropriate message when no users are found', async () => {
@@ -343,15 +330,9 @@ describe('<PostSearchForm />', () => {
 
       const fullTextSearch = screen.getByTestId('fullTextSearch');
 
-      fireEvent.change(fullTextSearch, {
-        target: {
-          value: expectedText,
-        },
-      });
+      userEvent.type(fullTextSearch, expectedText);
 
-      await waitFor(() => {
-        expect(container).toHaveClass('border-primary');
-      });
+      await waitFor(() => expect(container).toHaveClass('border-primary'));
     });
 
     it('passes the entered text to the onSearch handler', async () => {
@@ -370,21 +351,19 @@ describe('<PostSearchForm />', () => {
       await screen.findByTestId('authorNotFoundMessage');
 
       const fullTextSearch = screen.getByTestId('fullTextSearch');
-      fireEvent.change(fullTextSearch, {
-        target: {
-          value: expectedText,
-        },
-      });
+
+      userEvent.type(fullTextSearch, expectedText);
 
       const submitButton = screen.getByTestId('searchButton');
-      fireEvent.click(submitButton);
 
-      await waitFor(() => {
+      userEvent.click(submitButton);
+
+      await waitFor(() =>
         expect(mockOnSearch).toHaveBeenCalledWith({
           author: '',
           text: expectedText,
-        });
-      });
+        })
+      );
     });
   });
 });

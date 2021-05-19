@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import queryString from 'query-string';
 import React from 'react';
@@ -27,7 +27,8 @@ describe('<LoginPage />', () => {
 
       const usernameField = screen.getByTestId('usernameField');
 
-      fireEvent.blur(usernameField);
+      userEvent.click(usernameField);
+      userEvent.tab();
 
       const usernameError = await screen.findByTestId('usernameError');
 
@@ -47,7 +48,7 @@ describe('<LoginPage />', () => {
       const usernameField = screen.getByTestId('usernameField');
 
       userEvent.type(usernameField, '    ');
-      fireEvent.blur(usernameField);
+      userEvent.tab();
 
       const usernameError = await screen.findByTestId('usernameError');
 
@@ -68,7 +69,8 @@ describe('<LoginPage />', () => {
 
       const passwordField = screen.getByTestId('passwordField');
 
-      fireEvent.blur(passwordField);
+      userEvent.click(passwordField);
+      userEvent.tab();
 
       const passwordError = await screen.findByTestId('passwordError');
 
@@ -88,7 +90,7 @@ describe('<LoginPage />', () => {
       const passwordField = screen.getByTestId('passwordField');
 
       userEvent.type(passwordField, '    ');
-      fireEvent.blur(passwordField);
+      userEvent.tab();
 
       const passwordError = await screen.findByTestId('passwordError');
 
@@ -122,16 +124,16 @@ describe('<LoginPage />', () => {
 
       userEvent.type(usernameField, expectedUser.username);
       userEvent.type(passwordField, expectedUser.password);
-      fireEvent.click(rememberField);
-      fireEvent.click(submitButton);
+      userEvent.click(rememberField);
+      userEvent.click(submitButton);
 
-      await waitFor(() => {
+      await waitFor(() =>
         expect(loginSpy).toHaveBeenCalledWith(
           expectedUser.username,
           expectedUser.password,
           true
-        );
-      });
+        )
+      );
     });
 
     it('redirects to the URL specified in the "returnUrl" query parameter after login', async () => {
@@ -174,12 +176,12 @@ describe('<LoginPage />', () => {
 
       userEvent.type(usernameField, expectedUser.username);
       userEvent.type(passwordField, expectedUser.password);
-      fireEvent.click(rememberField);
-      fireEvent.click(submitButton);
+      userEvent.click(rememberField);
+      userEvent.click(submitButton);
 
-      await waitFor(() => {
-        expect(testLocation.pathname).toBe(expectedReturnUrl);
-      });
+      await waitFor(() =>
+        expect(testLocation.pathname).toBe(expectedReturnUrl)
+      );
     });
 
     it('redirects to "/" after login if no "returnUrl" query parameter is specified', async () => {
@@ -216,12 +218,10 @@ describe('<LoginPage />', () => {
 
       userEvent.type(usernameField, expectedUser.username);
       userEvent.type(passwordField, expectedUser.password);
-      fireEvent.click(rememberField);
-      fireEvent.click(submitButton);
+      userEvent.click(rememberField);
+      userEvent.click(submitButton);
 
-      await waitFor(() => {
-        expect(testLocation.pathname).toBe('/');
-      });
+      await waitFor(() => expect(testLocation.pathname).toBe('/'));
     });
 
     it('disables the submit button and shows a spinner while running', async () => {
@@ -241,24 +241,26 @@ describe('<LoginPage />', () => {
       const passwordField = screen.getByTestId('passwordField');
       const submitButton = screen.getByTestId('submitButton');
 
-      expect(submitButton).not.toBeDisabled();
+      expect(submitButton).toBeDisabled();
       expect(
         screen.queryByTestId('submitButtonSpinner')
       ).not.toBeInTheDocument();
 
       userEvent.type(usernameField, 'test');
       userEvent.type(passwordField, 'test');
-      fireEvent.click(submitButton);
+
+      expect(submitButton).not.toBeDisabled();
+
+      userEvent.click(submitButton);
 
       expect(submitButton).toBeDisabled();
       expect(screen.queryByTestId('submitButtonSpinner')).toBeInTheDocument();
 
-      await waitFor(() => {
-        expect(submitButton).not.toBeDisabled();
+      await waitFor(() =>
         expect(
           screen.queryByTestId('submitButtonSpinner')
-        ).not.toBeInTheDocument();
-      });
+        ).not.toBeInTheDocument()
+      );
     });
 
     it('trims the leading and trailing whitespace from Username and Password', async () => {
@@ -278,12 +280,11 @@ describe('<LoginPage />', () => {
 
       userEvent.type(usernameField, '  test  ');
       userEvent.type(passwordField, '  test  ');
-      fireEvent.click(submitButton);
+      userEvent.click(submitButton);
 
-      await waitFor(() => {
-        expect(usernameField).toHaveValue('test');
-        expect(passwordField).toHaveValue('test');
-      });
+      await screen.findByTestId('loginError');
+      expect(usernameField).toHaveValue('test');
+      expect(passwordField).toHaveValue('test');
     });
 
     it('displays the error message if a server error occurs during the login call', async () => {
@@ -311,12 +312,12 @@ describe('<LoginPage />', () => {
 
       userEvent.type(usernameField, 'test');
       userEvent.type(passwordField, 'test');
-      fireEvent.click(submitButton);
+      userEvent.click(submitButton);
 
-      const submitError = await screen.findByTestId('submitError');
+      const loginError = await screen.findByTestId('loginError');
 
       expect(loginSpy).toHaveBeenCalled();
-      expect(submitError).toHaveTextContent(expectedErrorMessage);
+      expect(loginError).toHaveTextContent(expectedErrorMessage);
     });
 
     it('displays the error message if a client error occurs during the login call', async () => {
@@ -340,12 +341,12 @@ describe('<LoginPage />', () => {
 
       userEvent.type(usernameField, 'test');
       userEvent.type(passwordField, 'test');
-      fireEvent.click(submitButton);
+      userEvent.click(submitButton);
 
-      const submitError = await screen.findByTestId('submitError');
+      const loginError = await screen.findByTestId('loginError');
 
       expect(loginSpy).toHaveBeenCalled();
-      expect(submitError).toHaveTextContent(expectedErrorMessage);
+      expect(loginError).toHaveTextContent(expectedErrorMessage);
     });
   });
 });

@@ -158,7 +158,6 @@ describe('<PostUpdatePage />', () => {
       const bodyField = screen.getByTestId('bodyField');
       const excerptField = screen.getByTestId('excerptField');
 
-      userEvent.click(titleField);
       userEvent.clear(titleField);
       userEvent.tab();
       userEvent.clear(bodyField);
@@ -194,7 +193,6 @@ describe('<PostUpdatePage />', () => {
       const titleField = screen.getByTestId('titleField');
       const excerptField = screen.getByTestId('excerptField');
 
-      userEvent.click(titleField);
       userEvent.clear(titleField);
       userEvent.type(titleField, '    ');
       userEvent.tab();
