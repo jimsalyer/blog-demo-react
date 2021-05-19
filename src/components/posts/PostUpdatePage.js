@@ -67,7 +67,7 @@ function PostUpdateForm({ id, updateError, updateSuccess }) {
 
   if (loadError) {
     return (
-      <Alert variant="danger" data-testid="loadingError">
+      <Alert variant="danger" data-testid="loadError">
         {loadError}
       </Alert>
     );

@@ -113,8 +113,8 @@ describe('<PostUpdatePage />', () => {
         </Provider>
       );
 
-      const loadingError = await screen.findByTestId('loadingError');
-      expect(loadingError).toHaveTextContent(expectedErrorMessage);
+      const loadError = await screen.findByTestId('loadError');
+      expect(loadError).toHaveTextContent(expectedErrorMessage);
     });
 
     it('displays the error message if a client error occurs while loading the post', async () => {
@@ -134,8 +134,8 @@ describe('<PostUpdatePage />', () => {
         </Provider>
       );
 
-      const loadingError = await screen.findByTestId('loadingError');
-      expect(loadingError).toHaveTextContent(expectedErrorMessage);
+      const loadError = await screen.findByTestId('loadError');
+      expect(loadError).toHaveTextContent(expectedErrorMessage);
     });
 
     it('displays an appropriate error if the current user is not the one who created the post', async () => {
@@ -154,8 +154,8 @@ describe('<PostUpdatePage />', () => {
         </Provider>
       );
 
-      const loadingError = await screen.findByTestId('loadingError');
-      expect(loadingError).toHaveTextContent(
+      const loadError = await screen.findByTestId('loadError');
+      expect(loadError).toHaveTextContent(
         'You do not have permission to edit this post.'
       );
     });

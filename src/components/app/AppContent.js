@@ -7,6 +7,7 @@ import NotFoundPage from '../not-found/NotFoundPage';
 import PostCreatePage from '../posts/PostCreatePage';
 import PostSearchPage from '../posts/PostSearchPage';
 import PostUpdatePage from '../posts/PostUpdatePage';
+import PostViewPage from '../posts/PostViewPage';
 
 export default function AppContent() {
   return (
@@ -21,6 +22,9 @@ export default function AppContent() {
         <ProtectedRoute path="/update/:id">
           <PostUpdatePage />
         </ProtectedRoute>
+        <Route path="/view/:id">
+          <PostViewPage />
+        </Route>
         <Route path="/login">
           <LoginPage />
         </Route>

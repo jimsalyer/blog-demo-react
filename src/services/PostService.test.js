@@ -46,13 +46,19 @@ describe('PostService', () => {
         image: 'http://www.example.com/test.png',
       };
 
+      const expectedQueryParams = {
+        _expand: 'user',
+      };
+
       const getSpy = jest.spyOn(postService.client, 'get').mockResolvedValue({
         data: expectedPost,
       });
 
       const actualPost = await postService.getPost(expectedPost.id);
 
-      expect(getSpy).toHaveBeenCalledWith(`/${expectedPost.id}`);
+      expect(getSpy).toHaveBeenCalledWith(
+        `/${expectedPost.id}?${stringifyQueryParams(expectedQueryParams)}`
+      );
       expect(actualPost).toStrictEqual(expectedPost);
     });
   });

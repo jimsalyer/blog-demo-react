@@ -32,7 +32,13 @@ export class PostService extends BaseService {
   }
 
   async getPost(id) {
-    const response = await this.client.get(`/${id}`);
+    const queryParams = {
+      _expand: 'user',
+    };
+
+    const response = await this.client.get(
+      `/${id}?${stringifyQueryParams(queryParams)}`
+    );
     return response.data;
   }
 

@@ -149,6 +149,219 @@ describe('<PostSearchPage />', () => {
     });
   });
 
+  it('displays an update button on posts that were created by the logged in user', async () => {
+    const expectedUserId = 1;
+    const expectedPosts = [
+      {
+        id: 1,
+        title: 'test title',
+        body: 'test body',
+        excerpt: 'test excerpt',
+        imageUrl: 'http://example.com/images/image.jpg',
+        userId: expectedUserId,
+        createUtc: '2020-01-01T00:00:00Z',
+        publishUtc: '2020-01-02T00:00:00Z',
+        modifyUtc: '2020-01-03T:00:00:00Z',
+      },
+      {
+        id: 2,
+        title: 'test title 2',
+        body: 'test body 2',
+        excerpt: 'test excerpt 2',
+        imageUrl: 'http://example.com/images/image2.jpg',
+        userId: 2,
+        createUtc: '2020-01-01T00:00:00Z',
+        publishUtc: '2020-01-02T00:00:00Z',
+        modifyUtc: '2020-01-03T:00:00:00Z',
+      },
+    ];
+
+    searchPostsSpy.mockResolvedValue({
+      pageCount: 4,
+      data: expectedPosts,
+    });
+
+    userSelectorSpy.mockReset().mockReturnValue({ id: expectedUserId });
+
+    render(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/']}>
+          <PostSearchPage />
+        </MemoryRouter>
+      </Provider>
+    );
+
+    const posts = await screen.findAllByTestId('post');
+    const updateButton = within(posts[0]).getByTestId('updatePostButton');
+
+    expect(updateButton).toHaveTextContent('Update Post');
+    expect(
+      within(posts[1]).queryByTestId('updatePostButton')
+    ).not.toBeInTheDocument();
+  });
+
+  it('does not display an update button if the user is not logged in', async () => {
+    const expectedPosts = [
+      {
+        id: 1,
+        title: 'test title',
+        body: 'test body',
+        excerpt: 'test excerpt',
+        imageUrl: 'http://example.com/images/image.jpg',
+        userId: 1,
+        createUtc: '2020-01-01T00:00:00Z',
+        publishUtc: '2020-01-02T00:00:00Z',
+        modifyUtc: '2020-01-03T:00:00:00Z',
+      },
+      {
+        id: 2,
+        title: 'test title 2',
+        body: 'test body 2',
+        excerpt: 'test excerpt 2',
+        imageUrl: 'http://example.com/images/image2.jpg',
+        userId: 2,
+        createUtc: '2020-01-01T00:00:00Z',
+        publishUtc: '2020-01-02T00:00:00Z',
+        modifyUtc: '2020-01-03T:00:00:00Z',
+      },
+    ];
+
+    searchPostsSpy.mockResolvedValue({
+      pageCount: 4,
+      data: expectedPosts,
+    });
+
+    render(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/']}>
+          <PostSearchPage />
+        </MemoryRouter>
+      </Provider>
+    );
+
+    await screen.findAllByTestId('post');
+    expect(screen.queryAllByTestId('updatePostButton')).toHaveLength(0);
+  });
+
+  it('routes to "/update/{id}" where {id} is the ID of the post whose update button was clicked', async () => {
+    const expectedUserId = 1;
+    const expectedPosts = [
+      {
+        id: 1,
+        title: 'test title',
+        body: 'test body',
+        excerpt: 'test excerpt',
+        imageUrl: 'http://example.com/images/image.jpg',
+        userId: expectedUserId,
+        createUtc: '2020-01-01T00:00:00Z',
+        publishUtc: '2020-01-02T00:00:00Z',
+        modifyUtc: '2020-01-03T:00:00:00Z',
+      },
+      {
+        id: 2,
+        title: 'test title 2',
+        body: 'test body 2',
+        excerpt: 'test excerpt 2',
+        imageUrl: 'http://example.com/images/image2.jpg',
+        userId: 2,
+        createUtc: '2020-01-01T00:00:00Z',
+        publishUtc: '2020-01-02T00:00:00Z',
+        modifyUtc: '2020-01-03T:00:00:00Z',
+      },
+    ];
+
+    let testLocation;
+
+    searchPostsSpy.mockResolvedValue({
+      pageCount: 4,
+      data: expectedPosts,
+    });
+
+    userSelectorSpy.mockReset().mockReturnValue({ id: expectedUserId });
+
+    render(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/']}>
+          <PostSearchPage />
+          <Route
+            path="*"
+            render={({ location }) => {
+              testLocation = location;
+              return null;
+            }}
+          />
+        </MemoryRouter>
+      </Provider>
+    );
+
+    const posts = await screen.findAllByTestId('post');
+    const updateButton = within(posts[0]).getByTestId('updatePostButton');
+
+    userEvent.click(updateButton);
+
+    await waitFor(() =>
+      expect(testLocation.pathname).toBe(`/update/${expectedPosts[0].id}`)
+    );
+  });
+
+  it('displays a read post button that, when clicked, routes to "/view/{id}" where {id} is the ID of the post', async () => {
+    const expectedPosts = [
+      {
+        id: 1,
+        title: 'test title',
+        body: 'test body',
+        excerpt: 'test excerpt',
+        imageUrl: 'http://example.com/images/image.jpg',
+        userId: 1,
+        createUtc: '2020-01-01T00:00:00Z',
+        publishUtc: '2020-01-02T00:00:00Z',
+        modifyUtc: '2020-01-03T:00:00:00Z',
+      },
+      {
+        id: 2,
+        title: 'test title 2',
+        body: 'test body 2',
+        excerpt: 'test excerpt 2',
+        imageUrl: 'http://example.com/images/image2.jpg',
+        userId: 2,
+        createUtc: '2020-01-01T00:00:00Z',
+        publishUtc: '2020-01-02T00:00:00Z',
+        modifyUtc: '2020-01-03T:00:00:00Z',
+      },
+    ];
+
+    let testLocation;
+
+    searchPostsSpy.mockResolvedValue({
+      pageCount: 4,
+      data: expectedPosts,
+    });
+
+    render(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/']}>
+          <PostSearchPage />
+          <Route
+            path="*"
+            render={({ location }) => {
+              testLocation = location;
+              return null;
+            }}
+          />
+        </MemoryRouter>
+      </Provider>
+    );
+
+    const posts = await screen.findAllByTestId('post');
+    const viewButton = within(posts[0]).getByTestId('viewPostButton');
+
+    userEvent.click(viewButton);
+
+    await waitFor(() =>
+      expect(testLocation.pathname).toBe(`/view/${expectedPosts[0].id}`)
+    );
+  });
+
   it('displays a loading message until the API call finishes', async () => {
     const expectedData = [
       {
@@ -456,161 +669,6 @@ describe('<PostSearchPage />', () => {
         page: 1,
         text: expectedText,
       })
-    );
-  });
-
-  it('displays an update button on posts that were created by the logged in user', async () => {
-    const expectedUserId = 1;
-    const expectedPosts = [
-      {
-        id: 1,
-        title: 'test title',
-        body: 'test body',
-        excerpt: 'test excerpt',
-        imageUrl: 'http://example.com/images/image.jpg',
-        userId: expectedUserId,
-        createUtc: '2020-01-01T00:00:00Z',
-        publishUtc: '2020-01-02T00:00:00Z',
-        modifyUtc: '2020-01-03T:00:00:00Z',
-      },
-      {
-        id: 2,
-        title: 'test title 2',
-        body: 'test body 2',
-        excerpt: 'test excerpt 2',
-        imageUrl: 'http://example.com/images/image2.jpg',
-        userId: 2,
-        createUtc: '2020-01-01T00:00:00Z',
-        publishUtc: '2020-01-02T00:00:00Z',
-        modifyUtc: '2020-01-03T:00:00:00Z',
-      },
-    ];
-
-    searchPostsSpy.mockResolvedValue({
-      pageCount: 4,
-      data: expectedPosts,
-    });
-
-    userSelectorSpy.mockReset().mockReturnValue({ id: expectedUserId });
-
-    render(
-      <Provider store={store}>
-        <MemoryRouter initialEntries={['/']}>
-          <PostSearchPage />
-        </MemoryRouter>
-      </Provider>
-    );
-
-    const posts = await screen.findAllByTestId('post');
-    const updateButton = within(posts[0]).getByTestId('updatePostButton');
-
-    expect(updateButton).toHaveTextContent('Update Post');
-    expect(
-      within(posts[1]).queryByTestId('updatePostButton')
-    ).not.toBeInTheDocument();
-  });
-
-  it('does not display an update button if the user is not logged in', async () => {
-    const expectedPosts = [
-      {
-        id: 1,
-        title: 'test title',
-        body: 'test body',
-        excerpt: 'test excerpt',
-        imageUrl: 'http://example.com/images/image.jpg',
-        userId: 1,
-        createUtc: '2020-01-01T00:00:00Z',
-        publishUtc: '2020-01-02T00:00:00Z',
-        modifyUtc: '2020-01-03T:00:00:00Z',
-      },
-      {
-        id: 2,
-        title: 'test title 2',
-        body: 'test body 2',
-        excerpt: 'test excerpt 2',
-        imageUrl: 'http://example.com/images/image2.jpg',
-        userId: 2,
-        createUtc: '2020-01-01T00:00:00Z',
-        publishUtc: '2020-01-02T00:00:00Z',
-        modifyUtc: '2020-01-03T:00:00:00Z',
-      },
-    ];
-
-    searchPostsSpy.mockResolvedValue({
-      pageCount: 4,
-      data: expectedPosts,
-    });
-
-    render(
-      <Provider store={store}>
-        <MemoryRouter initialEntries={['/']}>
-          <PostSearchPage />
-        </MemoryRouter>
-      </Provider>
-    );
-
-    await screen.findAllByTestId('post');
-    expect(screen.queryAllByTestId('updatePostButton')).toHaveLength(0);
-  });
-
-  it('routes to "/update/{id}" where {id} is the ID of the post whose update button was clicked', async () => {
-    const expectedUserId = 1;
-    const expectedPosts = [
-      {
-        id: 1,
-        title: 'test title',
-        body: 'test body',
-        excerpt: 'test excerpt',
-        imageUrl: 'http://example.com/images/image.jpg',
-        userId: expectedUserId,
-        createUtc: '2020-01-01T00:00:00Z',
-        publishUtc: '2020-01-02T00:00:00Z',
-        modifyUtc: '2020-01-03T:00:00:00Z',
-      },
-      {
-        id: 2,
-        title: 'test title 2',
-        body: 'test body 2',
-        excerpt: 'test excerpt 2',
-        imageUrl: 'http://example.com/images/image2.jpg',
-        userId: 2,
-        createUtc: '2020-01-01T00:00:00Z',
-        publishUtc: '2020-01-02T00:00:00Z',
-        modifyUtc: '2020-01-03T:00:00:00Z',
-      },
-    ];
-
-    let testLocation;
-
-    searchPostsSpy.mockResolvedValue({
-      pageCount: 4,
-      data: expectedPosts,
-    });
-
-    userSelectorSpy.mockReset().mockReturnValue({ id: expectedUserId });
-
-    render(
-      <Provider store={store}>
-        <MemoryRouter initialEntries={['/']}>
-          <PostSearchPage />
-          <Route
-            path="*"
-            render={({ location }) => {
-              testLocation = location;
-              return null;
-            }}
-          />
-        </MemoryRouter>
-      </Provider>
-    );
-
-    const posts = await screen.findAllByTestId('post');
-    const updateButton = within(posts[0]).getByTestId('updatePostButton');
-
-    userEvent.click(updateButton);
-
-    await waitFor(() =>
-      expect(testLocation.pathname).toBe(`/update/${expectedPosts[0].id}`)
     );
   });
 

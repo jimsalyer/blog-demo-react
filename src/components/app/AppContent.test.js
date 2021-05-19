@@ -109,6 +109,19 @@ describe('<AppContent />', () => {
     await store.dispatch(logout());
   });
 
+  it('renders <PostViewPage /> if the path is "/view/:id", where "id" is the post ID to view', async () => {
+    render(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/view/1']}>
+          <AppHeader />
+          <AppContent />
+        </MemoryRouter>
+      </Provider>
+    );
+
+    await screen.findByTestId('postViewPage');
+  });
+
   it('renders <LoginPage /> if the path is "/login"', async () => {
     render(
       <Provider store={store}>
