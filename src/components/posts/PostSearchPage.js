@@ -123,10 +123,13 @@ export default function PostSearchPage() {
           {posts.map((post) => (
             <Card key={post.id} className="mb-3" data-testid="post">
               <Card.Body>
-                <Card.Title>{post.title}</Card.Title>
-                <Card.Text>{post.excerpt}</Card.Text>
+                <Card.Title data-testid="title">{post.title}</Card.Title>
+                <Card.Text data-testid="excerpt">{post.excerpt}</Card.Text>
                 <Card.Text>
-                  By {post.user?.firstName} {post.user?.lastName}
+                  By{' '}
+                  <span data-testid="author">
+                    {post.user?.firstName} {post.user?.lastName}
+                  </span>
                 </Card.Text>
                 <Button
                   as={NavLink}
