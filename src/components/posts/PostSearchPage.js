@@ -128,6 +128,17 @@ export default function PostSearchPage() {
                 <Card.Text>
                   By {post.user?.firstName} {post.user?.lastName}
                 </Card.Text>
+                {user.id && user.id === post.userId && (
+                  <Button
+                    as={NavLink}
+                    to={`/update/${post.id}`}
+                    size="sm"
+                    variant="info"
+                    data-testid="updatePostButton"
+                  >
+                    Update Post
+                  </Button>
+                )}
               </Card.Body>
             </Card>
           ))}

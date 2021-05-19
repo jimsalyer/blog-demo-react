@@ -2,14 +2,17 @@ import { Formik, useFormikContext } from 'formik';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { Alert, Button, Card, Form, Spinner } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import * as yup from 'yup';
+import { userSelector } from '../../redux/userSlice';
 import postService from '../../services/PostService';
 import PostSearchLink from './PostSearchLink';
 
 function PostUpdateForm({ id, updateError, updateSuccess }) {
   const [isLoading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
+  const user = useSelector(userSelector);
 
   const {
     dirty,
@@ -27,6 +30,10 @@ function PostUpdateForm({ id, updateError, updateSuccess }) {
     async function loadPost() {
       try {
         const post = await postService.getPost(id);
+        if (post.userId !== user.id) {
+          throw new Error('You do not have permission to edit this post.');
+        }
+
         resetForm({
           values: {
             title: post.title,
@@ -47,7 +54,7 @@ function PostUpdateForm({ id, updateError, updateSuccess }) {
       setLoading(false);
     }
     loadPost();
-  }, [id, resetForm, setLoadError, setLoading]);
+  }, [id, resetForm, setLoadError, setLoading, user.id]);
 
   if (isLoading) {
     return (

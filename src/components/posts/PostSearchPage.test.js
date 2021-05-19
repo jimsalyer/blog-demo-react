@@ -1,8 +1,8 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { Provider } from 'react-redux';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route } from 'react-router-dom';
 import store from '../../redux/store';
 import * as userSliceExports from '../../redux/userSlice';
 import postService from '../../services/PostService';
@@ -22,11 +22,12 @@ describe('<PostSearchPage />', () => {
       .mockReturnValue({});
   });
 
-  it('renders a "Create New Post" button if the user is logged in', async () => {
+  it('renders a create post button if the user is logged in', async () => {
     searchPostsSpy.mockResolvedValue({
       pageCount: 1,
       data: [],
     });
+
     userSelectorSpy.mockReset().mockReturnValue({ id: 1 });
 
     render(
@@ -41,7 +42,7 @@ describe('<PostSearchPage />', () => {
     expect(createPostButton).toHaveTextContent('Create New Post');
   });
 
-  it('does not render a "Create New Post" button if the user is not logged in', async () => {
+  it('does not render a create post button if the user is not logged in', async () => {
     searchPostsSpy.mockResolvedValue({
       pageCount: 1,
       data: [],
@@ -58,6 +59,38 @@ describe('<PostSearchPage />', () => {
     await screen.findByTestId('warningMessage');
 
     expect(screen.queryByTestId('createPostButton')).not.toBeInTheDocument();
+  });
+
+  it('routes to "/create" when clicking on the create post button', async () => {
+    let testLocation;
+
+    searchPostsSpy.mockResolvedValue({
+      pageCount: 1,
+      data: [],
+    });
+
+    userSelectorSpy.mockReset().mockReturnValue({ id: 1 });
+
+    render(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/']}>
+          <PostSearchPage />
+          <Route
+            path="*"
+            render={({ location }) => {
+              testLocation = location;
+              return null;
+            }}
+          />
+        </MemoryRouter>
+      </Provider>
+    );
+
+    const createPostButton = await screen.findByTestId('createPostButton');
+
+    userEvent.click(createPostButton);
+
+    await waitFor(() => expect(testLocation.pathname).toBe('/create'));
   });
 
   it('renders a list of posts', async () => {
@@ -423,6 +456,161 @@ describe('<PostSearchPage />', () => {
         page: 1,
         text: expectedText,
       })
+    );
+  });
+
+  it('displays an update button on posts that were created by the logged in user', async () => {
+    const expectedUserId = 1;
+    const expectedPosts = [
+      {
+        id: 1,
+        title: 'test title',
+        body: 'test body',
+        excerpt: 'test excerpt',
+        imageUrl: 'http://example.com/images/image.jpg',
+        userId: expectedUserId,
+        createUtc: '2020-01-01T00:00:00Z',
+        publishUtc: '2020-01-02T00:00:00Z',
+        modifyUtc: '2020-01-03T:00:00:00Z',
+      },
+      {
+        id: 2,
+        title: 'test title 2',
+        body: 'test body 2',
+        excerpt: 'test excerpt 2',
+        imageUrl: 'http://example.com/images/image2.jpg',
+        userId: 2,
+        createUtc: '2020-01-01T00:00:00Z',
+        publishUtc: '2020-01-02T00:00:00Z',
+        modifyUtc: '2020-01-03T:00:00:00Z',
+      },
+    ];
+
+    searchPostsSpy.mockResolvedValue({
+      pageCount: 4,
+      data: expectedPosts,
+    });
+
+    userSelectorSpy.mockReset().mockReturnValue({ id: expectedUserId });
+
+    render(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/']}>
+          <PostSearchPage />
+        </MemoryRouter>
+      </Provider>
+    );
+
+    const posts = await screen.findAllByTestId('post');
+    const updateButton = within(posts[0]).getByTestId('updatePostButton');
+
+    expect(updateButton).toHaveTextContent('Update Post');
+    expect(
+      within(posts[1]).queryByTestId('updatePostButton')
+    ).not.toBeInTheDocument();
+  });
+
+  it('does not display an update button if the user is not logged in', async () => {
+    const expectedPosts = [
+      {
+        id: 1,
+        title: 'test title',
+        body: 'test body',
+        excerpt: 'test excerpt',
+        imageUrl: 'http://example.com/images/image.jpg',
+        userId: 1,
+        createUtc: '2020-01-01T00:00:00Z',
+        publishUtc: '2020-01-02T00:00:00Z',
+        modifyUtc: '2020-01-03T:00:00:00Z',
+      },
+      {
+        id: 2,
+        title: 'test title 2',
+        body: 'test body 2',
+        excerpt: 'test excerpt 2',
+        imageUrl: 'http://example.com/images/image2.jpg',
+        userId: 2,
+        createUtc: '2020-01-01T00:00:00Z',
+        publishUtc: '2020-01-02T00:00:00Z',
+        modifyUtc: '2020-01-03T:00:00:00Z',
+      },
+    ];
+
+    searchPostsSpy.mockResolvedValue({
+      pageCount: 4,
+      data: expectedPosts,
+    });
+
+    render(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/']}>
+          <PostSearchPage />
+        </MemoryRouter>
+      </Provider>
+    );
+
+    await screen.findAllByTestId('post');
+    expect(screen.queryAllByTestId('updatePostButton')).toHaveLength(0);
+  });
+
+  it('routes to "/update/{id}" where {id} is the ID of the post whose update button was clicked', async () => {
+    const expectedUserId = 1;
+    const expectedPosts = [
+      {
+        id: 1,
+        title: 'test title',
+        body: 'test body',
+        excerpt: 'test excerpt',
+        imageUrl: 'http://example.com/images/image.jpg',
+        userId: expectedUserId,
+        createUtc: '2020-01-01T00:00:00Z',
+        publishUtc: '2020-01-02T00:00:00Z',
+        modifyUtc: '2020-01-03T:00:00:00Z',
+      },
+      {
+        id: 2,
+        title: 'test title 2',
+        body: 'test body 2',
+        excerpt: 'test excerpt 2',
+        imageUrl: 'http://example.com/images/image2.jpg',
+        userId: 2,
+        createUtc: '2020-01-01T00:00:00Z',
+        publishUtc: '2020-01-02T00:00:00Z',
+        modifyUtc: '2020-01-03T:00:00:00Z',
+      },
+    ];
+
+    let testLocation;
+
+    searchPostsSpy.mockResolvedValue({
+      pageCount: 4,
+      data: expectedPosts,
+    });
+
+    userSelectorSpy.mockReset().mockReturnValue({ id: expectedUserId });
+
+    render(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/']}>
+          <PostSearchPage />
+          <Route
+            path="*"
+            render={({ location }) => {
+              testLocation = location;
+              return null;
+            }}
+          />
+        </MemoryRouter>
+      </Provider>
+    );
+
+    const posts = await screen.findAllByTestId('post');
+    const updateButton = within(posts[0]).getByTestId('updatePostButton');
+
+    userEvent.click(updateButton);
+
+    await waitFor(() =>
+      expect(testLocation.pathname).toBe(`/update/${expectedPosts[0].id}`)
     );
   });
 

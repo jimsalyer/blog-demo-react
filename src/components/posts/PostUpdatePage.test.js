@@ -31,11 +31,14 @@ describe('<PostUpdatePage />', () => {
 
   let getPostSpy;
   let updatePostSpy;
+  let userSelectorSpy;
 
   beforeEach(() => {
     getPostSpy = jest.spyOn(postService, 'getPost');
     updatePostSpy = jest.spyOn(postService, 'updatePost');
-    jest.spyOn(userSliceExports, 'userSelector').mockReturnValue(expectedUser);
+    userSelectorSpy = jest
+      .spyOn(userSliceExports, 'userSelector')
+      .mockReturnValue(expectedUser);
   });
 
   describe('Initialization', () => {
@@ -133,6 +136,28 @@ describe('<PostUpdatePage />', () => {
 
       const loadingError = await screen.findByTestId('loadingError');
       expect(loadingError).toHaveTextContent(expectedErrorMessage);
+    });
+
+    it('displays an appropriate error if the current user is not the one who created the post', async () => {
+      userSelectorSpy.mockReset().mockReturnValue({
+        ...expectedUser,
+        id: expectedUser.id + 1,
+      });
+
+      render(
+        <Provider store={store}>
+          <MemoryRouter initialEntries={[`/${expectedPost.id}`]}>
+            <Route path="/:id">
+              <PostUpdatePage />
+            </Route>
+          </MemoryRouter>
+        </Provider>
+      );
+
+      const loadingError = await screen.findByTestId('loadingError');
+      expect(loadingError).toHaveTextContent(
+        'You do not have permission to edit this post.'
+      );
     });
   });
 
@@ -244,6 +269,7 @@ describe('<PostUpdatePage />', () => {
         body: '',
         excerpt: '',
         image: '',
+        userId: expectedUser.id,
         createUtc: expectedPost.createUtc,
         modifyUtc: expectedPost.modifyUtc,
       });

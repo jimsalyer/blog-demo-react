@@ -8,7 +8,10 @@ export default function PostSearchLink({ children, ...props }) {
   const postSearch = useSelector(postSearchSelector);
   return (
     <Link
-      to={{ pathname: '/', search: postSearch }}
+      to={{
+        pathname: '/',
+        search: postSearch,
+      }}
       data-testid="postSearchLink"
       {...props}
     >
