@@ -15,7 +15,7 @@ export default function Pager({
   const pageBuffer = Math.floor(pageLength / 2);
   const pageEnd =
     currentPage + pageBuffer < pageCount
-      ? Math.max(currentPage + pageBuffer, pageLength)
+      ? Math.max(currentPage + pageBuffer, Math.min(pageCount, pageLength))
       : pageCount;
   const pageStart = pageEnd > pageLength ? pageEnd - pageLength + 1 : 1;
   const pageNumbers = _.range(pageStart, pageEnd + 1);
