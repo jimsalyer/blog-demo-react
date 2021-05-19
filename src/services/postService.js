@@ -17,7 +17,13 @@ export class PostService extends BaseService {
   }
 
   async createPost(post) {
-    const response = await this.client.post('/', post);
+    const response = await this.client.post('/', {
+      title: post.title,
+      body: post.body,
+      excerpt: post.excerpt,
+      image: post.image,
+      userId: post.userId,
+    });
     return response.data;
   }
 
@@ -55,7 +61,12 @@ export class PostService extends BaseService {
   }
 
   async updatePost(id, post) {
-    const response = await this.client.put(`/${id}`, post);
+    const response = await this.client.patch(`/${id}`, {
+      title: post.title,
+      body: post.body,
+      excerpt: post.excerpt,
+      image: post.image,
+    });
     return response.data;
   }
 }

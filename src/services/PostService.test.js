@@ -6,8 +6,10 @@ describe('PostService', () => {
   describe('createPost()', () => {
     it('makes a POST request with the given data and returns the result', async () => {
       const expectedPost = {
-        title: 'test title',
-        body: 'test body',
+        title: 'Test Title',
+        body: 'Test Body',
+        excerpt: 'Test Excerpt',
+        image: 'http://www.example.com/test.png',
       };
 
       const postSpy = jest.spyOn(postService.client, 'post').mockResolvedValue({
@@ -27,7 +29,7 @@ describe('PostService', () => {
 
       const deleteSpy = jest
         .spyOn(postService.client, 'delete')
-        .mockResolvedValue(null);
+        .mockResolvedValue({});
 
       await postService.deletePost(expectedId);
 
@@ -38,9 +40,10 @@ describe('PostService', () => {
   describe('getPost()', () => {
     it('makes a GET request with the given ID and returns the result', async () => {
       const expectedPost = {
-        id: 1,
-        title: 'test title',
-        body: 'test body',
+        title: 'Test Title',
+        body: 'Test Body',
+        excerpt: 'Test Excerpt',
+        image: 'http://www.example.com/test.png',
       };
 
       const getSpy = jest.spyOn(postService.client, 'get').mockResolvedValue({
@@ -79,33 +82,36 @@ describe('PostService', () => {
         userId: expectedParams.author,
       };
 
-      const expectedData = [
+      const expectedPost = {
+        title: 'Test Title',
+        body: 'Test Body',
+        excerpt: 'Test Excerpt',
+        image: 'http://www.example.com/test.png',
+        userId: 1,
+      };
+
+      const expectedPosts = [
         {
+          ...expectedPost,
           id: 1,
-          title: 'test title',
-          body: 'test body',
-          userId: 1,
         },
         {
+          ...expectedPost,
           id: 2,
-          title: 'test title 2',
-          body: 'test body 2',
-          userId: 1,
         },
       ];
 
-      const mockResponse = {
-        data: expectedData,
-      };
-
-      getSpy.mockResolvedValue(mockResponse);
+      getSpy.mockResolvedValue({
+        pageCount: 4,
+        data: expectedPosts,
+      });
 
       const actualResult = await postService.searchPosts(expectedParams);
 
       expect(getSpy).toHaveBeenCalledWith(
         `/?${queryString.stringify(expectedQueryParams)}`
       );
-      expect(actualResult.data).toStrictEqual(expectedData);
+      expect(actualResult.data).toStrictEqual(expectedPosts);
     });
 
     it('sets the parameters to default values if they are not provided', async () => {
@@ -128,23 +134,22 @@ describe('PostService', () => {
   });
 
   describe('updatePost()', () => {
-    it('makes a PUT request with the given ID and data and returns the result', async () => {
+    it('makes a PATCH request with the given ID and data and returns the result', async () => {
+      const expectedId = 1;
       const expectedPost = {
-        id: 1,
-        title: 'test title',
-        body: 'test body',
+        title: 'Test Title',
+        body: 'Test Body',
+        excerpt: 'Test Excerpt',
+        image: 'http://www.example.com/test.png',
       };
 
-      const putSpy = jest.spyOn(postService.client, 'put').mockResolvedValue({
-        data: expectedPost,
-      });
+      const patchSpy = jest
+        .spyOn(postService.client, 'patch')
+        .mockResolvedValue({ data: expectedPost });
 
-      const actualPost = await postService.updatePost(
-        expectedPost.id,
-        expectedPost
-      );
+      const actualPost = await postService.updatePost(expectedId, expectedPost);
 
-      expect(putSpy).toHaveBeenCalledWith(`/${expectedPost.id}`, expectedPost);
+      expect(patchSpy).toHaveBeenCalledWith(`/${expectedId}`, expectedPost);
       expect(actualPost).toStrictEqual(expectedPost);
     });
   });

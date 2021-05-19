@@ -139,8 +139,7 @@ server.post('/auth/logout', (req, res) => {
 });
 
 server.use((req, res, next) => {
-  const date = new Date();
-  const utc = date.toISOString();
+  const utc = new Date().toISOString();
   const accessToken = req.headers['x-access-token'];
 
   if (
@@ -154,9 +153,8 @@ server.use((req, res, next) => {
 
   if (req.method === 'POST') {
     req.body.createUtc = utc;
-  } else if (/^(patch|put)$/i.test(req.method)) {
-    req.body.modifyUtc = utc;
   }
+  req.body.modifyUtc = utc;
 
   return next();
 });

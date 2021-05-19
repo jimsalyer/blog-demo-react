@@ -22,18 +22,12 @@ describe('<PostUpdatePage />', () => {
     id: 1,
     title: 'Test Title',
     body: 'Test Body',
-    excerpt: 'Text Excerpt',
+    excerpt: 'Test Excerpt',
     image: 'http://www.example.com/assets/img/test.png',
     userId: expectedUser.id,
     createUtc: '2020-10-12T17:00:00.000Z',
-    publishUtc: '2020-10-14T08:00:00.000Z',
     modifyUtc: '2020-10-14T08:00:00.000Z',
   };
-
-  const dateTimeFormatter = new Intl.DateTimeFormat('en-US', {
-    dateStyle: 'long',
-    timeStyle: 'medium',
-  });
 
   let getPostSpy;
   let updatePostSpy;
@@ -66,28 +60,15 @@ describe('<PostUpdatePage />', () => {
       const bodyField = screen.getByTestId('bodyField');
       const excerptField = screen.getByTestId('excerptField');
       const imageField = screen.getByTestId('imageField');
-      const publishField = screen.getByTestId('publishField');
       const createUtcField = screen.getByTestId('createUtcField');
-      const publishUtcField = screen.getByTestId('publishUtcField');
       const modifyUtcField = screen.getByTestId('modifyUtcField');
 
       expect(titleField).toHaveValue(expectedPost.title);
       expect(bodyField).toHaveValue(expectedPost.body);
       expect(excerptField).toHaveValue(expectedPost.excerpt);
       expect(imageField).toHaveValue(expectedPost.image);
-      expect(publishField).toBeChecked();
-
-      expect(createUtcField).toHaveValue(
-        dateTimeFormatter.format(new Date(expectedPost.createUtc))
-      );
-
-      expect(publishUtcField).toHaveValue(
-        dateTimeFormatter.format(new Date(expectedPost.publishUtc))
-      );
-
-      expect(modifyUtcField).toHaveValue(
-        dateTimeFormatter.format(new Date(expectedPost.modifyUtc))
-      );
+      expect(createUtcField).toHaveValue(expectedPost.createUtc);
+      expect(modifyUtcField).toHaveValue(expectedPost.modifyUtc);
     });
 
     it('shows a loading message until the post has been loaded', async () => {
@@ -254,27 +235,18 @@ describe('<PostUpdatePage />', () => {
   });
 
   describe('Submission', () => {
-    beforeEach(() => {
+    it('calls the updatePost method of the post service and displays a message when successful', async () => {
       getPostSpy.mockResolvedValue({
-        ...expectedPost,
+        id: expectedPost.id,
         title: '',
         body: '',
         excerpt: '',
         image: '',
+        createUtc: expectedPost.createUtc,
+        modifyUtc: expectedPost.modifyUtc,
       });
-    });
 
-    it('calls the updatePost method of the post service and redirects to the posts page', async () => {
-      const expectedValues = {
-        title: expectedPost.title,
-        body: expectedPost.body,
-        excerpt: expectedPost.excerpt,
-        image: expectedPost.image,
-      };
-
-      let testLocation;
-
-      updatePostSpy.mockResolvedValue(expectedValues);
+      updatePostSpy.mockResolvedValue(expectedPost);
 
       render(
         <Provider store={store}>
@@ -282,12 +254,6 @@ describe('<PostUpdatePage />', () => {
             <Route path="/:id">
               <PostUpdatePage />
             </Route>
-            <Route
-              path="*"
-              render={({ location }) => {
-                testLocation = location;
-              }}
-            />
           </MemoryRouter>
         </Provider>
       );
@@ -298,32 +264,32 @@ describe('<PostUpdatePage />', () => {
       const bodyField = screen.getByTestId('bodyField');
       const excerptField = screen.getByTestId('excerptField');
       const imageField = screen.getByTestId('imageField');
+      const createUtcField = screen.getByTestId('createUtcField');
+      const modifyUtcField = screen.getByTestId('modifyUtcField');
       const submitButton = screen.getByTestId('submitButton');
 
-      userEvent.type(titleField, expectedValues.title);
-      userEvent.type(bodyField, expectedValues.body);
-      userEvent.type(excerptField, expectedValues.excerpt);
-      userEvent.type(imageField, expectedValues.image);
+      userEvent.type(titleField, expectedPost.title);
+      userEvent.type(bodyField, expectedPost.body);
+      userEvent.type(excerptField, expectedPost.excerpt);
+      userEvent.type(imageField, expectedPost.image);
       fireEvent.click(submitButton);
 
-      await waitFor(() => {
-        expect(updatePostSpy).toHaveBeenCalledWith(
-          expectedPost.id.toString(),
-          expectedValues
-        );
-        expect(testLocation.pathname).toBe('/');
-      });
+      const successMessage = await screen.findByTestId('updateSuccess');
+      expect(successMessage).toHaveTextContent(
+        'The post was updated successfully.'
+      );
+      expect(updatePostSpy).toHaveBeenCalled();
+      expect(titleField).toHaveValue(expectedPost.title);
+      expect(bodyField).toHaveValue(expectedPost.body);
+      expect(excerptField).toHaveValue(expectedPost.excerpt);
+      expect(imageField).toHaveValue(expectedPost.image);
+      expect(createUtcField).toHaveValue(expectedPost.createUtc);
+      expect(modifyUtcField).toHaveValue(expectedPost.modifyUtc);
     });
 
     it('disables the submit button and shows a spinner while running', async () => {
-      const expectedValues = {
-        title: expectedPost.title,
-        body: expectedPost.body,
-        excerpt: expectedPost.excerpt,
-        image: expectedPost.image,
-      };
-
-      updatePostSpy.mockResolvedValue(expectedValues);
+      getPostSpy.mockResolvedValue(expectedPost);
+      updatePostSpy.mockResolvedValue(expectedPost);
 
       render(
         <Provider store={store}>
@@ -337,10 +303,6 @@ describe('<PostUpdatePage />', () => {
 
       await screen.findByTestId('postUpdateForm');
 
-      const titleField = screen.getByTestId('titleField');
-      const bodyField = screen.getByTestId('bodyField');
-      const excerptField = screen.getByTestId('excerptField');
-      const imageField = screen.getByTestId('imageField');
       const submitButton = screen.getByTestId('submitButton');
 
       expect(submitButton).not.toBeDisabled();
@@ -348,24 +310,26 @@ describe('<PostUpdatePage />', () => {
         screen.queryByTestId('submitButtonSpinner')
       ).not.toBeInTheDocument();
 
-      userEvent.type(titleField, expectedValues.title);
-      userEvent.type(bodyField, expectedValues.body);
-      userEvent.type(excerptField, expectedValues.excerpt);
-      userEvent.type(imageField, expectedValues.image);
       fireEvent.click(submitButton);
 
       expect(submitButton).toBeDisabled();
       expect(screen.queryByTestId('submitButtonSpinner')).toBeInTheDocument();
 
-      await waitFor(() => {
-        expect(submitButton).not.toBeDisabled();
-        expect(
-          screen.queryByTestId('submitButtonSpinner')
-        ).not.toBeInTheDocument();
-      });
+      await waitFor(() => expect(submitButton).not.toBeDisabled());
+
+      expect(
+        screen.queryByTestId('submitButtonSpinner')
+      ).not.toBeInTheDocument();
     });
 
     it('trims the leading and trailing whitespace from Title, Excerpt, and Image', async () => {
+      getPostSpy.mockResolvedValue({
+        ...expectedPost,
+        title: `    ${expectedPost.title}    `,
+        excerpt: `    ${expectedPost.excerpt}    `,
+        image: `    ${expectedPost.image}    `,
+      });
+
       updatePostSpy.mockRejectedValue({ message: 'test error message' });
 
       render(
@@ -381,25 +345,22 @@ describe('<PostUpdatePage />', () => {
       await screen.findByTestId('postUpdateForm');
 
       const titleField = screen.getByTestId('titleField');
-      const bodyField = screen.getByTestId('bodyField');
       const excerptField = screen.getByTestId('excerptField');
       const imageField = screen.getByTestId('imageField');
       const submitButton = screen.getByTestId('submitButton');
 
-      userEvent.type(titleField, '  test  ');
-      userEvent.type(bodyField, 'test');
-      userEvent.type(excerptField, '  test  ');
-      userEvent.type(imageField, '  test  ');
       fireEvent.click(submitButton);
 
       await screen.findByTestId('submitError');
-      expect(titleField).toHaveValue('test');
-      expect(excerptField).toHaveValue('test');
-      expect(imageField).toHaveValue('test');
+      expect(titleField).toHaveValue(expectedPost.title);
+      expect(excerptField).toHaveValue(expectedPost.excerpt);
+      expect(imageField).toHaveValue(expectedPost.image);
     });
 
     it('displays the error message if a server error occurs during the createPost call', async () => {
       const expectedErrorMessage = 'test error message';
+
+      getPostSpy.mockResolvedValue(expectedPost);
 
       updatePostSpy.mockRejectedValue({
         response: {
@@ -421,16 +382,8 @@ describe('<PostUpdatePage />', () => {
 
       await screen.findByTestId('postUpdateForm');
 
-      const titleField = screen.getByTestId('titleField');
-      const bodyField = screen.getByTestId('bodyField');
-      const excerptField = screen.getByTestId('excerptField');
-      const imageField = screen.getByTestId('imageField');
       const submitButton = screen.getByTestId('submitButton');
 
-      userEvent.type(titleField, 'test');
-      userEvent.type(bodyField, 'test');
-      userEvent.type(excerptField, 'test');
-      userEvent.type(imageField, 'test');
       fireEvent.click(submitButton);
 
       const submitError = await screen.findByTestId('submitError');
@@ -441,6 +394,8 @@ describe('<PostUpdatePage />', () => {
 
     it('displays the error message if a client error occurs during the createPost call', async () => {
       const expectedErrorMessage = 'test error message';
+
+      getPostSpy.mockResolvedValue(expectedPost);
 
       updatePostSpy.mockImplementation(() => {
         throw new Error(expectedErrorMessage);
@@ -458,16 +413,8 @@ describe('<PostUpdatePage />', () => {
 
       await screen.findByTestId('postUpdateForm');
 
-      const titleField = screen.getByTestId('titleField');
-      const bodyField = screen.getByTestId('bodyField');
-      const excerptField = screen.getByTestId('excerptField');
-      const imageField = screen.getByTestId('imageField');
       const submitButton = screen.getByTestId('submitButton');
 
-      userEvent.type(titleField, 'test');
-      userEvent.type(bodyField, 'test');
-      userEvent.type(excerptField, 'test');
-      userEvent.type(imageField, 'test');
       fireEvent.click(submitButton);
 
       const submitError = await screen.findByTestId('submitError');

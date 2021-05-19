@@ -41,7 +41,6 @@ async function generateData() {
     const bodyParagraphCount = faker.datatype.number({ min: 4, max: 16 });
     const user = faker.random.arrayElement(users);
     const createUtc = faker.date.between(user.registerUtc, new Date());
-    const publishUtc = faker.date.between(createUtc, new Date());
 
     return {
       id: index + 1,
@@ -51,8 +50,7 @@ async function generateData() {
       image: faker.image.technics(1200, 750),
       userId: user.id,
       createUtc,
-      publishUtc,
-      modifyUtc: faker.date.between(publishUtc, new Date()),
+      modifyUtc: faker.date.between(createUtc, new Date()),
     };
   });
 
@@ -61,7 +59,7 @@ async function generateData() {
     const bodyParagraphCount = faker.datatype.number({ min: 1, max: 3 });
     const user = faker.random.arrayElement(users);
     const createUtcMin =
-      post.publishUtc > user.registerUtc ? post.publishUtc : user.registerUtc;
+      post.createUtc > user.registerUtc ? post.createUtc : user.registerUtc;
     const createUtc = faker.date.between(createUtcMin, new Date());
 
     return {
