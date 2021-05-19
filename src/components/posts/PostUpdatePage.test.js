@@ -249,7 +249,6 @@ describe('<PostUpdatePage />', () => {
 
       const imageField = screen.getByTestId('imageField');
 
-      userEvent.click(imageField);
       userEvent.clear(imageField);
       userEvent.type(imageField, 'test image');
       userEvent.tab();

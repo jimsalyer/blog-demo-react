@@ -14,8 +14,8 @@ describe('<PostCreatePage />', () => {
     createPostSpy = jest.spyOn(postService, 'createPost');
   });
 
-  describe('Title Field', () => {
-    it('shows appropriate styling and message when it is blank', async () => {
+  describe('Validation', () => {
+    it('shows appropriate styling and messages when the Title, Body, or Excerpt fields are blank', async () => {
       render(
         <Provider store={store}>
           <MemoryRouter>
@@ -25,17 +25,27 @@ describe('<PostCreatePage />', () => {
       );
 
       const titleField = screen.getByTestId('titleField');
+      const bodyField = screen.getByTestId('bodyField');
+      const excerptField = screen.getByTestId('excerptField');
 
       userEvent.click(titleField);
       userEvent.tab();
+      userEvent.tab();
+      userEvent.tab();
 
       const titleError = await screen.findByTestId('titleError');
+      const bodyError = await screen.findByTestId('bodyError');
+      const excerptError = await screen.findByTestId('excerptError');
 
       expect(titleField).toHaveClass('is-invalid');
+      expect(bodyField).toHaveClass('is-invalid');
+      expect(excerptField).toHaveClass('is-invalid');
       expect(titleError).toHaveTextContent('Title is required.');
+      expect(bodyError).toHaveTextContent('Body is required.');
+      expect(excerptError).toHaveTextContent('Excerpt is required.');
     });
 
-    it('shows appropriate styling and message when it is all whitespace', async () => {
+    it('shows appropriate styling and messages when the Title or Excerpt fields are all whitespace', async () => {
       render(
         <Provider store={store}>
           <MemoryRouter>
@@ -45,83 +55,23 @@ describe('<PostCreatePage />', () => {
       );
 
       const titleField = screen.getByTestId('titleField');
+      const excerptField = screen.getByTestId('excerptField');
 
       userEvent.type(titleField, '    ');
       userEvent.tab();
-
-      const titleError = await screen.findByTestId('titleError');
-
-      expect(titleField).toHaveClass('is-invalid');
-      expect(titleError).toHaveTextContent('Title is required.');
-    });
-  });
-
-  describe('Body Field', () => {
-    it('shows appropriate styling and message when it is blank', async () => {
-      render(
-        <Provider store={store}>
-          <MemoryRouter>
-            <PostCreatePage />
-          </MemoryRouter>
-        </Provider>
-      );
-
-      const bodyField = screen.getByTestId('bodyField');
-
-      userEvent.click(bodyField);
-      userEvent.tab();
-
-      const bodyError = await screen.findByTestId('bodyError');
-
-      expect(bodyField).toHaveClass('is-invalid');
-      expect(bodyError).toHaveTextContent('Body is required.');
-    });
-  });
-
-  describe('Excerpt Field', () => {
-    it('shows appropriate styling and message when it is blank', async () => {
-      render(
-        <Provider store={store}>
-          <MemoryRouter>
-            <PostCreatePage />
-          </MemoryRouter>
-        </Provider>
-      );
-
-      const excerptField = screen.getByTestId('excerptField');
-
-      userEvent.click(excerptField);
-      userEvent.tab();
-
-      const excerptError = await screen.findByTestId('excerptError');
-
-      expect(excerptField).toHaveClass('is-invalid');
-      expect(excerptError).toHaveTextContent('Excerpt is required.');
-    });
-
-    it('shows appropriate styling and message when it is all whitespace', async () => {
-      render(
-        <Provider store={store}>
-          <MemoryRouter>
-            <PostCreatePage />
-          </MemoryRouter>
-        </Provider>
-      );
-
-      const excerptField = screen.getByTestId('excerptField');
-
       userEvent.type(excerptField, '    ');
       userEvent.tab();
 
+      const titleError = await screen.findByTestId('titleError');
       const excerptError = await screen.findByTestId('excerptError');
 
+      expect(titleField).toHaveClass('is-invalid');
       expect(excerptField).toHaveClass('is-invalid');
+      expect(titleError).toHaveTextContent('Title is required.');
       expect(excerptError).toHaveTextContent('Excerpt is required.');
     });
-  });
 
-  describe('Image Field', () => {
-    it('shows appropriate styling and message when it contains whitespace', async () => {
+    it('shows appropriate styling and message when the Image field contains whitespace', async () => {
       render(
         <Provider store={store}>
           <MemoryRouter>
@@ -142,7 +92,7 @@ describe('<PostCreatePage />', () => {
     });
   });
 
-  describe('Submission Handling', () => {
+  describe('Submission', () => {
     it('calls the createPost method of the post service and redirects to the posts page', async () => {
       const expectedPost = {
         title: 'Test Title',

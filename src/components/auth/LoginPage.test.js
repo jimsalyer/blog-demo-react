@@ -15,8 +15,8 @@ describe('<LoginPage />', () => {
     loginSpy = jest.spyOn(authService, 'login');
   });
 
-  describe('Username Field', () => {
-    it('shows appropriate styling and message when it is blank', async () => {
+  describe('Validation', () => {
+    it('shows appropriate styling and messages when the Username or Password fields are blank', async () => {
       render(
         <Provider store={store}>
           <MemoryRouter initialEntries={['/login']}>
@@ -26,17 +26,22 @@ describe('<LoginPage />', () => {
       );
 
       const usernameField = screen.getByTestId('usernameField');
+      const passwordField = screen.getByTestId('passwordField');
 
       userEvent.click(usernameField);
       userEvent.tab();
+      userEvent.tab();
 
       const usernameError = await screen.findByTestId('usernameError');
+      const passwordError = await screen.findByTestId('passwordError');
 
       expect(usernameField).toHaveClass('is-invalid');
+      expect(passwordField).toHaveClass('is-invalid');
       expect(usernameError).toHaveTextContent('Username is required.');
+      expect(passwordError).toHaveTextContent('Password is required.');
     });
 
-    it('shows appropriate styling and message when it is all whitespace', async () => {
+    it('shows appropriate styling and messages when the Username or Password fields are all whitespace', async () => {
       render(
         <Provider store={store}>
           <MemoryRouter initialEntries={['/login']}>
@@ -46,60 +51,24 @@ describe('<LoginPage />', () => {
       );
 
       const usernameField = screen.getByTestId('usernameField');
+      const passwordField = screen.getByTestId('passwordField');
 
       userEvent.type(usernameField, '    ');
       userEvent.tab();
-
-      const usernameError = await screen.findByTestId('usernameError');
-
-      expect(usernameField).toHaveClass('is-invalid');
-      expect(usernameError).toHaveTextContent('Username is required.');
-    });
-  });
-
-  describe('Password Field', () => {
-    it('shows appropriate styling and message when it is blank', async () => {
-      render(
-        <Provider store={store}>
-          <MemoryRouter initialEntries={['/login']}>
-            <LoginPage />
-          </MemoryRouter>
-        </Provider>
-      );
-
-      const passwordField = screen.getByTestId('passwordField');
-
-      userEvent.click(passwordField);
-      userEvent.tab();
-
-      const passwordError = await screen.findByTestId('passwordError');
-
-      expect(passwordField).toHaveClass('is-invalid');
-      expect(passwordError).toHaveTextContent('Password is required.');
-    });
-
-    it('shows appropriate styling and message when it is all whitespace', async () => {
-      render(
-        <Provider store={store}>
-          <MemoryRouter initialEntries={['/login']}>
-            <LoginPage />
-          </MemoryRouter>
-        </Provider>
-      );
-
-      const passwordField = screen.getByTestId('passwordField');
-
       userEvent.type(passwordField, '    ');
       userEvent.tab();
 
+      const usernameError = await screen.findByTestId('usernameError');
       const passwordError = await screen.findByTestId('passwordError');
 
+      expect(usernameField).toHaveClass('is-invalid');
       expect(passwordField).toHaveClass('is-invalid');
+      expect(usernameError).toHaveTextContent('Username is required.');
       expect(passwordError).toHaveTextContent('Password is required.');
     });
   });
 
-  describe('Submission Handling', () => {
+  describe('Submission', () => {
     it('logs the user in', async () => {
       const expectedUser = {
         id: 1,
