@@ -77,7 +77,7 @@ export default function PostSearchPage() {
       }
     }
     loadPosts();
-  }, [dispatch, history, location, queryParams]);
+  }, [history, location, queryParams]);
 
   return (
     <div data-testid="postSearchPage">

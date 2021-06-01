@@ -45,7 +45,7 @@ export default function PostSearchForm({ queryValues, onError, onSearch }) {
       setLoadingUsers(false);
     }
     loadUsers();
-  }, [onError]);
+  }, []);
 
   return (
     <Formik initialValues={initialValues} onSubmit={handleFormikSubmit}>

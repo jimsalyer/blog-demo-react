@@ -54,7 +54,7 @@ function PostUpdateForm({ id, updateError, updateSuccess }) {
       setLoading(false);
     }
     loadPost();
-  }, [id, resetForm, setLoadError, setLoading, user.id]);
+  }, [id, user.id]);
 
   if (isLoading) {
     return (
