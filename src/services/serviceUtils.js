@@ -1,5 +1,12 @@
 import queryString from 'query-string';
 
+export function parseQueryString(value) {
+  return queryString.parse(value, {
+    parseBooleans: true,
+    parseNumbers: true,
+  });
+}
+
 export function parsePageCount(response) {
   if (typeof response?.headers?.link === 'string') {
     const links = response.headers.link.split(',');
@@ -22,13 +29,6 @@ export function parsePageCount(response) {
     }
   }
   return 1;
-}
-
-export function parseQueryString(value) {
-  return queryString.parse(value, {
-    parseBooleans: true,
-    parseNumbers: true,
-  });
 }
 
 export function stringifyQueryParams(value) {

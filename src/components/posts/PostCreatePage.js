@@ -24,7 +24,7 @@ export default function PostCreatePage() {
       .matches(/^\S*$/, 'Image cannot contain whitespace.'),
   });
 
-  async function handleFormikSubmit(values, { setFieldValue, setSubmitting }) {
+  async function handleFormikSubmit(values, { setFieldValue }) {
     try {
       const title = values.title.trim();
       const { body } = values;

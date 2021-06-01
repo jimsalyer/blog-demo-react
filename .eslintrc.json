@@ -7,8 +7,7 @@
   },
   "extends": [
     "airbnb",
-    "react-app",
-    "react-app/jest",
+    "plugin:jest/recommended",
     "plugin:prettier/recommended"
   ],
   "parser": "@babel/eslint-parser",
