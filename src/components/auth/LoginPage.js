@@ -122,9 +122,9 @@ export default function LoginPage() {
               </Card.Body>
               <Card.Footer>
                 <Button
-                  type="submit"
+                  block
                   disabled={!dirty || isSubmitting || user.isProcessing}
-                  className="btn-block"
+                  type="submit"
                   data-testid="submitButton"
                 >
                   {(isSubmitting || user.isProcessing) && (
