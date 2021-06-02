@@ -1,17 +1,20 @@
 /* istanbul ignore file */
 import React from 'react';
 import { render } from 'react-dom';
-import { Provider } from 'react-redux';
+import { Provider as StoreProvider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import './index.scss';
 import App from './components/app/App';
+import ToastContextProvider from './contexts/toast/ToastContextProvider';
 import store from './redux/store';
 
 render(
-  <Provider store={store}>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </Provider>,
+  <StoreProvider store={store}>
+    <ToastContextProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </ToastContextProvider>
+  </StoreProvider>,
   document.getElementById('root')
 );

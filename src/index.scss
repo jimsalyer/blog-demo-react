@@ -57,3 +57,10 @@ $overflows: append($overflows, visible);
 .max-width-xl {
   max-width: 80em;
 }
+
+.toast-container {
+  position: absolute;
+  top: $spacer;
+  right: $spacer;
+  z-index: $zindex-modal !important;
+}
