@@ -1,8 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { Provider } from 'react-redux';
+import { Provider as StoreProvider } from 'react-redux';
 import { MemoryRouter, Route } from 'react-router-dom';
+import { ToastProvider } from 'react-toast-notifications';
 import store from '../../redux/store';
 import { login } from '../../redux/userSlice';
 import authService from '../../services/AuthService';
@@ -40,11 +41,13 @@ describe('<AppHeader />', () => {
   describe('Rendering', () => {
     it('renders user dropdown with a "Log Out" link if the user is logged in', async () => {
       render(
-        <Provider store={store}>
-          <MemoryRouter initialEntries={['/']}>
-            <AppHeader />
-          </MemoryRouter>
-        </Provider>
+        <StoreProvider store={store}>
+          <ToastProvider>
+            <MemoryRouter initialEntries={['/']}>
+              <AppHeader />
+            </MemoryRouter>
+          </ToastProvider>
+        </StoreProvider>
       );
 
       screen.getByTestId('loginLink');
@@ -71,18 +74,20 @@ describe('<AppHeader />', () => {
       let testLocation;
 
       render(
-        <Provider store={store}>
-          <MemoryRouter initialEntries={['/']}>
-            <AppHeader />
-            <Route
-              path="*"
-              render={({ location }) => {
-                testLocation = location;
-                return null;
-              }}
-            />
-          </MemoryRouter>
-        </Provider>
+        <StoreProvider store={store}>
+          <ToastProvider>
+            <MemoryRouter initialEntries={['/']}>
+              <AppHeader />
+              <Route
+                path="*"
+                render={({ location }) => {
+                  testLocation = location;
+                  return null;
+                }}
+              />
+            </MemoryRouter>
+          </ToastProvider>
+        </StoreProvider>
       );
 
       await store.dispatch(login(expectedLogin));
@@ -103,11 +108,13 @@ describe('<AppHeader />', () => {
 
     it('renders and activates "Posts" link when the path is "/"', () => {
       render(
-        <Provider store={store}>
-          <MemoryRouter initialEntries={['/']}>
-            <AppHeader />
-          </MemoryRouter>
-        </Provider>
+        <StoreProvider store={store}>
+          <ToastProvider>
+            <MemoryRouter initialEntries={['/']}>
+              <AppHeader />
+            </MemoryRouter>
+          </ToastProvider>
+        </StoreProvider>
       );
 
       screen.getByTestId('appHeader');
@@ -116,11 +123,13 @@ describe('<AppHeader />', () => {
 
     it('renders and activates "Log In" link when the path is "/login"', () => {
       render(
-        <Provider store={store}>
-          <MemoryRouter initialEntries={['/login']}>
-            <AppHeader />
-          </MemoryRouter>
-        </Provider>
+        <StoreProvider store={store}>
+          <ToastProvider>
+            <MemoryRouter initialEntries={['/login']}>
+              <AppHeader />
+            </MemoryRouter>
+          </ToastProvider>
+        </StoreProvider>
       );
 
       screen.getByTestId('appHeader');
@@ -133,18 +142,20 @@ describe('<AppHeader />', () => {
 
     beforeEach(() => {
       render(
-        <Provider store={store}>
-          <MemoryRouter initialEntries={['/invalid-path']}>
-            <AppHeader />
-            <Route
-              path="*"
-              render={({ location }) => {
-                testLocation = location;
-                return null;
-              }}
-            />
-          </MemoryRouter>
-        </Provider>
+        <StoreProvider store={store}>
+          <ToastProvider>
+            <MemoryRouter initialEntries={['/invalid-path']}>
+              <AppHeader />
+              <Route
+                path="*"
+                render={({ location }) => {
+                  testLocation = location;
+                  return null;
+                }}
+              />
+            </MemoryRouter>
+          </ToastProvider>
+        </StoreProvider>
       );
     });
 

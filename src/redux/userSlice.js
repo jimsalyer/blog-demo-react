@@ -21,11 +21,11 @@ export const login = createAsyncThunk(
 export const logout = createAsyncThunk(
   'user/logout',
   async (_, { rejectWithValue }) => {
-    localStorage.removeItem(userStorageKey);
     try {
-      const accessToken = await authService.logout();
-      return accessToken;
+      await authService.logout();
+      localStorage.removeItem(userStorageKey);
     } catch (error) {
+      localStorage.removeItem(userStorageKey);
       if (error.response?.data) {
         return rejectWithValue(error.response.data);
       }
@@ -57,8 +57,7 @@ export default createSlice({
       errorMessage: payload.message,
       isProcessing: false,
     }),
-    [logout.fulfilled]: (state, { payload }) => ({
-      ...payload,
+    [logout.fulfilled]: () => ({
       errorMessage: '',
       isProcessing: false,
     }),

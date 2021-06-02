@@ -1,8 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { Provider } from 'react-redux';
+import { Provider as StoreProvider } from 'react-redux';
 import { MemoryRouter, Route } from 'react-router-dom';
+import { ToastProvider } from 'react-toast-notifications';
 import store from '../../redux/store';
 import postService from '../../services/PostService';
 import PostCreatePage from './PostCreatePage';
@@ -17,11 +18,13 @@ describe('<PostCreatePage />', () => {
   describe('Validation', () => {
     it('shows appropriate styling and messages when the Title, Body, or Excerpt fields are blank', async () => {
       render(
-        <Provider store={store}>
-          <MemoryRouter>
-            <PostCreatePage />
-          </MemoryRouter>
-        </Provider>
+        <StoreProvider store={store}>
+          <ToastProvider>
+            <MemoryRouter>
+              <PostCreatePage />
+            </MemoryRouter>
+          </ToastProvider>
+        </StoreProvider>
       );
 
       const titleField = screen.getByTestId('titleField');
@@ -47,11 +50,13 @@ describe('<PostCreatePage />', () => {
 
     it('shows appropriate styling and messages when the Title or Excerpt fields are all whitespace', async () => {
       render(
-        <Provider store={store}>
-          <MemoryRouter>
-            <PostCreatePage />
-          </MemoryRouter>
-        </Provider>
+        <StoreProvider store={store}>
+          <ToastProvider>
+            <MemoryRouter>
+              <PostCreatePage />
+            </MemoryRouter>
+          </ToastProvider>
+        </StoreProvider>
       );
 
       const titleField = screen.getByTestId('titleField');
@@ -73,11 +78,13 @@ describe('<PostCreatePage />', () => {
 
     it('shows appropriate styling and message when the Image field contains whitespace', async () => {
       render(
-        <Provider store={store}>
-          <MemoryRouter>
-            <PostCreatePage />
-          </MemoryRouter>
-        </Provider>
+        <StoreProvider store={store}>
+          <ToastProvider>
+            <MemoryRouter>
+              <PostCreatePage />
+            </MemoryRouter>
+          </ToastProvider>
+        </StoreProvider>
       );
 
       const imageField = screen.getByTestId('imageField');
@@ -106,17 +113,19 @@ describe('<PostCreatePage />', () => {
       createPostSpy.mockResolvedValue(expectedPost);
 
       render(
-        <Provider store={store}>
-          <MemoryRouter>
-            <PostCreatePage />
-            <Route
-              path="*"
-              render={({ location }) => {
-                testLocation = location;
-              }}
-            />
-          </MemoryRouter>
-        </Provider>
+        <StoreProvider store={store}>
+          <ToastProvider>
+            <MemoryRouter>
+              <PostCreatePage />
+              <Route
+                path="*"
+                render={({ location }) => {
+                  testLocation = location;
+                }}
+              />
+            </MemoryRouter>
+          </ToastProvider>
+        </StoreProvider>
       );
 
       const titleField = screen.getByTestId('titleField');
@@ -141,11 +150,13 @@ describe('<PostCreatePage />', () => {
       createPostSpy.mockResolvedValue({});
 
       render(
-        <Provider store={store}>
-          <MemoryRouter>
-            <PostCreatePage />
-          </MemoryRouter>
-        </Provider>
+        <StoreProvider store={store}>
+          <ToastProvider>
+            <MemoryRouter>
+              <PostCreatePage />
+            </MemoryRouter>
+          </ToastProvider>
+        </StoreProvider>
       );
 
       const titleField = screen.getByTestId('titleField');
@@ -183,11 +194,13 @@ describe('<PostCreatePage />', () => {
       createPostSpy.mockRejectedValue({ message: 'test error message' });
 
       render(
-        <Provider store={store}>
-          <MemoryRouter>
-            <PostCreatePage />
-          </MemoryRouter>
-        </Provider>
+        <StoreProvider store={store}>
+          <ToastProvider>
+            <MemoryRouter>
+              <PostCreatePage />
+            </MemoryRouter>
+          </ToastProvider>
+        </StoreProvider>
       );
 
       const titleField = screen.getByTestId('titleField');
@@ -220,11 +233,13 @@ describe('<PostCreatePage />', () => {
       });
 
       render(
-        <Provider store={store}>
-          <MemoryRouter>
-            <PostCreatePage />
-          </MemoryRouter>
-        </Provider>
+        <StoreProvider store={store}>
+          <ToastProvider>
+            <MemoryRouter>
+              <PostCreatePage />
+            </MemoryRouter>
+          </ToastProvider>
+        </StoreProvider>
       );
 
       const titleField = screen.getByTestId('titleField');
@@ -253,11 +268,13 @@ describe('<PostCreatePage />', () => {
       });
 
       render(
-        <Provider store={store}>
-          <MemoryRouter>
-            <PostCreatePage />
-          </MemoryRouter>
-        </Provider>
+        <StoreProvider store={store}>
+          <ToastProvider>
+            <MemoryRouter>
+              <PostCreatePage />
+            </MemoryRouter>
+          </ToastProvider>
+        </StoreProvider>
       );
 
       const titleField = screen.getByTestId('titleField');

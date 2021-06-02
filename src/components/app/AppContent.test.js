@@ -1,13 +1,14 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import { Provider } from 'react-redux';
+import { Provider as StoreProvider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom';
+import { ToastProvider } from 'react-toast-notifications';
 import store from '../../redux/store';
 import { login, logout } from '../../redux/userSlice';
 import authService from '../../services/AuthService';
 import postService from '../../services/PostService';
+import userService from '../../services/UserService';
 import AppContent from './AppContent';
-import AppHeader from './AppHeader';
 
 describe('<AppContent />', () => {
   const expectedLogin = {
@@ -39,55 +40,65 @@ describe('<AppContent />', () => {
 
   beforeEach(() => {
     jest.spyOn(authService, 'login').mockResolvedValue(expectedUser);
-    jest
-      .spyOn(authService, 'logout')
-      .mockResolvedValue({ userId: expectedUser.id });
+    jest.spyOn(authService, 'logout').mockResolvedValue({});
 
     jest.spyOn(postService, 'getPost').mockResolvedValue(expectedPost);
     jest.spyOn(postService, 'searchPosts').mockResolvedValue({
       pageCount: 1,
       data: [expectedPost],
     });
+
+    jest.spyOn(userService, 'listUsers').mockResolvedValue([]);
   });
 
   it('renders <PostSearchPage /> if the path is exactly "/"', async () => {
     render(
-      <Provider store={store}>
-        <MemoryRouter initialEntries={['/']}>
-          <AppContent />
-        </MemoryRouter>
-      </Provider>
+      <StoreProvider store={store}>
+        <ToastProvider>
+          <MemoryRouter initialEntries={['/']}>
+            <AppContent />
+          </MemoryRouter>
+        </ToastProvider>
+      </StoreProvider>
     );
 
-    await screen.findByTestId('postSearchPage');
+    await waitFor(() =>
+      expect(screen.queryByTestId('postSearchPage')).toBeInTheDocument()
+    );
   });
 
   it('renders <LoginPage /> if the path is "/create" and the user is not logged in', async () => {
     render(
-      <Provider store={store}>
-        <MemoryRouter initialEntries={['/create']}>
-          <AppHeader />
-          <AppContent />
-        </MemoryRouter>
-      </Provider>
+      <StoreProvider store={store}>
+        <ToastProvider>
+          <MemoryRouter initialEntries={['/create']}>
+            <AppContent />
+          </MemoryRouter>
+        </ToastProvider>
+      </StoreProvider>
     );
 
-    await screen.findByTestId('loginPage');
+    await waitFor(() =>
+      expect(screen.queryByTestId('loginPage')).toBeInTheDocument()
+    );
   });
 
   it('renders <PostCreatePage /> if the path is "/create" and the user is logged in', async () => {
     await store.dispatch(login(expectedLogin));
 
     render(
-      <Provider store={store}>
-        <MemoryRouter initialEntries={['/create']}>
-          <AppHeader />
-          <AppContent />
-        </MemoryRouter>
-      </Provider>
+      <StoreProvider store={store}>
+        <ToastProvider>
+          <MemoryRouter initialEntries={['/create']}>
+            <AppContent />
+          </MemoryRouter>
+        </ToastProvider>
+      </StoreProvider>
     );
 
-    await screen.findByTestId('postCreatePage');
+    await waitFor(() =>
+      expect(screen.queryByTestId('postCreatePage')).toBeInTheDocument()
+    );
 
     await store.dispatch(logout());
   });
@@ -96,50 +107,67 @@ describe('<AppContent />', () => {
     await store.dispatch(login(expectedLogin));
 
     render(
-      <Provider store={store}>
-        <MemoryRouter initialEntries={['/update/1']}>
-          <AppHeader />
-          <AppContent />
-        </MemoryRouter>
-      </Provider>
+      <StoreProvider store={store}>
+        <ToastProvider>
+          <MemoryRouter initialEntries={['/update/1']}>
+            <AppContent />
+          </MemoryRouter>
+        </ToastProvider>
+      </StoreProvider>
     );
 
-    await screen.findByTestId('postUpdatePage');
+    await waitFor(() =>
+      expect(screen.queryByTestId('postUpdatePage')).toBeInTheDocument()
+    );
 
     await store.dispatch(logout());
   });
 
   it('renders <PostViewPage /> if the path is "/view/:id", where "id" is the post ID to view', async () => {
     render(
-      <Provider store={store}>
-        <MemoryRouter initialEntries={['/view/1']}>
-          <AppHeader />
-          <AppContent />
-        </MemoryRouter>
-      </Provider>
+      <StoreProvider store={store}>
+        <ToastProvider>
+          <MemoryRouter initialEntries={['/view/1']}>
+            <AppContent />
+          </MemoryRouter>
+        </ToastProvider>
+      </StoreProvider>
     );
 
-    await screen.findByTestId('postViewPage');
+    await waitFor(() =>
+      expect(screen.queryByTestId('postViewPage')).toBeInTheDocument()
+    );
   });
 
   it('renders <LoginPage /> if the path is "/login"', async () => {
     render(
-      <Provider store={store}>
-        <MemoryRouter initialEntries={['/login']}>
-          <AppContent />
-        </MemoryRouter>
-      </Provider>
+      <StoreProvider store={store}>
+        <ToastProvider>
+          <MemoryRouter initialEntries={['/login']}>
+            <AppContent />
+          </MemoryRouter>
+        </ToastProvider>
+      </StoreProvider>
     );
 
-    await screen.findByTestId('loginPage');
+    await waitFor(() =>
+      expect(screen.queryByTestId('loginPage')).toBeInTheDocument()
+    );
   });
 
-  it('renders <NotFoundPage /> if the path does not have a corresponding route', () => {
+  it('renders <NotFoundPage /> if the path does not have a corresponding route', async () => {
     render(
-      <MemoryRouter initialEntries={['/invalid-path']}>
-        <AppContent />
-      </MemoryRouter>
+      <StoreProvider store={store}>
+        <ToastProvider>
+          <MemoryRouter initialEntries={['/invalid-path']}>
+            <AppContent />
+          </MemoryRouter>
+        </ToastProvider>
+      </StoreProvider>
     );
-    screen.getByTestId('notFoundPage');
+
+    await waitFor(() =>
+      expect(screen.queryByTestId('notFoundPage')).toBeInTheDocument()
+    );
   });
 });

@@ -150,7 +150,6 @@ describe('userSlice', () => {
       expect(actualUser).toStrictEqual(expectedUser);
 
       expectedState = {
-        ...expectedAccessToken,
         errorMessage: '',
         isProcessing: false,
       };

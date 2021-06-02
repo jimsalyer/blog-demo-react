@@ -2,9 +2,11 @@ import React from 'react';
 import { Container, Nav, Navbar, NavDropdown, Spinner } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useHistory } from 'react-router-dom';
+import { useToasts } from 'react-toast-notifications';
 import { logout, userSelector } from '../../redux/userSlice';
 
 export default function AppHeader() {
+  const { addToast } = useToasts();
   const dispatch = useDispatch();
   const history = useHistory();
   const user = useSelector(userSelector);
@@ -13,6 +15,12 @@ export default function AppHeader() {
     if (eventKey === 'logout' && !user.isProcessing) {
       try {
         await dispatch(logout());
+        addToast(
+          `${user.firstName} ${user.lastName} logged out successfully.`,
+          {
+            appearance: 'success',
+          }
+        );
         history.push('/login');
       } catch {
         // Do nothing

@@ -58,9 +58,6 @@ $overflows: append($overflows, visible);
   max-width: 80em;
 }
 
-.toast-container {
-  position: absolute;
-  top: $spacer;
-  right: $spacer;
+.react-toast-notifications__container {
   z-index: $zindex-modal !important;
 }

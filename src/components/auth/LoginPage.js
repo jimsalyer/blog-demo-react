@@ -4,10 +4,12 @@ import React from 'react';
 import { Alert, Button, Card, Form, Spinner } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
+import { useToasts } from 'react-toast-notifications';
 import * as yup from 'yup';
 import { login, userSelector } from '../../redux/userSlice';
 
 export default function LoginPage() {
+  const { addToast } = useToasts();
   const dispatch = useDispatch();
   const history = useHistory();
   const initialValues = { username: '', password: '', remember: false };
@@ -29,7 +31,16 @@ export default function LoginPage() {
     setFieldValue('password', password);
 
     try {
-      await dispatch(login({ username, password, remember }));
+      const { payload } = await dispatch(
+        login({ username, password, remember })
+      );
+
+      addToast(
+        `${payload.firstName} ${payload.lastName} logged in successfully.`,
+        {
+          appearance: 'success',
+        }
+      );
 
       const queryValues = queryString.parse(location.search);
       if (queryValues.returnUrl) {

@@ -3,12 +3,14 @@ import React, { useState } from 'react';
 import { Alert, Button, Card, Form, Spinner } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import { useToasts } from 'react-toast-notifications';
 import * as yup from 'yup';
 import { userSelector } from '../../redux/userSlice';
 import postService from '../../services/PostService';
 import PostSearchLink from './PostSearchLink';
 
 export default function PostCreatePage() {
+  const { addToast } = useToasts();
   const history = useHistory();
   const initialValues = { title: '', body: '', excerpt: '', image: '' };
   const [createError, setCreateError] = useState('');
@@ -44,6 +46,8 @@ export default function PostCreatePage() {
         image,
         userId: user.id,
       });
+
+      addToast(`"${title}" created successfully.`, { appearance: 'success' });
       history.push('/');
     } catch (error) {
       if (error.response?.data) {

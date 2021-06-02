@@ -1,7 +1,8 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import { Provider } from 'react-redux';
+import { Provider as StoreProvider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom';
+import { ToastProvider } from 'react-toast-notifications';
 import store from '../../redux/store';
 import App from './App';
 
@@ -12,15 +13,19 @@ jest.mock('../../services/PostService', () => ({
 describe('<App />', () => {
   it('renders <AppHeader />, <AppContent />, and <AppFooter />', async () => {
     render(
-      <Provider store={store}>
-        <MemoryRouter initialEntries={['/']}>
-          <App />
-        </MemoryRouter>
-      </Provider>
+      <StoreProvider store={store}>
+        <ToastProvider>
+          <MemoryRouter initialEntries={['/']}>
+            <App />
+          </MemoryRouter>
+        </ToastProvider>
+      </StoreProvider>
     );
 
     screen.getByTestId('appHeader');
-    await screen.findByTestId('postSearchPage');
+    await waitFor(() => {
+      expect(screen.queryByTestId('postSearchPage')).toBeInTheDocument();
+    });
     screen.getByTestId('appFooter');
   });
 });
