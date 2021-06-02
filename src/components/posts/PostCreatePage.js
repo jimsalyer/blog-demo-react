@@ -47,7 +47,9 @@ export default function PostCreatePage() {
         userId: user.id,
       });
 
-      addToast(`"${title}" created successfully.`, { appearance: 'success' });
+      addToast(`"${title}" was created successfully.`, {
+        appearance: 'success',
+      });
       history.push('/');
     } catch (error) {
       if (error.response?.data) {

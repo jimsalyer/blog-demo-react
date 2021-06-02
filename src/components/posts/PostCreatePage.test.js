@@ -146,6 +146,47 @@ describe('<PostCreatePage />', () => {
       expect(testLocation.pathname).toBe('/');
     });
 
+    it('shows a notification message after creating a post', async () => {
+      const expectedPost = {
+        title: 'Test Title',
+        body: 'Test Body',
+        excerpt: 'Test Excerpt',
+        image: 'http://www.example.com/test-image.png',
+      };
+
+      createPostSpy.mockResolvedValue(expectedPost);
+
+      render(
+        <StoreProvider store={store}>
+          <ToastProvider>
+            <MemoryRouter>
+              <PostCreatePage />
+            </MemoryRouter>
+          </ToastProvider>
+        </StoreProvider>
+      );
+
+      const titleField = screen.getByTestId('titleField');
+      const bodyField = screen.getByTestId('bodyField');
+      const excerptField = screen.getByTestId('excerptField');
+      const imageField = screen.getByTestId('imageField');
+      const submitButton = screen.getByTestId('submitButton');
+
+      userEvent.type(titleField, expectedPost.title);
+      userEvent.type(bodyField, expectedPost.body);
+      userEvent.type(excerptField, expectedPost.excerpt);
+      userEvent.type(imageField, expectedPost.image);
+      userEvent.click(submitButton);
+
+      await waitFor(() =>
+        expect(
+          screen.queryByText(
+            `"${expectedPost.title}" was created successfully.`
+          )
+        )
+      );
+    });
+
     it('disables the submit button and shows a spinner while running', async () => {
       createPostSpy.mockResolvedValue({});
 

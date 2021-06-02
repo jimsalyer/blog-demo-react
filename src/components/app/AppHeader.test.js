@@ -70,21 +70,12 @@ describe('<AppHeader />', () => {
       await screen.findByTestId('loginLink');
     });
 
-    it('renders a status message while waiting for the logout action to complete and then redirects to "/login"', async () => {
-      let testLocation;
-
+    it('renders a status message while waiting for the logout action to complete', async () => {
       render(
         <StoreProvider store={store}>
           <ToastProvider>
             <MemoryRouter initialEntries={['/']}>
               <AppHeader />
-              <Route
-                path="*"
-                render={({ location }) => {
-                  testLocation = location;
-                  return null;
-                }}
-              />
             </MemoryRouter>
           </ToastProvider>
         </StoreProvider>
@@ -103,7 +94,36 @@ describe('<AppHeader />', () => {
       expect(logoutStatus).toHaveTextContent('Logging Out');
 
       await screen.findByTestId('loginLink');
-      expect(testLocation.pathname).toBe('/login');
+    });
+
+    it('shows a notification message when the logout action is complete', async () => {
+      render(
+        <StoreProvider store={store}>
+          <ToastProvider>
+            <MemoryRouter initialEntries={['/']}>
+              <AppHeader />
+            </MemoryRouter>
+          </ToastProvider>
+        </StoreProvider>
+      );
+
+      await store.dispatch(login(expectedLogin));
+
+      const userDropdown = await screen.findByTestId('userDropdown');
+      const userDropdownToggle = userDropdown.querySelector('.dropdown-toggle');
+      userEvent.click(userDropdownToggle);
+
+      const logoutLink = await screen.findByTestId('logoutLink');
+      userEvent.click(logoutLink);
+
+      await screen.findByTestId('loginLink');
+      await waitFor(() =>
+        expect(
+          screen.queryByText(
+            `${expectedUser.firstName} ${expectedUser.lastName} logged out successfully.`
+          )
+        ).toBeInTheDocument()
+      );
     });
 
     it('renders and activates "Posts" link when the path is "/"', () => {

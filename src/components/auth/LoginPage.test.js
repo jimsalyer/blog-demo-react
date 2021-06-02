@@ -112,6 +112,46 @@ describe('<LoginPage />', () => {
       );
     });
 
+    it('shows a notification message after the user is successfully logged in', async () => {
+      const expectedUser = {
+        id: 1,
+        username: 'testusername',
+        password: 'testpassword',
+        firstName: 'Test',
+        lastName: 'User',
+      };
+
+      loginSpy.mockResolvedValue(expectedUser);
+
+      render(
+        <StoreProvider store={store}>
+          <ToastProvider>
+            <MemoryRouter initialEntries={['/login']}>
+              <LoginPage />
+            </MemoryRouter>
+          </ToastProvider>
+        </StoreProvider>
+      );
+
+      const usernameField = screen.getByTestId('usernameField');
+      const passwordField = screen.getByTestId('passwordField');
+      const rememberField = screen.getByTestId('rememberField');
+      const submitButton = screen.getByTestId('submitButton');
+
+      userEvent.type(usernameField, expectedUser.username);
+      userEvent.type(passwordField, expectedUser.password);
+      userEvent.click(rememberField);
+      userEvent.click(submitButton);
+
+      await waitFor(() =>
+        expect(
+          screen.queryByText(
+            `${expectedUser.firstName} ${expectedUser.lastName} logged in successfully.`
+          )
+        )
+      );
+    });
+
     it('redirects to the URL specified in the "returnUrl" query parameter after login', async () => {
       const expectedReturnUrl = '/test-url';
 
